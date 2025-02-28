@@ -1,24 +1,21 @@
-import AppRoutes from "./routes/AppRoutes";
-import { Provider } from 'react-redux'
-import {store} from './store'
+import { BrowserRouter as Router } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-
+import AppRoutes from "./routes/AppRoutes";
+import useAuthCheck from "./CostomHooks/useAuthCheck ";
 
 const App = () => {
+  const loading = useAuthCheck(); 
+
+  if (loading) {
+    return <h1>Loading...</h1>; 
+  }
+
   return (
-    
-      <Provider store={store}>
-        <ToastContainer theme="dark" />
-<AppRoutes/>
+    <Router>
+      <ToastContainer theme="dark" />
+      <AppRoutes />
+    </Router>
+  );
+};
 
-    </Provider>
-
-   
-    
-      
-   
- 
-  )
-}
-
-export default App
+export default App;

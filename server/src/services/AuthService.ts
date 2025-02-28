@@ -1,85 +1,184 @@
-import bcrypt from 'bcryptjs'
-import { generateToken } from '../utils/jwt'
-import UserRepository from '../repositories/UserRepository'
-import { error } from 'console';
-import { generateOTP,sendMailer} from '../utils/emailService';
-import OtpRepository from '../repositories/OtpRepository';
+import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/jwt";
+import UserRepository from "../repositories/UserRepository";
+import { error } from "console";
+import { generateOTP, sendMailer } from "../utils/emailService";
+import OtpRepository from "../repositories/OtpRepository";
+import { emit } from "process";
 interface AuthResult {
-    message?: string;
-    user?: object;
-    token?: string;
-    error?: string;
-    success?: boolean;
+  message?: string;
+  user?: object;
+  token?: string;
+  error?: string;
+  success?: boolean;
 }
-class AuthService{
-    async registerUser(name:string,email:string,password:string) :Promise<AuthResult>{
-        const exitingUser =await UserRepository.findUserByEmail(email)
-        const otpSended= await OtpRepository.findByEmail(email)
-        if(otpSended){
-           
-            return {success:true,message:'OTP already sent to this email'}
-
-        }
-        if(exitingUser && exitingUser.isVerified){
-          return {success:false,message:'User with this email already exists'}
-        }
-        if(!exitingUser){
-            const hasshedPassword = await bcrypt.hash(password,10)
-            const newUser =await UserRepository.createUser({name,email,password:hasshedPassword})
-           
-        }
-       
-
-        const otp=generateOTP()
-        const otpExpires = new Date(Date.now() + 1 * 60 * 1000); //one minutes
-        await OtpRepository.saveOTP(email,otp ,otpExpires)
-
-        await sendMailer(email,otp)
-       
-        return {success:true,message: "OTP sent to email. Please verify." };
+class AuthService {
+  async registerUser(
+    name: string,
+    email: string,
+    password: string
+  ): Promise<AuthResult> {
+    const exitingUser = await UserRepository.findUserByEmail(email);
+    const otpSended = await OtpRepository.findByEmail(email);
+    if (otpSended) {
+      return { success: true, message: "OTP already sent to this email" };
+    }
+    
+    if (exitingUser && exitingUser.isVerified && !exitingUser.isGoogleUser) {
+      return { success: false, message: "User with this email already exists" };
+    }
+    if(exitingUser && exitingUser.isGoogleUser && !exitingUser.password){
+       const hashedPassword= await bcrypt.hash(password,10)
+       await UserRepository.findUserAndUpdate(exitingUser.email,{
+        password:hashedPassword
+       })
 
     }
-    async verifyOtp(email:string,otp:string){
-        const otpData= await OtpRepository.findOTP(email,otp)
-        if(!otpData){
-            return {success:false,message:'Invalid OTP or Otp Expired'}    
-        }
-        if(otpData.expiresAt < new Date()){
-            return {success:false,message : "Otp Expired"}
-        }
-        await OtpRepository.deleteOTP(email)
-        await UserRepository.findUserAndUpdate(email,{isVerified:true})
-        return {success:true,message:"Otp verified"}
+    if (!exitingUser) {
+      const hasshedPassword = await bcrypt.hash(password, 10);
+      const newUser = await UserRepository.createUser({
+        name,
+        email,
+        password: hasshedPassword,
+      });
     }
 
-    async resendOtp(email:string){
-        const user = await UserRepository.findUserByEmail(email)
-        if(!user){
-            return {success:false,message:"User with this email does not exist"}
-        }
-        const otpSended = await OtpRepository.findByEmail(email)
-        if(otpSended){
-            return {success:true,message:"OTP already sent to this email"}
-        }
-        const otp = generateOTP()
-        const otpExpires = new Date(Date.now() + 1 * 60 * 1000)
-        await OtpRepository.saveOTP(email,otp ,otpExpires)
-        await sendMailer(email,otp)
-        return {success:true,messsage:"Otp sended succcessfully"}
-        
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 1 * 60 * 1000); //one minutes
+    await OtpRepository.saveOTP(email, otp, otpExpires);
+
+    await sendMailer(email, otp);
+
+    return { success: true, message: "OTP sent to email. Please verify." };
+  }
+  async verifyOtp(email: string, otp: string) {
+    const otpData = await OtpRepository.findOTP(email, otp);
+    if (!otpData) {
+      return { success: false, message: "Invalid OTP or Otp Expired" };
     }
+    if (otpData.expiresAt < new Date()) {
+      return { success: false, message: "Otp Expired" };
+    }
+    await OtpRepository.deleteOTP(email);
+    await UserRepository.findUserAndUpdate(email, { isVerified: true });
+    return { success: true, message: "Otp verified" };
+  }
+
+  async resendOtp(email: string) {
+    const user = await UserRepository.findUserByEmail(email);
+    if (!user) {
+      return { success: false, message: "User with this email does not exist" };
+    }
+    const otpSended = await OtpRepository.findByEmail(email);
+    if (otpSended) {
+      return { success: true, message: "OTP already sent to this email" };
+    }
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 1 * 60 * 1000);
+    await OtpRepository.saveOTP(email, otp, otpExpires);
+    await sendMailer(email, otp);
+    return { success: true, messsage: "Otp sended succcessfully" };
+  }
 
 
-    async loginUser(email:string,password:string){
-        const user= await UserRepository.findUserByEmail(email)
-       if(!user){
-    return {success:false,message:'User with this email does not exist'} 
+
+
+
+
+
+
+
+
+  async loginUser(email: string, password: string) {
+    try {
+        const user = await UserRepository.findUserByEmail(email);
+        if (!user) {
+          return { success: false, message: "User with this email does not exist" };
+        }
+        if(user && !user.password){
+            return { success: false, message: "this is googel user password not set" }
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return { success: false, message: "Password is incorrect" };
+        }
+        return { success: true, user: user, token: generateToken(user._id) };
+    } catch (error:any) {
+        return {success:false,message:error.message}
     }
-    const isMatch= await bcrypt.compare(password,user.password)
-    if(!isMatch){
-        return {success:false,message:'Password is incorrect'}
+  }
+
+
+
+
+
+
+
+
+  async findUser(id: string) {
+    try {
+      const userDetails = await UserRepository.findUserById(id);
+      if (!userDetails) {
+        return { success: false, message: "User not found" };
+      }
+      return { success: true, user: userDetails };
+    } catch (err: any) {
+      return { success: false, message: "Internal Server Error" };
     }
-    return {success:true,user:user,token:generateToken(user._id)}
+  }
+  async saveGoogleUser(
+    googleId: string,
+    email: string,
+    name: string,
+    image: string
+  ) {
+    try {
+      const existingUser = await UserRepository.findUserByEmail(email);
+      if (existingUser) {
+        if (existingUser.isGoogleUser) {
+          return {
+            success: true,
+            user: existingUser,
+            token: generateToken(existingUser._id),
+          };
+        } else {
+          const updateUser = await UserRepository.findUserAndUpdate(
+            existingUser.email,
+            { isGoogleUser: true, googleId: googleId, profile_imaga: image }
+          );
+          if (updateUser) {
+            return {
+              success: true,
+              user: updateUser,
+              token: generateToken(updateUser._id),
+            };
+          }
+        }
+      } else {
+        const createUser = await UserRepository.createUser({
+          googleId,
+          email,
+          name,
+          profile_imaga: image,
+          isGoogleUser: true,
+          isVerified: true,
+        });
+        if (createUser) {
+          return {
+            success: true,
+            user: createUser,
+            token: generateToken(createUser._id),
+          };
+        }
+      }
+    } catch (err: any) {
+      console.log(err);
+      console.error("Error in saveGoogleUser:", err);
     }
+  }
 }
-export default new AuthService
+
+
+
+
+export default new AuthService();

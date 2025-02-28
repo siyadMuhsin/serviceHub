@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Login.css";
 import { FaGoogle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   signUpStart,
   signUpSuccess,
@@ -9,20 +10,28 @@ import {
   verifyOtpStart,
   verifyOtpSuccess,
   verifyOtpFailure,
+  loginFailure,
+  loginStart,
+  loginSuccess,
 } from "../../../Slice/authSlice";
 import { RootState, AppDispatch } from "../../../store";
 import {
   registerUser,
   verifyOtp,
   resendOtp,
+  loginUser,
+  googleSignIn
 } from "../../../services/User/AuthServices";
 import { toast } from "react-toastify";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error, otpSent, otpVerified } = useSelector(
+  const { loading, error, otpSent, otpVerified,isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
+
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -33,7 +42,7 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState<number>(0);
   const [isResendDisabled, setIsResendDisabled] = useState<boolean>(true);
-
+const [googleUser,setGoogleUser]=useState<object|null>(null)
   useEffect(() => {
     const container = document.getElementById("container");
     if (container) {
@@ -45,20 +54,20 @@ const Login = () => {
 
   useEffect(() => {
     let interval: number | void; // Use `number` for browser environment
-  
+
     const storedTimerEnd = localStorage.getItem("otpTimerEnd");
     if (storedTimerEnd) {
       const timerEnd = parseInt(storedTimerEnd, 10);
       const now = Date.now();
       const remainingTime = Math.max(0, Math.floor((timerEnd - now) / 1000));
-  
+
       if (remainingTime > 0) {
         setTimer(remainingTime);
         setIsResendDisabled(true);
         interval = startTimer(timerEnd);
       }
     }
-  
+
     return () => {
       if (interval) clearInterval(interval); // Clear the interval on unmount
     };
@@ -68,16 +77,16 @@ const Login = () => {
     const interval = setInterval(() => {
       const now = Date.now();
       const remainingTime = Math.max(0, Math.floor((timerEnd - now) / 1000));
-  
+
       setTimer(remainingTime);
-  
+
       if (remainingTime <= 0) {
         clearInterval(interval);
         localStorage.removeItem("otpTimerEnd");
         setIsResendDisabled(false);
       }
     }, 1000);
-  
+
     return interval; // Return the interval ID
   };
 
@@ -128,6 +137,7 @@ const Login = () => {
       }
       try {
         dispatch(signUpStart());
+
         const response = await registerUser(formData);
         if (response.success) {
           dispatch(signUpSuccess(response));
@@ -169,10 +179,22 @@ const Login = () => {
         toast.error(error.message || "An error occurred during registration");
       }
     } else {
-      console.log("Signing in with: ", {
-        name: formData.name,
-        password: formData.password,
-      });
+      dispatch(loginStart());
+      const response = await loginUser(formData.email, formData.password);
+
+      try {
+        if (response?.success) {
+          dispatch(loginSuccess(response));
+          toast.success("Login successful!");
+          navigate("/");
+        } else {
+          dispatch(loginFailure(response.message || "Login failed")); 
+          toast.error(response.message || "Login failed. Please try again.");
+        }
+      } catch (err: any) {
+        dispatch(loginFailure(err.message || "An error occurred"));
+        toast.error(err.message || "An error occurred during login");
+      }
     }
   };
 
@@ -199,11 +221,31 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    console.log("Signing in with Google");
-    toast.info("Google Sign-In is not implemented yet.");
-  };
-
+const handleGoogleSignIn = useGoogleLogin({
+      onSuccess: (codeResponse) => setGoogleUser(codeResponse),
+      onError: (error) => {
+        console.log("Google error:", error);
+      },
+      flow:'implicit'
+    });
+    useEffect(() => {
+      const getData = async () => {
+        if (googleUser && googleUser.access_token) {
+          
+          try {
+            const response=await googleSignIn(googleUser);
+            if(response.success){
+              toast.success('login successfully')
+              dispatch(loginSuccess(response))
+            }
+            
+          } catch (error) {
+            console.error("Google Sign-In API Error:", error);
+          }
+        }
+      };
+      getData();
+    }, [googleUser]);
   return (
     <div id="container" className="container">
       <div className="row">
@@ -314,9 +356,9 @@ const Login = () => {
                 <i className="bx bxs-user"></i>
                 <input
                   type="text"
-                  name="name"
-                  placeholder="Name"
-                  value={formData.name}
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
                   onChange={handleChange}
                   required
                 />
@@ -332,8 +374,8 @@ const Login = () => {
                   required
                 />
               </div>
-              <button className="action" type="submit">
-                Sign in
+              <button className="action" type="submit" disabled={loading}>
+                {loading ? "Loading..." : "Sign In"}
               </button>
               <button
                 className="google-btn"
