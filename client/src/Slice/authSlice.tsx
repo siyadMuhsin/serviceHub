@@ -7,9 +7,7 @@ interface AuthState {
   error: string | null;
   otpSent: boolean;
   otpVerified: boolean;
- 
   isAuthenticated:boolean;
-
 }
 
 const initialState: AuthState = {
