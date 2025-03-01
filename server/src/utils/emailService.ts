@@ -24,7 +24,24 @@ export const sendMailer = async (email: string, otp: string) => {
   
   
   return transporter.sendMail(mailOptions)
-   
+
+}
 
 
+export const generateResetToken=()=>{
+    return crypto.randomBytes(20).toString('hex')
+}
+
+export const sendResetMail=async(email:string,token:string)=>{
+    const resetUrl =`http://localhost:5173/reset-password/${token}`
+    const mailOptions={
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Password Reset",
+        text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+               Please click on the following link, or paste it into your browser to complete the process:\n\n
+               ${resetUrl}\n\n
+               If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    }
+    await transporter.sendMail(mailOptions)
 }

@@ -2,9 +2,15 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/jwt";
 import UserRepository from "../repositories/UserRepository";
 import { error } from "console";
-import { generateOTP, sendMailer } from "../utils/emailService";
+import {
+  generateOTP,
+  sendMailer,
+  generateResetToken,
+  sendResetMail,
+} from "../utils/emailService";
 import OtpRepository from "../repositories/OtpRepository";
-import { emit } from "process";
+import { resolveSoa } from "dns";
+
 interface AuthResult {
   message?: string;
   user?: object;
@@ -23,16 +29,15 @@ class AuthService {
     if (otpSended) {
       return { success: true, message: "OTP already sent to this email" };
     }
-    
+
     if (exitingUser && exitingUser.isVerified && !exitingUser.isGoogleUser) {
       return { success: false, message: "User with this email already exists" };
     }
-    if(exitingUser && exitingUser.isGoogleUser && !exitingUser.password){
-       const hashedPassword= await bcrypt.hash(password,10)
-       await UserRepository.findUserAndUpdate(exitingUser.email,{
-        password:hashedPassword
-       })
-
+    if (exitingUser && exitingUser.isGoogleUser && !exitingUser.password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await UserRepository.findUserAndUpdate(exitingUser.email, {
+        password: hashedPassword,
+      });
     }
     if (!exitingUser) {
       const hasshedPassword = await bcrypt.hash(password, 10);
@@ -80,40 +85,30 @@ class AuthService {
     return { success: true, messsage: "Otp sended succcessfully" };
   }
 
-
-
-
-
-
-
-
-
-
   async loginUser(email: string, password: string) {
     try {
-        const user = await UserRepository.findUserByEmail(email);
-        if (!user) {
-          return { success: false, message: "User with this email does not exist" };
-        }
-        if(user && !user.password){
-            return { success: false, message: "this is googel user password not set" }
-        }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-          return { success: false, message: "Password is incorrect" };
-        }
-        return { success: true, user: user, token: generateToken(user._id) };
-    } catch (error:any) {
-        return {success:false,message:error.message}
+      const user = await UserRepository.findUserByEmail(email);
+      if (!user) {
+        return {
+          success: false,
+          message: "User with this email does not exist",
+        };
+      }
+      if (user && !user.password) {
+        return {
+          success: false,
+          message: "this is googel user password not set",
+        };
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return { success: false, message: "Password is incorrect" };
+      }
+      return { success: true, user: user, token: generateToken(user._id) };
+    } catch (error: any) {
+      return { success: false, message: error.message };
     }
   }
-
-
-
-
-
-
-
 
   async findUser(id: string) {
     try {
@@ -176,9 +171,47 @@ class AuthService {
       console.error("Error in saveGoogleUser:", err);
     }
   }
+
+  async forgetPassword(email: string) {
+    try {
+      const existingUser = await UserRepository.findUserByEmail(email);
+      if (!existingUser) {
+        return { success: false, message: "Email not found" };
+      }
+      const resetToken = generateResetToken();
+      existingUser.resetPasswordToken = resetToken;
+      existingUser.resetPasswordExpires = new Date(Date.now() + 300000);
+      await existingUser.save();
+
+      await sendResetMail(email, resetToken);
+      return { success: true, message: "Password reset email sent" };
+    } catch (error) {
+      console.error("Error in forgetPassword:", error);
+      return {
+        success: false,
+        message: "An error occurred. Please try again.",
+      };
+    }
+  }
+
+
+  async resetPassword (token:string,newPassword:string){
+    try {
+      const user= await UserRepository.findOneBYToken(token)
+      if (!user) {
+        return { success: false, message: "Invalid or expired token" };
+      }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword; 
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+    return { success: true, message: "Password reset successful" };
+    } catch (error) {
+      console.error("Error in resetPassword:", error);
+      return { success: false, message: "An error occurred. Please try again." };
+    }
+  }
 }
-
-
-
 
 export default new AuthService();

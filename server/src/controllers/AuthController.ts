@@ -118,10 +118,22 @@ class AuthController {
       
       
     } catch (err:any) {
-      
+      console.log('google signin error',err)
     }
     
   }
+  static async forgetPassword(req:Request,res:Response){
+      const {email}=req.body
+      const response= await AuthService.forgetPassword(email)
+      res.json(response)
+  }
+  
+  static async resetPassword(req:Request,res:Response){
+    const {token,newPassword}=req.body;
+    const response= await AuthService.resetPassword(token,newPassword)
+    res.json(response)
+  }
+
 }
 
 export default AuthController;

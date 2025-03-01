@@ -385,7 +385,7 @@ const handleGoogleSignIn = useGoogleLogin({
                 <FaGoogle className="google-icon" /> Sign in with Google
               </button>
               <p>
-                <b>Forgot password?</b>
+                <b onClick={()=>navigate('/forget-password')} className="cursor-pointer">Forgot password?</b>
               </p>
               <p>
                 <span>Don't have an account?</span>

@@ -84,3 +84,14 @@ export const googleSignIn = async (googleData: any) => {
     console.error("Google Sign-In Error:", err.response?.data || err.message);
   }
 };
+
+
+export const forgetPassword=async(email:string)=>{
+    const response= await API.post('/forgot-password',{email})
+    return response
+
+}
+export const resetPassword=async(token:string|undefined , newPassword:string)=>{
+  const response= await API.post('/reset-password',{token,newPassword})
+return response
+}

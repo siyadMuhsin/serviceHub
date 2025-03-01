@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
 
   const handleLogout = async () => {
     const response = await LogoutUser();
+  
     console.log(response);
     
     dispatch(logout());

@@ -13,6 +13,11 @@ class UserRepository {
     async findUserAndUpdate(email: string, update: Partial<IUser>): Promise<IUser | null> {
         return User.findOneAndUpdate({ email }, update);
     }
+    async findOneBYToken(token:string):Promise<IUser | null>{
+        return User.findOne({resetPasswordToken: token,
+        resetPasswordExpires: { $gt: new Date() }})
+
+    }
     
 }
 export default new UserRepository()
