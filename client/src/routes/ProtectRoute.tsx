@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Navigate ,Outlet} from "react-router-dom";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useSelector((state: any) => state.auth);
@@ -12,4 +12,13 @@ const LoginRoute = ({ children }: { children: React.ReactNode }) => {
   return !isAuthenticated ? children : <Navigate to="/" replace />;
 };
 
-export { ProtectedRoute, LoginRoute };
+const AdminProtectRoute = () => {
+  const { adminAuthenticated } = useSelector((state: any) => state.adminAuth);
+
+  return adminAuthenticated ? <Outlet /> : <Navigate to="/admin/login" replace />;
+};
+const AdminLoginRoute =({children}:{children:React.ReactNode})=>{
+  const { adminAuthenticated } = useSelector((state: any) => state.adminAuth);
+  return !adminAuthenticated ?children :<Navigate to ='/admin/dashboard' replace />
+}
+export { ProtectedRoute, LoginRoute,AdminProtectRoute ,AdminLoginRoute};

@@ -4,8 +4,14 @@ import Landing from "../pages/User/Home/Landing";
 import { ProtectedRoute, LoginRoute } from "./ProtectRoute";
 import ForgetPasword from "../pages/User/Auth/ForgetPasword";
 import ResetPassword from "../pages/User/Auth/ResetPassword";
+import useAuthCheck from "./../CostomHooks/useAuthCheck ";
 
 const AppRoutes = () => {
+  const loading = useAuthCheck(); 
+
+  if (loading) {
+    return <h1>Loading...</h1>; 
+  }
   return (
     <Routes>
       <Route
