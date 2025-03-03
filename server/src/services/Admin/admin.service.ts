@@ -1,6 +1,7 @@
 import adminRepository from "../../repositories/Admin/admin.repository";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { generateAccessToken, generateRefreshToken } from "../../utils/jwt";
 
 interface AuthResult {
     message?: string;
@@ -8,6 +9,8 @@ interface AuthResult {
     token?: string;
     error?: string;
     success?: boolean;
+    accessToken?:string;
+    refreshToken?:string
   }
 class AdminService {
   async loginAdmin(email: string, password: string): Promise<AuthResult> {
@@ -15,10 +18,9 @@ class AdminService {
     console.log(admin)
     if (!admin) return {success:false,message:"Admin not found"};
     if(admin.adminPassword===password){
-        const token = jwt.sign({ id: admin._id, role: "admin" }, process.env.JWT_SECRET as string, {
-            expiresIn: "2h",
-          });
-          return {success:true,token}
+        const accessToken =await generateAccessToken(admin._id,'admin')
+        const refreshToken =await generateRefreshToken(admin._id,'admin')
+        return {success:true,accessToken,refreshToken}
     }else{
         return {success:false,message:"invalid password"}
     }

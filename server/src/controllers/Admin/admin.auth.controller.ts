@@ -9,9 +9,16 @@ class AdminController {
       const { email, password } = req.body;
       const response = await adminService.loginAdmin(email, password);
       if(response.success){
-        res.cookie("adminToken", response.token, { httpOnly: true, secure: false });
+        res.cookie("adminAccessToken", 
+          response.accessToken,
+           { httpOnly: true, secure: false });
+        
+        res.cookie('adminRefreshToken',
+          response.refreshToken,
+          { httpOnly: true, secure: false })
+
         res.json({ success: true, message: "Login successful"})
-        return
+        return;
       }
       res.json(response)
       return 
@@ -21,7 +28,8 @@ class AdminController {
   }
 
   async logout(req: Request, res: Response) {
-    res.clearCookie("adminToken");
+    res.clearCookie("adminAccessToken");
+    res.clearCookie('adminRefreshToken')
     res.json({ success: true, message: "Logged out successfully" });
   }
   

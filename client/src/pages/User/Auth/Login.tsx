@@ -42,7 +42,7 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState<number>(0);
   const [isResendDisabled, setIsResendDisabled] = useState<boolean>(true);
-const [googleUser,setGoogleUser]=useState<object|null>(null)
+const [googleUser,setGoogleUser]=useState<object |null >(null)
   useEffect(() => {
     const container = document.getElementById("container");
     if (container) {
@@ -53,8 +53,7 @@ const [googleUser,setGoogleUser]=useState<object|null>(null)
   }, []);
 
   useEffect(() => {
-    let interval: number | void; // Use `number` for browser environment
-
+    let interval: number | void ; // Use `number` for browser environment
     const storedTimerEnd = localStorage.getItem("otpTimerEnd");
     if (storedTimerEnd) {
       const timerEnd = parseInt(storedTimerEnd, 10);
@@ -308,12 +307,14 @@ const handleGoogleSignIn = useGoogleLogin({
                 >
                   <FaGoogle className="google-icon" /> Sign up with Google
                 </button>
+
                 <p>
                   <span>Already have an account?</span>
                   <b onClick={toggleAuthMode} className="pointer">
                     Sign in here
                   </b>
                 </p>
+              
               </form>
             ) : (
               <form className="form sign-up" onSubmit={handleOtpSubmit}>
@@ -393,6 +394,12 @@ const handleGoogleSignIn = useGoogleLogin({
                   Sign up here
                 </b>
               </p>
+              <p>
+                  <span>Are you a Service Expert? </span>
+                  <b onClick={() => navigate('/expert/auth')} className="pointer">
+                    login here
+                  </b>
+                </p>
             </form>
           </div>
         </div>

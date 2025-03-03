@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { generateToken } from "../utils/jwt";
+import { generateAccessToken,generateRefreshToken } from "../utils/jwt";
 import UserRepository from "../repositories/UserRepository";
 import { error } from "console";
 import {
@@ -10,6 +10,7 @@ import {
 } from "../utils/emailService";
 import OtpRepository from "../repositories/OtpRepository";
 import { resolveSoa } from "dns";
+import { access } from "fs";
 
 interface AuthResult {
   message?: string;
@@ -104,7 +105,16 @@ class AuthService {
       if (!isMatch) {
         return { success: false, message: "Password is incorrect" };
       }
-      return { success: true, user: user, token: generateToken(user._id) };
+       // Generate Tokens
+       const accessToken = generateAccessToken(user._id,'user');
+       const refreshToken = generateRefreshToken(user._id,'user');
+
+       return { 
+        success: true, 
+        user: user, 
+        accessToken, 
+        refreshToken 
+      };
     } catch (error: any) {
       return { success: false, message: error.message };
     }
@@ -134,7 +144,8 @@ class AuthService {
           return {
             success: true,
             user: existingUser,
-            token: generateToken(existingUser._id),
+            accessToken: generateAccessToken(existingUser._id,'user'),
+            refreshToken:generateRefreshToken(existingUser._id,'user')
           };
         } else {
           const updateUser = await UserRepository.findUserAndUpdate(
@@ -145,7 +156,8 @@ class AuthService {
             return {
               success: true,
               user: updateUser,
-              token: generateToken(updateUser._id),
+              accessToken: generateAccessToken(updateUser._id,'user'),
+              refreshToken:generateRefreshToken(updateUser._id,'user')
             };
           }
         }
@@ -162,7 +174,8 @@ class AuthService {
           return {
             success: true,
             user: createUser,
-            token: generateToken(createUser._id),
+            accessToken: generateAccessToken(createUser._id,'user'),
+            refreshToken:generateRefreshToken(createUser._id,'user')
           };
         }
       }
