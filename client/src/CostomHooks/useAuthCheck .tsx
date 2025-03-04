@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginSuccess, logout } from "../Slice/authSlice";
-import API from "../../axiosConfig";
+import {userAPI} from "../../axiosConfig";
 
 const useAuthCheck = () => {
   const dispatch = useDispatch();
@@ -10,7 +10,7 @@ const useAuthCheck = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await API.get("/me", { withCredentials: true });
+        const response = await userAPI.get("/me", { withCredentials: true });
 
         if (response.data.success) {
           dispatch(loginSuccess(response.data.user));

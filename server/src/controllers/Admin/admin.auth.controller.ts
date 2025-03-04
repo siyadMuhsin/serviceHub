@@ -34,6 +34,7 @@ class AdminController {
   }
   
   async checkAdmin(req:AuthRequest,res:Response){
+    
      try {
       if (!req.admin) {
         res.json({ success: false, message: "Unauthorized" });

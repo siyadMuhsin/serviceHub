@@ -14,6 +14,7 @@ const AdminAuthCheck= () => {
         const response = await adminAuthCheck();
 
         if (response.success) {
+          console.log('fdsfasdf')
           dispatch(adminLogin());
         } else {
           dispatch(adminLogout());

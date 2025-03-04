@@ -1,23 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({onToggle}) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+ 
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
-    { icon: "📊", text: "Dashboard" },
-    { icon: "👥", text: "User Management" },
-    { icon: "🛠", text: "Worker Management" },
-    { icon: "📅", text: "Bookings Overview" },
-    { icon: "💰", text: "Earnings & Reports" },
-    { icon: "🔄", text: "Refund Requests" },
-    { icon: "📣", text: "Notifications" },
-    { icon: "⚙️", text: "Settings" },
+    { icon: "📊", text: "Dashboard", path: "/admin/dashboard" },
+    { icon: "👥", text: "User Management", path: "/admin/user-management" },
+    { icon: "🛠", text: "Expert Management", path: "/admin/expert-management" },
+    { icon: "🗂️", text: "Category Management", path: "/admin/categories" },
+    { icon: "🔧", text: "Service Management", path: "/admin/services" },
+    { icon: "💰", text: "Earnings", path: "/admin/earnings" },
+    { icon: "📝", text: "Subscription", path: "/admin/subscription" },
   ];
 
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
+    onToggle(!isExpanded); // Notify parent component
   };
 
   return (
@@ -37,9 +40,9 @@ const Sidebar: React.FC = () => {
         {menuItems.map((item, index) => (
           <li
             key={index}
-            onClick={() => setSelectedIndex(index)}
+            onClick={() => navigate(item.path)}
             className={`flex items-center px-4 py-3 cursor-pointer transition-all ${
-              index === selectedIndex
+              location.pathname === item.path
                 ? "bg-[#3F8CFF] bg-opacity-20 border-l-4 border-[#3F8CFF] text-white"
                 : "hover:bg-[#3F8CFF] hover:bg-opacity-10 text-gray-300"
             }`}

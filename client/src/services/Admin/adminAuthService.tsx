@@ -1,8 +1,8 @@
-import API from '../../../axiosConfig'
+import {adminAPI} from '../../../axiosConfig'
 
 export const adminLoginService = async (email: string, password: string) => {
     try {
-      const response = await API.post("/admin/login", { email, password });
+      const response = await adminAPI.post("/login", { email, password });
       return response.data;
     } catch (error: any) {
       return { success: false, message: error.response?.data?.message || "Login failed" };
@@ -11,7 +11,7 @@ export const adminLoginService = async (email: string, password: string) => {
   
   export const adminLogoutService = async () => {
     try {
-     const response= await API.post("/admin/logout");
+     const response= await adminAPI.post("/logout");
       return response.data;
     } catch (error) {
       return { success: false, message: "Logout failed" };
@@ -19,9 +19,10 @@ export const adminLoginService = async (email: string, password: string) => {
   };
   export const adminAuthCheck=async()=>{
     try {
-     const response= await API.get('/admin')
+     const response= await adminAPI.get('/')
+     console.log(response)
      return response.data
     } catch (error) {
-      
+      console.log(error)      
     }
   }
