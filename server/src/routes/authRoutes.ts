@@ -24,5 +24,7 @@ router.get('/me',verifyToken,AuthController.getCurrentUser)
 
 router.post('/refresh', TokenController.userRefreshToken);
 
+// create expert account
+router.post('/experts/create')
 
 export default router;

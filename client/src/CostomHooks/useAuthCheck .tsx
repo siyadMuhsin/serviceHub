@@ -13,7 +13,8 @@ const useAuthCheck = () => {
         const response = await userAPI.get("/me", { withCredentials: true });
 
         if (response.data.success) {
-          dispatch(loginSuccess(response.data.user));
+          
+          dispatch(loginSuccess(response.data));
         } else {
           dispatch(logout());
         }

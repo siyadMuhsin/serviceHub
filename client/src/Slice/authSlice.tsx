@@ -59,7 +59,19 @@ const authSlice = createSlice({
       state.otpSent = false;
       state.otpVerified = false;
     },
+    changeRole(state, action) {
+      console.log("from redux",action)
+      if (state.user) {
+          state.user.role = action.payload; // ✅ Change role in Redux state
+      }
+  },
+    setUser:(state,action)=>{
+      state.user=action.payload.user
 
+    },
+
+
+    
     // login actions
     loginStart:(state)=>{
       state.loading= true;
@@ -94,6 +106,8 @@ export const {
   loginFailure,
   loginStart,
   loginSuccess,
+  changeRole,
+  setUser,
   logout
 } = authSlice.actions;
 

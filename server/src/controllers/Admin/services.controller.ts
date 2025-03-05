@@ -12,6 +12,7 @@ class ServiceController{
     }
 
      async getAllServices(req: Request, res: Response): Promise<void> {
+        console.log('service get in')
         try {
             const response = await ServicesService.getAllServices();
             res.json(response);

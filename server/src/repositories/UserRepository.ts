@@ -10,6 +10,10 @@ class UserRepository {
     async findUserById(id:string):Promise<IUser|null>{
         return await User.findById(id)
     }
+    async findByIdAndUpdate(id:string,update:Partial<IUser>):Promise<IUser | null>{
+        return User.findByIdAndUpdate(id,update)
+
+    }
     async findUserAndUpdate(email: string, update: Partial<IUser>): Promise<IUser | null> {
         return User.findOneAndUpdate({ email }, update);
     }

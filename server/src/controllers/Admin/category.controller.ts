@@ -23,6 +23,7 @@ class CategoryController {
    * Get all categories
    */
   async getAllCategories(req: Request, res: Response): Promise<void> {
+    console.log('category get in')
     try {
       const response = await CategoryServices.getAllCategories();
       res.status(response.success ? 200 : 400).json(response);

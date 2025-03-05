@@ -4,7 +4,7 @@ export interface IUser extends Document {
     name: string;
     email: string;
     password: string;
-    role: "user" | "woker";
+    role: "user" | "expert";
     createdAt: Date;
     isGoogleUser: boolean;
     googleId: string;
@@ -19,9 +19,10 @@ const userSchema = new Schema<IUser>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: false },
-    role: { type: String, required: true, enum: ["user", "woker"], default: "user" },
+    role: { type: String, required: true, enum: ["user", "expert"], default: "user" },
     createdAt: { type: Date, default: Date.now },
     isGoogleUser: { type: Boolean, default: false },
+    
     googleId: { type: String, required: false },
     profile_imaga: { type: String, required: false },
     resetPasswordToken: { type: String }, // Changed to String
