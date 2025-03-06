@@ -9,8 +9,15 @@ export const getCategories = async () => {
         return { categories: [] }; 
     }
 };
-export const addCategory=async()=>{
-    const response = await adminAPI.post('/service')
-    return response.data
+export const addCategory=async(formData)=>{
+    try {
+        const response = await adminAPI.post('/category',formData,{ headers: {
+            "Content-Type": "multipart/form-data", // This is optional
+        }} )
+        return response.data
+    } catch (error) {
+        return error
+    }
     
+      
 }

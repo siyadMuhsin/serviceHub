@@ -15,6 +15,7 @@ import {
   loginSuccess,
 } from "../../../Slice/authSlice";
 import { RootState, AppDispatch } from "../../../store";
+import validation from "../../../validations/formValidation";
 import {
   registerUser,
   verifyOtp,
@@ -134,6 +135,8 @@ const [googleUser,setGoogleUser]=useState<object |null >(null)
         toast.error("Passwords do not match!");
         return;
       }
+      const checkValid= validation(formData)
+      if(!checkValid)return ;
       try {
         dispatch(signUpStart());
 
@@ -178,7 +181,10 @@ const [googleUser,setGoogleUser]=useState<object |null >(null)
         toast.error(error.message || "An error occurred during registration");
       }
     } else {
+      const checkValid= validation({email:formData.email,password:formData.password})
+      if(!checkValid)return ;
       dispatch(loginStart());
+
       const response = await loginUser(formData.email, formData.password);
 
       try {

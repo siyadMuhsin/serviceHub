@@ -4,20 +4,34 @@ import { Category } from "../../models/category.model";
 
 import CategoryServices from "../../services/Admin/category.service";
 class CategoryController {
-    async createCategory(req:Request,res:Response):Promise<void>{
-        try{
-            const {name,description,image}= req.body
-            const response= await CategoryServices.createCategory(name,description,image)
-            if(response?.success){
-                res.json(response)
-                return
-            }
-            res.json(response)
-            return
-        }catch(err:any){
-            res.status(500).json({ success: false, message: err.message });
-        }
+  async createCategory(req: Request, res: Response): Promise<void> {
+    try {
+      const { name, description } = req.body;
+
+      // Validate required fields
+      if (!name || !description) {
+         res.status(400).json({ success: false, message: "Name and description are required" });
+         return
+      }
+
+      // Validate image upload
+      if (!req.file) {
+        res.status(400).json({ success: false, message: "Image upload is required" });
+        return
+      }
+
+      // Call service to create category
+      const response = await CategoryServices.createCategory(name, description, req.file);
+      
+
+       res.status(response.success ? 201 : 400).json(response);
+       return
+    } catch (error: any) {
+      console.error("Error in createCategory Controller:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+      return
     }
+  }
 
      /**
    * Get all categories

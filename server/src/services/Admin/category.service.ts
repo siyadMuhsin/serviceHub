@@ -1,33 +1,32 @@
+import { resolve } from "path";
 import CategoryRepository from "../../repositories/Admin/category.respository";
 import { ICategory } from "../../types/Admin";
+import cloudinary from "../../config/cloudinary";
+import { CloudinaryService } from "../../config/cloudinary";
+import { error } from "console";
 
 class CategoryService {
      /**
    * Create a new category
    */
-  async createCategory(name: string, description: string, image: string) {
+  async createCategory(name: string, description: string ,file: Express.Multer.File) {
     try {
       const existingCategory = await CategoryRepository.getCategoryByName(name);
       if (existingCategory) {
         return { success: false, message: "Category name is already in use" };
       }
 
-      const category = await CategoryRepository.createCategory({
-        name,
-        description,
-        image,
-      });
-      return {
-        success: true,
-        message: "Category created successfully",
-        category,
-      };
+      const imageUrl = await CloudinaryService.uploadImage(file);
+      if (!imageUrl) {
+        return { success: false, message: "Cloudinary upload failed" };
+      }
+      
+      const category = await CategoryRepository.createCategory({ name, description, image: imageUrl });
+      return { success: true, message: "Category created successfully", category };
     } catch (error: any) {
-      console.error("Error in createCategory:", error);
-      return {
-        success: false,
-        message: "Something went wrong. Please try again.",
-      };
+      
+      console.error("Error in createCategory Service:", error);
+      return { success: false, message: "Something went wrong. Please try again." };
     }
   }
 

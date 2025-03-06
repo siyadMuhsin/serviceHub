@@ -3,7 +3,7 @@ import DataTable from "react-data-table-component";
 import Header from "../../components/Admin/Header";
 import Sidebar from "../../components/Admin/Sidebar";
 import { getCategories, addCategory } from "../../services/Admin/category.service";
-import AddCategoryModal from "../../components/Admin/Modals/AddCategoryModal ";
+import AddCategoryModal from "../../components/Admin/Modals/AddCategoryModal";
 
 const Category: React.FC = () => {
   const [categories, setCategories] = useState([]);
@@ -24,15 +24,16 @@ const Category: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent, newCategory: any) => {
+  const handleSubmit = async (e: React.FormEvent, formData: FormData) => {
     e.preventDefault();
+    console.log("from category:",formData)
     try {
       console.log('handle submit category');
-      const response = await addCategory(newCategory);
+      const response = await addCategory(formData);
       if (response.success) {
         alert("Category added successfully!");
         setIsModalOpen(false);
-        fetchCategories(); // Refresh categories list
+         
       }
     } catch (error) {
       console.error("Error adding category:", error);

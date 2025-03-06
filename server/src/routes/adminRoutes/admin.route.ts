@@ -5,7 +5,9 @@ import servicesController from "../../controllers/Admin/services.controller";
 import categoryController from "../../controllers/Admin/category.controller";
 import { verifyAdmin } from "../../middlewares/adminSecure";
 import TokenController from "../../controllers/Token.controller";
+import upload from "../../config/multer";
 const router= express.Router()
+
 
 router.post('/login',adminAuthController.login)
 router.post('/logout',adminAuthController.logout)
@@ -16,7 +18,7 @@ router.get('/',verifyAdmin,adminAuthController.checkAdmin)
 
 
 //category routes
-router.post('/category',categoryController.createCategory)
+router.post('/category',upload.single('image'),categoryController.createCategory)
 router.get("/categories", categoryController.getAllCategories);
 router.put("/category/:id", categoryController.updateCategory);
 router.delete("/category/:id", categoryController.deleteCategory);

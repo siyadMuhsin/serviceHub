@@ -1,73 +1,47 @@
 import React, { useState } from "react";
-import ReactCrop, { Crop } from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
+import ImageCropper from "../../../Utils/ImageCropper"; // Import the reusable cropper component
 
-const AddCategoryModal = ({ isModalOpen, setIsModalOpen, handleSubmit }) => {
-  const [newCategory, setNewCategory] = useState({
+interface AddCategoryModalProps {
+  isModalOpen: boolean;
+  setIsModalOpen: (open: boolean) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>, category: { name: string; description: string; image: File | null }) => void;
+}
+
+const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isModalOpen, setIsModalOpen, handleSubmit }) => {
+  const [newCategory, setNewCategory] = useState<{ name: string; description: string; image: File | null }>({
     name: "",
     description: "",
-    image: "",
+    image: null,
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [crop, setCrop] = useState<Crop>({
-    unit: "%",
-    width: 50,
-    height: 50,
-    x: 25,
-    y: 25,
-  });
-  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [croppedFile, setCroppedFile] = useState<File | null>(null);
 
-  // Handle text input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setNewCategory({ ...newCategory, [e.target.name]: e.target.value });
   };
 
-  // Handle image selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       setSelectedImage(file);
-      setImagePreview(URL.createObjectURL(file));
+      const imageURL = URL.createObjectURL(file);
+      setImagePreview(imageURL); // Ensure image is set before rendering cropper
     }
   };
 
-  // Crop completed handler
-  const onCropComplete = (crop: Crop) => {
-    if (!imagePreview) return;
-    const img = new Image();
-    img.src = imagePreview;
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-  
-      const scaleX = img.naturalWidth / img.width;
-      const scaleY = img.naturalHeight / img.height;
-  
-      canvas.width = crop.width;
-      canvas.height = crop.height;
-      ctx.drawImage(
-        img,
-        crop.x * scaleX,
-        crop.y * scaleY,
-        crop.width * scaleX,
-        crop.height * scaleY,
-        0,
-        0,
-        crop.width,
-        crop.height
-      );
-  
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const croppedImageUrl = URL.createObjectURL(blob);
-          setCroppedImage(croppedImageUrl);
-          setNewCategory({ ...newCategory, image: croppedImageUrl });
-        }
-      }, "image/jpeg");
-    };
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData:FormData=new FormData()
+    formData.append('name',newCategory.name)
+    formData.append('description',newCategory.description)
+    if (croppedFile) {
+      formData.append("image", croppedFile);
+    }
+   
+    
+    // setNewCategory(updatedCategory);
+    handleSubmit(e, formData);
   };
 
   return (
@@ -75,7 +49,7 @@ const AddCategoryModal = ({ isModalOpen, setIsModalOpen, handleSubmit }) => {
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
         <div className="bg-[#2A2A3C] p-6 rounded-lg shadow-lg text-white w-96">
           <h2 className="text-xl font-bold mb-4">Add Category</h2>
-          <form onSubmit={(e) => handleSubmit(e, newCategory)}>
+          <form onSubmit={handleFormSubmit}>
             <input
               type="text"
               name="name"
@@ -101,22 +75,11 @@ const AddCategoryModal = ({ isModalOpen, setIsModalOpen, handleSubmit }) => {
               required
             />
 
-            {/* Image Preview and Cropper */}
-            {imagePreview && (
-              <div className="mb-3">
-                <ReactCrop
-                  src={imagePreview}
-                  crop={crop}
-                  onChange={(newCrop) => setCrop(newCrop)}
-                  onComplete={onCropComplete}
-                />
-              </div>
-            )}
+            {imagePreview && <ImageCropper imageSrc={imagePreview} setCroppedFile={setCroppedFile} />}
 
-            {/* Cropped Image Preview */}
-            {croppedImage && (
+            {croppedFile && (
               <div className="mb-3">
-                <img src={croppedImage} alt="Cropped" className="w-full h-auto rounded" />
+                <img src={URL.createObjectURL(croppedFile)} alt="Cropped" className="w-full h-auto rounded" />
               </div>
             )}
 

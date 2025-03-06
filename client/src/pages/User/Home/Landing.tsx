@@ -6,7 +6,7 @@ import CreateExpertModal from "../../../components/User/modals/CreateExpertModal
 import { adminAPI } from "../../../../axiosConfig";
 import { setInitialCategories, setInitialServices } from "../../../Slice/categoryServiceSlice";
 import { createExpertAccount } from "../../../services/User/createExpertAccount";
-import Loading from "../../../components/Loading"; // Import Loading Component
+import Loading from "../../../components/Loading"; 
 import { changeRole } from "../../../Slice/authSlice";
 import { FaBullseye } from "react-icons/fa";
 import { toast } from "react-toastify";
