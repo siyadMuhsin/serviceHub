@@ -6,10 +6,14 @@ import { CloudinaryService } from "../../config/cloudinary";
 import { error } from "console";
 
 class CategoryService {
-     /**
+  /**
    * Create a new category
    */
-  async createCategory(name: string, description: string ,file: Express.Multer.File) {
+  async createCategory(
+    name: string,
+    description: string,
+    file: Express.Multer.File
+  ) {
     try {
       const existingCategory = await CategoryRepository.getCategoryByName(name);
       if (existingCategory) {
@@ -20,17 +24,27 @@ class CategoryService {
       if (!imageUrl) {
         return { success: false, message: "Cloudinary upload failed" };
       }
-      
-      const category = await CategoryRepository.createCategory({ name, description, image: imageUrl });
-      return { success: true, message: "Category created successfully", category };
+
+      const category = await CategoryRepository.createCategory({
+        name,
+        description,
+        image: imageUrl,
+      });
+      return {
+        success: true,
+        message: "Category created successfully",
+        category,
+      };
     } catch (error: any) {
-      
       console.error("Error in createCategory Service:", error);
-      return { success: false, message: "Something went wrong. Please try again." };
+      return {
+        success: false,
+        message: "Something went wrong. Please try again.",
+      };
     }
   }
 
-   /**
+  /**
    * Get all categories
    */
 
@@ -41,6 +55,25 @@ class CategoryService {
     } catch (error: any) {
       console.error("Error in getAllCategories:", error);
       return { success: false, message: "Failed to fetch categories" };
+    }
+  }
+  /**
+   * soft delete section
+   */
+  async changeStatus(id: string) {
+    try {
+      const category=await CategoryRepository.getCategoryById(id)
+      if(!category){
+        return { success: false, message: "Category not found" };
+      }
+      const updateStatus= !category.isActive
+      const updatedCategory=await CategoryRepository.updateCategory(id,{isActive:updateStatus})
+      
+      return { success: true,
+        message: `Category ${updateStatus ? "listed" : "unlisted"} successfully`,
+        category: updatedCategory}
+    } catch (err:any) {
+      return {success:false,message:err.message}
     }
   }
 
@@ -62,7 +95,7 @@ class CategoryService {
     }
   }
 
-   /**
+  /**
    * Update category
    */
 
@@ -93,10 +126,10 @@ class CategoryService {
     }
   }
 
-   /**
+  /**
    * Delete category
    */
-  
+
   async deleteCategory(id: string) {
     try {
       const isDeleted = await CategoryRepository.deleteCategory(id);

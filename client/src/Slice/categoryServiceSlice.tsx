@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { act } from "react";
 
 // interface Category {
 //     id: string;
@@ -33,9 +34,18 @@ const categoryServiceSlice = createSlice({
         },
         setInitialServices: (state, action: PayloadAction<[]>) => {
             state.services = action.payload;
+        },
+        addToCategories: (state, action: PayloadAction<any>) => {
+            state.categories.push(action.payload);
+        },
+        toggleCategoryStatus: (state, action: PayloadAction<{ id: string; status: boolean }>) => {
+           console.log(action.payload.status)
+            state.categories = state.categories.map(category =>
+                category._id === action.payload.id ? { ...category, isActive: !action.payload.status } : category
+            );
         }
     }
 });
 
-export const { setInitialCategories, setInitialServices } = categoryServiceSlice.actions;
+export const { setInitialCategories, setInitialServices ,addToCategories,toggleCategoryStatus} = categoryServiceSlice.actions;
 export default categoryServiceSlice.reducer;

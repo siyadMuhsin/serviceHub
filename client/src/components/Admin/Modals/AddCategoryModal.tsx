@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ImageCropper from "../../../Utils/ImageCropper"; // Import the reusable cropper component
+import validation from "../../../validations/formValidation";
 
 interface AddCategoryModalProps {
   isModalOpen: boolean;
@@ -32,6 +33,9 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isModalOpen, setIsM
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const valid= validation({name:newCategory.name,descripton:newCategory.description})
+    
+    if(!valid)return;
     const formData:FormData=new FormData()
     formData.append('name',newCategory.name)
     formData.append('description',newCategory.description)
@@ -46,14 +50,14 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isModalOpen, setIsM
 
   return (
     isModalOpen && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-[#2A2A3C] p-6 rounded-lg shadow-lg text-white w-96">
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50  " >
+        <div className="bg-[#2A2A3C] p-6 rounded-lg shadow-lg text-white w-96 max-h-[80vh] overflow-y-auto scrollba">
           <h2 className="text-xl font-bold mb-4">Add Category</h2>
-          <form onSubmit={handleFormSubmit}>
+          <form onSubmit={handleFormSubmit} className="flex flex-col space-y-3">
             <input
               type="text"
               name="name"
-              placeholder="Category Name"
+              placeholder="Category Name" 
               value={newCategory.name}
               onChange={handleInputChange}
               className="w-full p-2 mb-3 rounded bg-[#1E1E2F] text-white"

@@ -21,6 +21,7 @@ router.get('/',verifyAdmin,adminAuthController.checkAdmin)
 router.post('/category',upload.single('image'),categoryController.createCategory)
 router.get("/categories", categoryController.getAllCategories);
 router.put("/category/:id", categoryController.updateCategory);
+router.patch('/category/:id/status',categoryController.list_and_unlist)
 router.delete("/category/:id", categoryController.deleteCategory);
 
 //service routes
