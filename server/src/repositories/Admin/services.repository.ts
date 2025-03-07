@@ -22,7 +22,7 @@ class ServiceRepository {
     }
 
      async updateService(serviceId: string, data: Partial<IServices>) {
-        return await Services.findByIdAndUpdate(serviceId, data, { new: true });
+        return await Services.findByIdAndUpdate(serviceId, data, { new: true }).populate('categoryId');
     }
 
      async deleteService(serviceId: string) {

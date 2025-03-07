@@ -6,6 +6,7 @@ const serviceShema=new Schema<IServices>({
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     description: { type: String },
     image: { type: String },
+    isActive:{type:Boolean,default:true},
     createdAt: { type: Date, default: Date.now },
 })
 

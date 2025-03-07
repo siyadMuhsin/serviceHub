@@ -9,11 +9,11 @@ export const getCategories = async () => {
     return { categories: [] };
   }
 };
-export const addCategory = async (formData:FormData) => {
+export const addCategory = async (formData: FormData) => {
   try {
     const response = await adminAPI.post("/category", formData, {
       headers: {
-        "Content-Type": "multipart/form-data", // This is optional
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data;
@@ -29,3 +29,19 @@ export const category_list_unlist = async (id: string, status: boolean) => {
     return error.data;
   }
 };
+
+export const edit_category = async (id: string, formData: FormData) => {
+  try {
+    const response = await adminAPI.put(`/category/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.log(error);
+    return error.data;
+  }
+};
+
+

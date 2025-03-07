@@ -20,16 +20,17 @@ router.get('/',verifyAdmin,adminAuthController.checkAdmin)
 //category routes
 router.post('/category',upload.single('image'),categoryController.createCategory)
 router.get("/categories", categoryController.getAllCategories);
-router.put("/category/:id", categoryController.updateCategory);
+router.put("/category/:id",upload.single('image'), categoryController.updateCategory);
 router.patch('/category/:id/status',categoryController.list_and_unlist)
 router.delete("/category/:id", categoryController.deleteCategory);
 
 //service routes
-router.post("/service", servicesController.createService);
+router.post("/service", upload.single('image'),servicesController.createService);
 router.get("/services", servicesController.getAllServices);
+router.patch('/service/:id/status',servicesController.ist_and_unlist)
 router.get("/sercvices/:id", servicesController.getServiceById);
 router.get("/services/category/:categoryId", servicesController.getServicesByCategory);
-router.put("/service/:id", servicesController.updateService);
-router.delete("/service/:id", servicesController.deleteService);
+router.put("/service/:id",upload.single('image'), servicesController.updateService);
+
 
 export default router

@@ -4,6 +4,7 @@ import { ICategory } from "../../types/Admin";
 import cloudinary from "../../config/cloudinary";
 import { CloudinaryService } from "../../config/cloudinary";
 import { error } from "console";
+import { Multer } from "multer";
 
 class CategoryService {
   /**
@@ -103,18 +104,40 @@ class CategoryService {
     id: string,
     name?: string,
     description?: string,
-    image?: string
+    file?: Express.Multer.File
   ) {
     try {
-      const updatedCategory = await CategoryRepository.updateCategory(id, {
-        name,
-        description,
-        image,
-      });
-      if (!updatedCategory) {
+      let imageUrl: string | null = null;
+  
+      // Upload new image if provided
+      if (file) {
+        imageUrl = await CloudinaryService.uploadImage(file);
+        if (!imageUrl) {
+          return { success: false, message: "Cloudinary upload failed" };
+        }
+      }
+  
+      // Get the existing category to retain old image if no new one is uploaded
+      const existingCategory = await CategoryRepository.getCategoryById(id);
+      if (!existingCategory) {
         return { success: false, message: "Category not found" };
       }
-
+  
+      const updatedData: any = {};
+      if (name) updatedData.name = name;
+      if (description) updatedData.description = description;
+      if (imageUrl) {
+        updatedData.image = imageUrl;
+      } else {
+        updatedData.image = existingCategory.image; // Keep old image
+      }
+  
+      // Update category
+      const updatedCategory = await CategoryRepository.updateCategory(id, updatedData);
+      if (!updatedCategory) {
+        return { success: false, message: "Failed to update category" };
+      }
+  
       return {
         success: true,
         message: "Category updated successfully",
@@ -125,7 +148,7 @@ class CategoryService {
       return { success: false, message: "Failed to update category" };
     }
   }
-
+  
   /**
    * Delete category
    */

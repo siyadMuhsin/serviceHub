@@ -5,19 +5,20 @@ import Sidebar from "../../components/Admin/Sidebar";
 import {
   getCategories,
   addCategory,
-  category_list_unlist
+  category_list_unlist,
+  edit_category,
 } from "../../services/Admin/category.service";
-import AddCategoryModal from "../../components/Admin/Modals/AddCategoryModal";
+import AddCategoryModal from "../../components/Admin/Modals/CategoryModal";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addToCategories,
   setInitialCategories,
   toggleCategoryStatus,
+  updateCategory,
 } from "../../Slice/categoryServiceSlice";
 import { RootState } from "@reduxjs/toolkit/query";
 import { toast } from "react-toastify";
 import Loading from "../../components/Loading";
-
 
 const Category: React.FC = () => {
   const { categories } = useSelector(
@@ -28,6 +29,7 @@ const Category: React.FC = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [editingCategory, setEditCategory] = useState();
   const dispatch = useDispatch();
   // Fetch categories
   useEffect(() => {
@@ -46,12 +48,37 @@ const Category: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent, formData: FormData) => {
     setIsLoading(true);
     e.preventDefault();
-   
+  
+    if (editingCategory) {
+      try {
+        const response = await edit_category(editingCategory._id, formData);
+  
+        if (response?.success) {
+          toast.success(response.message);
+  
+          // ✅ Update Redux store after editing
+          dispatch(updateCategory(response.updatedCategory));
+  
+          handleCloseModal();
+        } else {
+          toast.error(response.message);
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to update category");
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+  
     try {
       const response = await addCategory(formData);
       if (response.success) {
-        toast.success("category added successfully");
+        toast.success("Category added successfully");
         setIsModalOpen(false);
+        
+        // ✅ Update Redux store after adding
         dispatch(addToCategories(response.category));
       } else {
         toast.error(response.message);
@@ -65,21 +92,32 @@ const Category: React.FC = () => {
   };
 
   //List and unlist fuctionality
-  const handleListAndUnlist=async(id:string,status:boolean)=>{
+  const handleListAndUnlist = async (id: string, status: boolean) => {
     try {
       const response = await category_list_unlist(id, status); // Pass id and status
-  
+
       if (response?.success) {
         console.log(`Category ${status ? "listed" : "unlisted"} successfully`);
-        dispatch(toggleCategoryStatus({id,status}))
+        dispatch(toggleCategoryStatus({ id, status }));
       } else {
         console.error(response?.message || "Failed to update category status");
       }
     } catch (error) {
       console.error("Error updating category status:", error);
     }
+  };
+  // handle edite category
+  const handleEditCategory = (id: string) => {
+    const selectedCategory = categories.find((a: any) => a._id == id);
+ 
+    setEditCategory(selectedCategory);
+    setIsModalOpen(true);
+  };
 
-  }
+  const handleCloseModal = () => {
+    setEditCategory(null);
+    setIsModalOpen(false);
+  };
   // Table columns
   const columns = [
     {
@@ -114,7 +152,7 @@ const Category: React.FC = () => {
             row.isActive === true ? "bg-green-500" : "bg-red-500"
           } text-white`}
         >
-          {row.isActive ? 'Listed':'Unlisted'}
+          {row.isActive ? "Listed" : "Unlisted"}
         </span>
       ),
       width: "120px",
@@ -124,13 +162,13 @@ const Category: React.FC = () => {
       cell: (row: any) => (
         <div className="flex space-x-2">
           <button
-            onClick={() => console.log("Edit:", row.id)}
+            onClick={() => handleEditCategory(row._id)}
             className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Edit
           </button>
           <button
-            onClick={()=>handleListAndUnlist(row._id,row.isActive)}
+            onClick={() => handleListAndUnlist(row._id, row.isActive)}
             className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
           >
             {row.isActive ? "Unlist" : "List"}
@@ -211,7 +249,8 @@ const Category: React.FC = () => {
         <AddCategoryModal
           handleSubmit={handleSubmit}
           isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
+          setIsModalOpen={handleCloseModal}
+          categoryToEdit={editingCategory}
         />
       )}
     </>

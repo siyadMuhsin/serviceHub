@@ -1,10 +1,19 @@
+import servicesService from "../../services/Admin/services.service";
 import ServicesService from "../../services/Admin/services.service";
 import { Request,Response} from "express";
 class ServiceController{
      async createService(req: Request, res: Response): Promise<void> {
         try {
-            const { name, categoryId, description, image } = req.body;
-            const response = await ServicesService.createService(name, categoryId, description, image);
+            const { name, categoryId, description} = req.body;
+            if (!name?.trim() || !categoryId?.trim() || !description?.trim()) {
+                res.status(400).json({ success: false, message: "All fields are required" });
+                return;
+            }
+            if(!req.file){
+                res.status(400).json({success:false,message:'image must be needed'})
+                return
+            }
+            const response = await ServicesService.createService(name, categoryId, description,req.file);
             res.status(response.success ? 200 : 400).json(response);
         } catch (error: any) {
             res.status(500).json({ success: false, message: error.message });
@@ -41,22 +50,31 @@ class ServiceController{
     }
 
      async updateService(req: Request, res: Response): Promise<void> {
+       
         try {
             const { id } = req.params;
-            const response = await ServicesService.updateService(id, req.body);
+         
+            const response = await ServicesService.updateService(id, req.body,req.file);
+            console.log(response)
             res.status(response.success ? 200 : 400).json(response);
         } catch (error: any) {
             res.status(500).json({ success: false, message: error.message });
         }
     }
-     async deleteService(req: Request, res: Response): Promise<void> {
-        try {
-            const { id } = req.params;
-            const response = await ServicesService.deleteService(id);
+    
+    async ist_and_unlist(req:Request,res:Response):Promise<void>{
+        try{
+            const {id} = req.params
+         
+            const response= await servicesService.changeStatus(id)
+           
             res.status(response.success ? 200 : 400).json(response);
-        } catch (error: any) {
-            res.status(500).json({ success: false, message: error.message });
+
+        }catch(err:any){
+            console.log(err)
+            res.status(500).json({ success: false, message: err.message });
         }
+
     }
 }
  

@@ -99,14 +99,9 @@ class CategoryController {
   async updateCategory(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      console.log(id);
-      const { name, description, image } = req.body;
-      const response = await CategoryServices.updateCategory(
-        id,
-        name,
-        description,
-        image
-      );
+      
+      const { name, description} = req.body;
+     const response= await CategoryServices.updateCategory(id,name,description,req.file)
       res.status(response.success ? 200 : 400).json(response);
     } catch (err: any) {
       console.error("Error in updateCategory:", err);

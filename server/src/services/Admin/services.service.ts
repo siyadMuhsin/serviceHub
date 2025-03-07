@@ -1,17 +1,24 @@
 import { ObjectId } from "mongoose";
 import servicesRepository from "../../repositories/Admin/services.repository";
 import { IServices } from "../../types/Admin";
+import multer from "multer";
+import { CloudinaryService } from "../../config/cloudinary";
 
 class ServicesService{
     // Create a new service
-     async createService(name: string, categoryId: ObjectId, description: string, image: string) {
+     async createService(name: string, categoryId: ObjectId, description: string, image: Express.Multer.File) {
         try {
             const existingService= await servicesRepository.getServiceByName(name)
             if(existingService){
                 return {success:false,message:'Service name already used'}
+            }  
+            const imageUrl= await CloudinaryService.uploadImage(image)
+            if(!imageUrl){
+                return {success:false,message:'Cloudnary upload failed'}
             }
-            const service = await servicesRepository.createService({ name, categoryId, description, image });
-            return { success: true, message: "Service created successfully", service };
+            const service = await servicesRepository.createService({ name, categoryId, description, image:imageUrl });
+            const populateCatory=await servicesRepository.getServiceById(service._id)
+            return { success: true, message: "Service created successfully", service:populateCatory };
         } catch (error) {
             return { success: false, message: "Error creating service", error };
         }
@@ -50,29 +57,77 @@ class ServicesService{
         }
     }
     // Update service
-     async updateService(serviceId: string, data: Partial<IServices>) {
+    async updateService(
+        serviceId: string,
+        data: Partial<IServices>,
+        file?: Express.Multer.File
+      ) {
         try {
-            const updatedService = await servicesRepository.updateService(serviceId, data);
-            if (!updatedService) {
-                return { success: false, message: "Service not found or update failed" };
+          let imageUrl: string | null = null;
+      
+          // Upload new image if a file is provided
+          if (file) {
+            imageUrl = await CloudinaryService.uploadImage(file);
+            if (!imageUrl) {
+              return { success: false, message: "Cloudinary upload error" };
             }
-            return { success: true, message: "Service updated successfully", updatedService };
+            console.log(imageUrl)
+            data.image = imageUrl; // Assign the uploaded image URL to data
+          }
+      
+          // Fetch the existing service
+          const existingService = await servicesRepository.getServiceById(serviceId);
+          if (!existingService) {
+            return { success: false, message: "Service not found" };
+          }
+      
+          const updatedData: any = {};
+          if (data.name) updatedData.name = data.name;
+          if (data.description) updatedData.description = data.description;
+          if(data.categoryId)updatedData.categoryId=data.categoryId
+          if (imageUrl) {
+            updatedData.image = imageUrl;
+          } else {
+            updatedData.image = existingService.image; // Keep old image
+          }
+      
+          // Merge new data with existing service data
+          const updatedService = await servicesRepository.updateService(serviceId, updatedData);
+      
+          if (!updatedService) {
+            return { success: false, message: "Service update failed" };
+          }
+      
+          return {
+            success: true,
+            message: "Service updated successfully",
+            service:updatedService,
+          };
         } catch (error) {
-            return { success: false, message: "Error updating service", error };
+          console.error("Error updating service:", error);
+          return { success: false, message: "Error updating service", error };
         }
-    }
+      }
+      
       // Delete service
-       async deleteService(serviceId: string) {
-        try {
-            const deletedService = await servicesRepository.deleteService(serviceId);
-            if (!deletedService) {
-                return { success: false, message: "Service not found or deletion failed" };
+     async changeStatus(id:string){
+         try {
+         
+              const service=await servicesRepository.getServiceById(id)
+              if(!service){
+                return { success: false, message: "Service not found" };
+              }
+              const updateStatus= !service.isActive
+              const updatedService=await servicesRepository.updateService(id,{isActive:updateStatus})
+             
+              return { success: true,
+                message: `Service ${updateStatus ? "listed" : "unlisted"} successfully`,
+                service: updatedService}
+            } catch (err:any) {
+             
+              return {success:false,message:err.message}
             }
-            return { success: true, message: "Service deleted successfully" };
-        } catch (error) {
-            return { success: false, message: "Error deleting service", error };
-        }
-    }
+     }
 }
 
 export default new ServicesService()
