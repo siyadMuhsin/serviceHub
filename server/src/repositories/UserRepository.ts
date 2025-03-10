@@ -1,6 +1,9 @@
 import User,{IUser} from "../models/Usermodel";
 
 class UserRepository {
+    async getAlluser():Promise<IUser[]>{
+        return await User.find()
+    }
     async createUser(userData:Partial<IUser>) :Promise<IUser> {
         return await User.create(userData)
     } 
@@ -12,7 +15,6 @@ class UserRepository {
     }
     async findByIdAndUpdate(id:string,update:Partial<IUser>):Promise<IUser | null>{
         return User.findByIdAndUpdate(id,update)
-
     }
     async findUserAndUpdate(email: string, update: Partial<IUser>): Promise<IUser | null> {
         return User.findOneAndUpdate({ email }, update);

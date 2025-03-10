@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { adminLogout } from "../../Slice/adminAuthSlice";
 import { adminLogoutService } from "../../services/Admin/adminAuthService";
 import ConfirmModal from "../../Utils/Confirmation";
+import { clearEverything } from "../../Slice/categoryServiceSlice";
 
 const Header: React.FC = () => {
   const dispatch = useDispatch();
@@ -16,6 +17,7 @@ const Header: React.FC = () => {
     const response = await adminLogoutService();
     if (response.success) {
       dispatch(adminLogout()); // Clear Redux state
+      dispatch(clearEverything())
       navigate("/admin/login"); // Redirect to login
     } else {
       alert("Can't logout");

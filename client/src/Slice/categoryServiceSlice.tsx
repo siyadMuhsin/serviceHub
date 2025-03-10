@@ -71,7 +71,12 @@ const categoryServiceSlice = createSlice({
             service._id==action.payload._id ? action.payload : service
         )
 
+    },
+    clearEverything:(state)=>{
+        state.categories=[]
+        state.services=[]
     }
+
   },
 });
 
@@ -83,6 +88,8 @@ export const {
   updateCategory,
   addToServices,
   updateService,
-  toggleServiceStatus
+  toggleServiceStatus,
+  
+clearEverything
 } = categoryServiceSlice.actions;
 export default categoryServiceSlice.reducer;

@@ -3,6 +3,7 @@ import express,{ Express } from "express";
 import adminAuthController from "../../controllers/Admin/admin.auth.controller";
 import servicesController from "../../controllers/Admin/services.controller";
 import categoryController from "../../controllers/Admin/category.controller";
+import userController from "../../controllers/Admin/user.controller";
 import { verifyAdmin } from "../../middlewares/adminSecure";
 import TokenController from "../../controllers/Token.controller";
 import upload from "../../config/multer";
@@ -32,5 +33,9 @@ router.get("/sercvices/:id", servicesController.getServiceById);
 router.get("/services/category/:categoryId", servicesController.getServicesByCategory);
 router.put("/service/:id",upload.single('image'), servicesController.updateService);
 
+
+// users routes
+router.get('/users',userController.getUsers)
+router.patch('/user/:id',userController.block_unblockUser)
 
 export default router

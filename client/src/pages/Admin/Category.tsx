@@ -12,37 +12,25 @@ import AddCategoryModal from "../../components/Admin/Modals/CategoryModal";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addToCategories,
-  setInitialCategories,
   toggleCategoryStatus,
   updateCategory,
 } from "../../Slice/categoryServiceSlice";
-import { RootState } from "@reduxjs/toolkit/query";
 import { toast } from "react-toastify";
 import Loading from "../../components/Loading";
 
 const Category: React.FC = () => {
   const { categories } = useSelector(
-    (state: RootState) => state.categoryService
+    (state: any) => state.categoryService
   );
   // const [categories, setCategories] = useState([]);
   const [filterText, setFilterText] = useState("");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [editingCategory, setEditCategory] = useState();
+  const [editingCategory, setEditCategory] = useState<any>();
   const dispatch = useDispatch();
   // Fetch categories
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
-  const fetchCategories = async () => {
-    const response = await getCategories();
-    if (response.categories) {
-      dispatch(setInitialCategories(response.categories));
-      // setCategories(response.categories);
-    }
-  };
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent, formData: FormData) => {
@@ -124,11 +112,21 @@ const Category: React.FC = () => {
       name: "Image",
       selector: (row: any) => row.image,
       cell: (row: any) => (
-        <img
-          src={row.image}
-          alt={row.name}
-          className="w-12 h-12 object-cover rounded"
-        />
+        <div className="relative group">
+          <img
+            src={row.image}
+            alt={row.name}
+            className="w-12 h-12 object-cover rounded-full transition-transform duration-200"
+          />
+          {/* Enlarged Image on Hover */}
+          <div className="z-10 absolute left-0 top-0 w-32 h-32 hidden group-hover:flex justify-center items-center bg-white p-1 shadow-lg border rounded-lg">
+            <img
+              src={row.image}
+              alt={row.name}
+              className="w-full h-full object-cover rounded"
+            />
+          </div>
+        </div>
       ),
       width: "80px",
     },
@@ -148,12 +146,11 @@ const Category: React.FC = () => {
       selector: (row: any) => row.isActive,
       cell: (row: any) => (
         <span
-          className={`px-2 py-1 rounded text-sm ${
-            row.isActive === true ? "bg-green-500" : "bg-red-500"
-          } text-white`}
-        >
-          {row.isActive ? "Listed" : "Unlisted"}
-        </span>
+  style={{ border: `1px solid ${row.isActive ? "#10b981" : "#ef4444"}` }} // Dynamic border color
+  className={`px-2 py-1 rounded text-sm } text-white`}
+>
+  {row.isActive ? "Listed" : "Unlisted"}
+</span>
       ),
       width: "120px",
     },
@@ -161,18 +158,20 @@ const Category: React.FC = () => {
       name: "Actions",
       cell: (row: any) => (
         <div className="flex space-x-2">
-          <button
-            onClick={() => handleEditCategory(row._id)}
-            className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => handleListAndUnlist(row._id, row.isActive)}
-            className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-          >
-            {row.isActive ? "Unlist" : "List"}
-          </button>
+ <button
+  onClick={() => handleEditCategory(row._id)}
+  style={{ border: "1px solid #1e40af" }} // Custom border color
+  className="px-2 py-1  text-white rounded hover:bg-blue-600"
+>
+  Edit
+</button>
+<button
+  onClick={() => handleListAndUnlist(row._id, row.isActive)}
+  style={{ border: "1px solid #d97706" }} // Custom border color for yellow
+  className="px-2 py-1  text-white rounded hover:bg-yellow-600"
+>
+  {row.isActive ? "Unlist" : "List"}
+</button>
         </div>
       ),
       width: "200px",
@@ -182,7 +181,7 @@ const Category: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#1E1E2F] text-white transition-all">
+      <div className="min-h-screen bg-[#1E1E2F] text-white transition-all pt-14">
         <Sidebar
           onToggle={(expanded: boolean) => setIsSidebarExpanded(expanded)}
         />
@@ -212,35 +211,19 @@ const Category: React.FC = () => {
 
           {/* Table */}
           {isLoading && <Loading />}
+          <div className="overflow-auto max-h-[calc(100vh-200px)]">
           <DataTable
             columns={columns}
             data={categories.filter((item: any) =>
               item.name.toLowerCase().includes(filterText.toLowerCase())
             )}
             pagination
-            paginationPerPage={10}
-            paginationRowsPerPageOptions={[10, 20, 30]}
+            paginationPerPage={5}
+            paginationRowsPerPageOptions={[5,10, 20, 30]}
             highlightOnHover
-            customStyles={{
-              headCells: {
-                style: {
-                  backgroundColor: "#2A2A3C",
-                  color: "#FFFFFF",
-                  fontSize: "14px",
-                },
-              },
-              cells: {
-                style: {
-                  backgroundColor: "#1E1E2F",
-                  color: "#FFFFFF",
-                  fontSize: "14px",
-                },
-              },
-              pagination: {
-                style: { backgroundColor: "#2A2A3C", color: "#FFFFFF" },
-              },
-            }}
+            customStyles={customStyles}
           />
+          </div>
         </main>
       </div>
 
@@ -255,6 +238,58 @@ const Category: React.FC = () => {
       )}
     </>
   );
+};
+
+const customStyles = {
+  headCells: {
+    style: {
+      backgroundColor: "#2A2A3C",
+      color: "#FFFFFF",
+      fontSize: "14px",
+      fontWeight: "bold",
+      paddingLeft: "16px",
+      paddingRight: "16px",
+    },
+  },
+  cells: {
+    style: {
+      backgroundColor: "#1E1E2F",
+      color: "#FFFFFF",
+      fontSize: "14px",
+      paddingLeft: "16px",
+      paddingRight: "16px",
+    },
+  },
+  rows: {
+    style: {
+      backgroundColor: "#1E1E2F",
+      color: "#FFFFFF",
+      "&:hover": {
+        backgroundColor: "#2A2A3C",
+        transition: "background-color 0.3s ease",
+      },
+    },
+  },
+  pagination: {
+    style: {
+      backgroundColor: "#2A2A3C",
+      color: "#FFFFFF",
+      fontSize: "14px",
+      borderTop: "1px solid #3F3F4F",
+    },
+    pageButtonsStyle: {
+      color: "#FFFFFF",
+      fill: "#FFFFFF",
+      backgroundColor: "transparent",
+      "&:disabled": {
+        color: "#6C6C7D",
+        fill: "#6C6C7D",
+      },
+      "&:hover:not(:disabled)": {
+        backgroundColor: "#3F8CFF",
+      },
+    },
+  },
 };
 
 export default Category;
