@@ -16,28 +16,26 @@ import { toast } from "react-toastify";
 const Landing = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false); // Add loading state
-  const { categories, services } = useSelector(
-    (state: RootState) => state.categoryService
-  );
+ 
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true); // Show loading
-        const categoriesRes = await adminAPI.get("/categories");
-        const servicesRes = await adminAPI.get("/services");
-        dispatch(setInitialCategories(categoriesRes.data.categories));
-        dispatch(setInitialServices(servicesRes.data.services));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false); // Hide loading
-      }
-    };
-    fetchData();
-  }, [dispatch]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       setIsLoading(true); // Show loading
+  //       const categoriesRes = await adminAPI.get("/categories");
+  //       const servicesRes = await adminAPI.get("/services");
+  //       dispatch(setInitialCategories(categoriesRes.data.categories));
+  //       dispatch(setInitialServices(servicesRes.data.services));
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     } finally {
+  //       setIsLoading(false); // Hide loading
+  //     }
+  //   };
+  //   fetchData();
+  // }, [dispatch]);
 
   
   const handleCreateExpert = async (expertData: any) => {
@@ -78,37 +76,9 @@ const Landing = () => {
     <div className="flex flex-col min-h-screen">
       {/* <Navbar /> */}
       {isLoading && <Loading />}
-      <div
-        className="becomWoker"
-        style={{
-          position: "fixed",
-          top: "80px",
-          right: "-80px",
-          transform: "translateX(-50%)",
-          zIndex: 50,
-        }}
-      >
-        {user.role === "user" ? (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
-          >
-            Create Expert Account
-          </button>
-        ) : (
-          <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-            Switch to Expert Account
-          </button>
-        )}
-      </div>
+    
       <UserHome  /> {/* This pushes content down */}
-      <CreateExpertModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onCreate={handleCreateExpert}
-        categories={categories}
-        services={services}
-      />
+      
     </div>
   );
 };

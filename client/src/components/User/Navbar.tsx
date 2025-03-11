@@ -9,39 +9,83 @@ import { FaRegUser, FaBars } from "react-icons/fa";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdEmail, MdLocationOn } from "react-icons/md";
 import { BsChatDots } from "react-icons/bs";
+import { createExpertAccount } from "../../services/User/createExpertAccount";
+import { changeRole } from "../../Slice/authSlice";
+import { toast } from "react-toastify";
+import CreateExpertModal from "./modals/CreateExpertModal";
+import Loading from "../Loading";
+import { ExpertData} from "@/Interfaces/interfaces";
+
 
 const Navbar: React.FC = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { categories, services } = useSelector((state: any) => state.categoryService);
+  const { user, isAuthenticated } = useSelector((state: any) => state.auth);
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { isAuthenticated } = useSelector((state: any) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     const response = await LogoutUser();
-    dispatch(logout());
     setShowLogoutModal(false);
     navigate("/login");
+    dispatch(logout());
   };
 
   const onCancel = () => {
     setShowLogoutModal(false);
   };
 
+  const handleCreateExpert = async (expertData: ExpertData) => {
+    setIsLoading(true); // Show loading when request starts
+
+    try {
+      const formData = new FormData();
+      formData.append("fullName", expertData.fullName);
+      formData.append("dob", expertData.dob);
+      formData.append("gender", expertData.gender);
+      formData.append("contact", expertData.contact);
+      formData.append("experience", expertData.experience);
+      formData.append("serviceId", expertData.service);
+      formData.append("categoryId", expertData.category);
+
+      if (expertData.certificate instanceof File) {
+        formData.append("certificate", expertData.certificate);
+      } else if (expertData.certificate && expertData.certificate[0]) {
+        formData.append("certificate", expertData.certificate[0]);
+      }
+
+      const response = await createExpertAccount(formData);
+
+      if (response.success) {
+        dispatch(changeRole("expert"));
+        setIsModalOpen(false);
+        toast.success(response.message);
+      }
+      console.log("Response:", response);
+    } catch (error) {
+      console.error("Error uploading expert:", error);
+    } finally {
+      setIsLoading(false); // Hide loading when request is completed
+    }
+  };
+
   return (
     <header className="w-full">
       {/* Top Bar */}
-      <div className="bg-blue-900 text-white text-sm px-6 py-2 flex justify-between items-center">
-        <div className="flex items-center gap-4">
+      <div className="bg-blue-900 text-white text-sm px-4 md:px-6 py-2 flex justify-between items-center">
+        <div className="flex items-center gap-2 md:gap-4">
           <span className="flex items-center gap-1">
             <MdLocationOn className="text-yellow-400" />
-            123 Street, New York
+            <span className="hidden sm:inline">123 Street, New York</span>
           </span>
           <span className="flex items-center gap-1">
             <MdEmail className="text-yellow-400" />
-            Email@Example.com
+            <span className="hidden sm:inline">Email@Example.com</span>
           </span>
         </div>
         <nav className="hidden md:flex gap-4">
@@ -52,12 +96,12 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* Main Navbar */}
-      <div className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+      <div className="bg-white shadow-md px-4 md:px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <div className="flex items-center gap-2 text-lg font-bold text-indigo-600">
           <Link to="/" className="flex items-center gap-2">
             <img src="logo.png" alt="Logo" className="w-8 h-8" />
-            Service Hub
+            <span className="hidden sm:inline">Service Hub</span>
           </Link>
         </div>
 
@@ -68,15 +112,29 @@ const Navbar: React.FC = () => {
           </Link>
         </nav>
 
+        {/* Become Expert Button */}
+        {user && user.role === "user" ? (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2 bg-green-500 text-white rounded text-sm md:text-base"
+          >
+            Become Expert Account
+          </button>
+        ) : (
+          <button className="py-2 text-blue-500 rounded text-sm md:text-base">
+            Switch to Expert Account
+          </button>
+        )}
+
         {/* Search Bar & Icons */}
         <div className="flex items-center gap-4">
           {/* Search Bar */}
-          <div className="relative">
+          <div className="relative hidden sm:block">
             <FiSearch className="absolute left-3 top-2.5 text-gray-500" />
             <input
               type="text"
               placeholder="Search for ‘AC service’"
-              className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none"
+              className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none w-48 md:w-64"
             />
           </div>
 
@@ -136,7 +194,7 @@ const Navbar: React.FC = () => {
             </Link>
           )}
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu Toggle */}
           <FaBars
             className="text-2xl cursor-pointer md:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -192,12 +250,24 @@ const Navbar: React.FC = () => {
         </div>
       )}
 
+      {/* Loading Indicator */}
+      {isLoading && <Loading />}
+
       {/* Logout Confirmation Modal */}
       <ConfirmModal
         isOpen={showLogoutModal}
         message="Are you sure you want to log out?"
         onConfirm={handleLogout}
         onCancel={onCancel}
+      />
+
+      {/* Create Expert Modal */}
+      <CreateExpertModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onCreate={handleCreateExpert}
+        categories={categories}
+        services={services}
       />
     </header>
   );

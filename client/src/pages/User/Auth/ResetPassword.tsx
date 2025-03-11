@@ -18,11 +18,9 @@ const ResetPassword = () => {
       toast.error("Passwords do not match");
       return;
     }
-
     setLoading(true);
     try {
       const response = await resetPassword(token,newPassword)
-
       if (response.data.success) {
         toast.success("Password reset successful. You can now log in.");
         navigate("/login");

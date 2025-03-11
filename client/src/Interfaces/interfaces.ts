@@ -1,14 +1,14 @@
 
 
-export interface ExpertInfo {
+export interface ExpertData {
     fullName: string;
     dob: string;
     gender: string;
     contact: string;
-    category: string;
-    service: string;
     experience: string;
-    certificate: File | null;
+    service: string;
+    category: string;
+    certificate: File | FileList | null;
 }
 
 export interface Category {

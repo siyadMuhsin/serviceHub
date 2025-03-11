@@ -1,25 +1,29 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginSuccess, logout } from "../Slice/authSlice";
-import {userAPI} from "../../axiosConfig";
-
+import { userAPI, adminAPI } from "../../axiosConfig";
+import {
+  setInitialCategories,
+  setInitialServices,
+} from "../Slice/categoryServiceSlice";
 const useAuthCheck = () => {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true); 
 
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
+   
     const fetchCurrentUser = async () => {
       try {
+        // ✅ Fetch user info
         const response = await userAPI.get("/me", { withCredentials: true });
-
         if (response.data.success) {
-          
+          console.log(response.data.user)
           dispatch(loginSuccess(response.data));
         } else {
           dispatch(logout());
         }
       } catch (error) {
-        console.log(error);
+        console.error("Error in fetching user data:", error);
         dispatch(logout());
       } finally {
         setLoading(false); 
@@ -29,7 +33,8 @@ const useAuthCheck = () => {
     fetchCurrentUser();
   }, [dispatch]);
 
-  return loading; 
+  
+  return loading
 };
 
 export default useAuthCheck;
