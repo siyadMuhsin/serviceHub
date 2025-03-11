@@ -5,6 +5,7 @@ import { ProtectedRoute, LoginRoute } from "./ProtectRoute";
 import ForgetPasword from "../pages/User/Auth/ForgetPasword";
 import ResetPassword from "../pages/User/Auth/ResetPassword";
 import useAuthCheck from "./../CostomHooks/useAuthCheck ";
+import Navbar from "../components/User/Navbar";
 
 const AppRoutes = () => {
   const loading = useAuthCheck(); 
@@ -13,6 +14,8 @@ const AppRoutes = () => {
     return <h1>Loading...</h1>; 
   }
   return (
+    <>
+    
     <Routes>
       <Route
         path="/login"
@@ -31,7 +34,12 @@ const AppRoutes = () => {
         }
       ></Route>
       <Route path="/reset-password/:token" element={<ResetPassword />}></Route>
-      <Route
+      
+      
+    </Routes>
+    <Navbar/>
+    <Routes>
+    <Route
         path="/"
         element={
           <ProtectedRoute>
@@ -40,6 +48,7 @@ const AppRoutes = () => {
         }
       />
     </Routes>
+    </>
   );
 };
 

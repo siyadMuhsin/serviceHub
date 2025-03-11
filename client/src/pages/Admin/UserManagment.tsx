@@ -151,14 +151,17 @@ const UserManagement: React.FC = () => {
         </main>
       </div>
 
-      {/* Snackbar for Alerts */}
+      {/* Snackbar for Alerts */
+      }
       <Snackbar
+      
         open={snackbar.open}
         autoHideDuration={3000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
+        variant="filled"
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
           sx={{ width: "100%" }}
