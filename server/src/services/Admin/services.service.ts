@@ -4,6 +4,7 @@ import { IServices } from "../../types/Admin";
 import multer from "multer";
 import { CloudinaryService } from "../../config/cloudinary";
 
+
 class ServicesService{
     // Create a new service
      async createService(name: string, categoryId: ObjectId, description: string, image: Express.Multer.File) {
@@ -127,6 +128,12 @@ class ServicesService{
              
               return {success:false,message:err.message}
             }
+     }
+     async getServicesByCategory_limit(categoryId:string,page:number,limit:number,search:string){
+      
+      console.log(search)
+      const response=await servicesRepository.getServicesByCategoryLimit(categoryId,limit,page,search)
+      return response
      }
 }
 

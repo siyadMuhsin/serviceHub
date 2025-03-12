@@ -153,18 +153,24 @@ class CategoryService {
    * Delete category
    */
 
-  async deleteCategory(id: string) {
-    try {
-      const isDeleted = await CategoryRepository.deleteCategory(id);
-      if (!isDeleted) {
-        return { success: false, message: "Category not found" };
-      }
+  // async deleteCategory(id: string) {
+  //   try {
+  //     const isDeleted = await CategoryRepository.deleteCategory(id);
+  //     if (!isDeleted) {
+  //       return { success: false, message: "Category not found" };
+  //     }
+  //     return { success: true, message: "Category deleted successfully" };
+  //   } catch (error: any) {
+  //     console.error("Error in deleteCategory:", error);
+  //     return { success: false, message: "Failed to delete category" };
+  //   }
+  // }
 
-      return { success: true, message: "Category deleted successfully" };
-    } catch (error: any) {
-      console.error("Error in deleteCategory:", error);
-      return { success: false, message: "Failed to delete category" };
-    }
+  //get categories by limit
+  async getCategoriesByLimit(page: number, limit: number,search:string) {
+    
+    const result = await CategoryRepository.getCategoriesByLimit(page, limit,search);
+    return result;
   }
 }
 

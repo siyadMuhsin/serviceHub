@@ -23,7 +23,7 @@ router.post('/category',upload.single('image'),categoryController.createCategory
 router.get("/categories", categoryController.getAllCategories);
 router.put("/category/:id",upload.single('image'), categoryController.updateCategory);
 router.patch('/category/:id/status',categoryController.list_and_unlist)
-router.delete("/category/:id", categoryController.deleteCategory);
+
 
 //service routes
 router.post("/service", upload.single('image'),servicesController.createService);

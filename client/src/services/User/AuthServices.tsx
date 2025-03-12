@@ -9,7 +9,7 @@ export const registerUser = async (formData: {
   confirmPassword: string;
 }) => {
   try {
-    const response = await userAPI.post(`/register`, formData);
+    const response = await userAPI.post(`/auth/register`, formData);
     return response.data;
   } catch (error: any) {
     throw new Error(
@@ -20,7 +20,7 @@ export const registerUser = async (formData: {
 
 export const verifyOtp = async (otp: string, email: string) => {
   try {
-    const response = await userAPI.post(`/verify-otp`, { otp, email });
+    const response = await userAPI.post(`/auth/verify-otp`, { otp, email });
     return response.data;
   } catch (error: any) {
     console.log(error);
@@ -32,7 +32,7 @@ export const verifyOtp = async (otp: string, email: string) => {
 };
 export const resendOtp = async (email: string) => {
   try {
-    const response = await userAPI.post("/resent-otp", { email });
+    const response = await userAPI.post("/auth/resent-otp", { email });
     return response.data;
   } catch (error: any) {
     console.log(error);
@@ -45,7 +45,7 @@ export const resendOtp = async (email: string) => {
 export const loginUser = async (email: string, password: string) => {
   console.log(email, password);
   try {
-    const response = await userAPI.post("/login", { email, password });
+    const response = await userAPI.post("/auth/login", { email, password });
   
     return response.data;
   } catch (error) {
@@ -54,7 +54,7 @@ export const loginUser = async (email: string, password: string) => {
 };
 export const LogoutUser = async () => {
   try {
-    const response = await userAPI.post("/logout");
+    const response = await userAPI.post("/auth/logout");
   
   } catch (err: any) {}
 };
@@ -75,7 +75,7 @@ export const googleSignIn = async (googleData: any) => {
       }
     );
     if(response.status===200){
-    const saveData=  await userAPI.post('/google-signin',{data:response.data})
+    const saveData=  await userAPI.post('/auth/google-signin',{data:response.data})
     return saveData.data;
     }
     
@@ -87,11 +87,11 @@ export const googleSignIn = async (googleData: any) => {
 
 
 export const forgetPassword=async(email:string)=>{
-    const response= await userAPI.post('/forgot-password',{email})
+    const response= await userAPI.post('/auth/forgot-password',{email})
     return response
 
 }
 export const resetPassword=async(token:string|undefined , newPassword:string)=>{
-  const response= await userAPI.post('/reset-password',{token,newPassword})
+  const response= await userAPI.post('/auth/reset-password',{token,newPassword})
 return response
 }

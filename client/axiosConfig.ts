@@ -17,14 +17,13 @@ const userAPI: AxiosInstance = axios.create({
     "Content-Type": "application/json",
   },
 });
-
 userAPI.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
     if (error.response && error.response.status === 401) {
       try {
         console.log("Refreshing token...");
-        const response = await userAPI.post<ApiResponse>("refresh");
+        const response = await userAPI.post<ApiResponse>("/auth/refresh");
         if (!response.data.success) {
           store.dispatch(logout());
           return;

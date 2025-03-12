@@ -11,15 +11,15 @@ function useFetchData() {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const categoriesRes = await adminAPI.get("/categories");
-            if (categoriesRes.data.success) {
-              dispatch(setInitialCategories(categoriesRes.data.categories));
-            }
-            // ✅ Fetch services
-            const servicesRes = await adminAPI.get("/services");
-            if (servicesRes.data.success) {
-              dispatch(setInitialServices(servicesRes.data.services));
-            }
+            // const categoriesRes = await adminAPI.get("/categories");
+            // if (categoriesRes.data.success) {
+            //   dispatch(setInitialCategories(categoriesRes.data.categories));
+            // }
+            // // ✅ Fetch services
+            // const servicesRes = await adminAPI.get("/services");
+            // if (servicesRes.data.success) {
+            //   dispatch(setInitialServices(servicesRes.data.services));
+            // }
         } catch (error) {
             console.log(error)
         }finally{

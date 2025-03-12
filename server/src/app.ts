@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import authRoutes from "./routes/authRoutes";
 import adminRoute from './routes/adminRoutes/admin.route'
 import expertRoute from './routes/expertRoutes/expert.routes'
+import userRoute from './routes/userRoutes/user.routes'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 const app=express()
@@ -20,7 +21,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 connectDB() 
 
-app.use('/',authRoutes)
+app.use('/',userRoute)
+app.use('/auth',authRoutes)
 app.use('/admin',adminRoute)
 app.use('/experts',expertRoute)
 const PORT=process.env.PORT || 3000

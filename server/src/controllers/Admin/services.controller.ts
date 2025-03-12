@@ -1,5 +1,6 @@
 import servicesService from "../../services/Admin/services.service";
 import ServicesService from "../../services/Admin/services.service";
+import mongoose,{ ObjectId } from "mongoose";
 import { Request,Response} from "express";
 class ServiceController{
      async createService(req: Request, res: Response): Promise<void> {
@@ -76,6 +77,40 @@ class ServiceController{
         }
 
     }
+
+    async getServicesByCategory_limit(req:Request,res:Response):Promise<void>{
+        try {
+            const { categoryId } = req.params;
+            const { page = 1, limit = 8 } = req.query;
+      
+            if (!categoryId) {
+              res.status(400).json({ error: "Category ID is required" });
+              return;
+            }
+      
+            const pageNumber = parseInt(page as string) || 1;
+            const limitNumber = parseInt(limit as string) || 8;
+            
+           
+
+    const search = typeof req.query.searchQuary === 'string' ? req.query.searchQuary : '';
+            const { services, totalServices } = await servicesService.getServicesByCategory_limit(
+                categoryId,
+              pageNumber,
+              limitNumber,search
+            );
+      
+            
+            res.status(200).json({
+            success:true,
+              services,
+              currentPage: pageNumber,
+              totalPages: Math.ceil(totalServices / limitNumber),
+            });
+          } catch (error:any) {
+            res.status(500).json({ error: error.message });
+          }
+        }
 }
  
 export default new ServiceController()

@@ -15,7 +15,7 @@ const useAuthCheck = () => {
     const fetchCurrentUser = async () => {
       try {
         // ✅ Fetch user info
-        const response = await userAPI.get("/me", { withCredentials: true });
+        const response = await userAPI.get("/auth/me", { withCredentials: true });
         if (response.data.success) {
           console.log(response.data.user)
           dispatch(loginSuccess(response.data));

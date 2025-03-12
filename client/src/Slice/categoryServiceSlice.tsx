@@ -1,20 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { act } from "react";
-
-// interface Category {
-//     id: string;
-//     name: string;
-//     description: string;
-//     image: string;
-// }
-
-// interface Service {
-//     id: string;
-//     name: string;
-//     description: string;
-//     image: string;
-// }
-
 interface CategoryServiceState {
   categories: [];
   services: [];

@@ -11,7 +11,6 @@ class CategoryRepository{
     }
     async getCategoryByName(name:string):Promise<ICategory | null>{
         return await Category.findOne({name})
-
     }
     async getCategoryById(id: string): Promise<ICategory | null> {
         return await Category.findById(id);
@@ -23,5 +22,22 @@ class CategoryRepository{
         const result = await Category.findByIdAndDelete(id);
         return !!result;
       }
-}
+
+      async getCategoriesByLimit(page: number, limit: number,search:string) {
+        const query = search
+      ? { name: { $regex: search, $options: "i" } } // Case-insensitive search
+      : {};
+
+    const skip = (page - 1) * limit;
+
+    const categories = await Category.find(query)
+      .skip(skip)
+      .limit(limit);
+
+    // Correct count query with the same search condition
+    const total = await Category.countDocuments(query);
+
+    return { categories, total };
+  }
+} 
 export default new CategoryRepository()

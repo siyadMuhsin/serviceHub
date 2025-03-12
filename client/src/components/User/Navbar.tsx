@@ -18,7 +18,7 @@ import { ExpertData} from "@/Interfaces/interfaces";
 
 
 const Navbar: React.FC = () => {
-  const { categories, services } = useSelector((state: any) => state.categoryService);
+  // const { categories, services } = useSelector((state: any) => state.categoryService);
   const { user, isAuthenticated } = useSelector((state: any) => state.auth);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
@@ -66,7 +66,6 @@ const Navbar: React.FC = () => {
         setIsModalOpen(false);
         toast.success(response.message);
       }
-      console.log("Response:", response);
     } catch (error) {
       console.error("Error uploading expert:", error);
     } finally {
@@ -266,8 +265,8 @@ const Navbar: React.FC = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreate={handleCreateExpert}
-        categories={categories}
-        services={services}
+        // categories={categories}
+        // services={services}
       />
     </header>
   );

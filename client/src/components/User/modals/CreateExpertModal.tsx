@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expertSchemaValidation } from "../../../validations/expertValidation";
 import { Category, Service, ExpertInfo } from "../../../Interfaces/interfaces";
+
+import { getServices } from "../../../services/Admin/service.service";
+import { getCategories } from "../../../services/Admin/category.service";
 
 interface CreateExpertModalProps {
     isOpen: boolean;
@@ -13,7 +16,7 @@ interface CreateExpertModalProps {
 }
 
 
-const CreateExpertModal: React.FC<CreateExpertModalProps> = ({ isOpen, onClose, onCreate, categories, services }) => {
+const CreateExpertModal: React.FC<CreateExpertModalProps> = ({ isOpen, onClose, onCreate}) => {
     const {
         register,
         handleSubmit,
@@ -23,7 +26,22 @@ const CreateExpertModal: React.FC<CreateExpertModalProps> = ({ isOpen, onClose, 
     } = useForm<ExpertInfo>({
         resolver: yupResolver(expertSchemaValidation),
     });
+    const [services,setServices]=useState()
+    const [categories,setCategories]=useState()
 
+    useEffect(()=>{
+        const fetchData=async()=>{
+            const serivces=await getServices()
+            if(serivces.success){
+                setServices(serivces.services)
+            }
+            const categories=await getCategories()
+            if(categories.success){
+                setCategories(categories.categories)
+            }
+        }
+        fetchData()
+    },[])
     const categoryValue = watch("category"); 
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

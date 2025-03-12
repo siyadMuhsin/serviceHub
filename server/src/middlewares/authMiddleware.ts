@@ -11,7 +11,7 @@ dotenv.config()
 
 const verifyToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
   try {
-    
+    console.log('verify token')
     const token = req.cookies?.accessToken; // Get token from cookie
     if (!token) {
       // creating new access token
