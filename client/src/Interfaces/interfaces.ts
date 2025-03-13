@@ -1,7 +1,7 @@
 
 
 export interface ExpertData {
-    fullName: string;
+    AccountName: string;
     dob: string;
     gender: string;
     contact: string;

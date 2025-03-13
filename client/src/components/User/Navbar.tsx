@@ -41,11 +41,12 @@ const Navbar: React.FC = () => {
   };
 
   const handleCreateExpert = async (expertData: ExpertData) => {
+    console.log('fds')
     setIsLoading(true); // Show loading when request starts
-
+console.log(expertData)
     try {
       const formData = new FormData();
-      formData.append("fullName", expertData.fullName);
+      formData.append("accountName", expertData.AccountName);
       formData.append("dob", expertData.dob);
       formData.append("gender", expertData.gender);
       formData.append("contact", expertData.contact);
@@ -113,18 +114,19 @@ const Navbar: React.FC = () => {
 
         {/* Become Expert Button */}
         {user && user.role === "user" ? (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-green-500 text-white rounded text-sm md:text-base"
-          >
-            Become Expert Account
-          </button>
-        ) : (
-          <button className="py-2 text-blue-500 rounded text-sm md:text-base">
-            Switch to Expert Account
-          </button>
-        )}
-
+  <button
+    onClick={() => setIsModalOpen(true)}
+    className="px-4 py-2 bg-green-500 text-white rounded text-sm md:text-base"
+  >
+    Become Expert Account
+  </button>
+) : user.expertStatus === 'pending' ? (
+  <span className="text-yellow-500 text-sm">Request Pending Approval...</span>
+) : (
+  <button className="py-2 text-blue-500 rounded text-sm md:text-base">
+    Switch to Expert Account
+  </button>
+)}
         {/* Search Bar & Icons */}
         <div className="flex items-center gap-4">
           {/* Search Bar */}
@@ -265,8 +267,7 @@ const Navbar: React.FC = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreate={handleCreateExpert}
-        // categories={categories}
-        // services={services}
+       
       />
     </header>
   );

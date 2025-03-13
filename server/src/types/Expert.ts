@@ -4,8 +4,9 @@ export interface IExpert extends Document {
     userId: mongoose.Types.ObjectId;
     serviceId: mongoose.Types.ObjectId;
     categoryId: mongoose.Types.ObjectId;
-    fullName: string;
+    accountName: string;
     dob: Date;
+    status:string;
     gender: "Male" | "Female" | "Other";
     contact: string;
     experience: number;

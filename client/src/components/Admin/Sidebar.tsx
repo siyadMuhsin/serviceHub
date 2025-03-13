@@ -11,7 +11,7 @@ const Sidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({onToggle}
   const menuItems = [
     { icon: "📊", text: "Dashboard", path: "/admin/dashboard" },
     { icon: "👥", text: "User Management", path: "/admin/users" },
-    { icon: "🛠", text: "Expert Management", path: "/admin/expert-management" },
+    { icon: "🛠", text: "Expert Management", path: "/admin/experts" },
     { icon: "🗂️", text: "Category Management", path: "/admin/categories" },
     { icon: "🔧", text: "Service Management", path: "/admin/services" },
     { icon: "💰", text: "Earnings", path: "/admin/earnings" },

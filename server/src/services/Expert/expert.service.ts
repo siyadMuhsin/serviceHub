@@ -34,7 +34,7 @@ class ExpertService {
             // Create expert with Cloudinary URL
             const url = result.secure_url;
             
-           const response= await ExpertRepository.createExpert({ ...data, certificateUrl: url },userId);
+           const response= await ExpertRepository.createExpert({ ...data, certificateUrl: url, },userId);
              await UserRepository.findByIdAndUpdate(userId,{role:"expert"})
              return response
         } catch (error: any) {
@@ -46,6 +46,26 @@ class ExpertService {
     
     async getExperts(): Promise<IExpert[]> {
         return await ExpertRepository.getExperts();
+    }
+    async getExpertBy_limit(page: number, limit: number,filter:string) {
+        try {
+            const query: any = {};
+            if (filter && filter !== 'all') {
+                query.status = filter;
+            }
+            const { experts, totalRecords } = await ExpertRepository.getExpertBy_limit(page, limit,query);
+            const totalPages = Math.ceil(totalRecords / limit);
+
+            return { 
+                success: true, 
+                experts, 
+                totalRecords, 
+                totalPages 
+            };
+        } catch (error) {
+            console.error('Error fetching experts:', error);
+            return { success: false, message: 'Failed to fetch experts.' };
+        }
     }
 }
 

@@ -90,10 +90,10 @@ const Category: React.FC = () => {
                 </div>
                 {/* Content */}
                 <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-800 hover:text-blue-600">
+                  <h2 className="text-xl font-bold text-gray-800 ">
                     {category.name}
                   </h2>
-                  <div className="w-16 h-1 bg-blue-500 mt-2"></div>
+                
                 </div>
               </Link>
             ))}

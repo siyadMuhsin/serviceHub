@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 export const expertSchemaValidation = yup.object().shape({
-    fullName: yup.string().required("Full Name is required"),
+    AccountName: yup.string().required("Account Name is required"),
     dob: yup.date().required("Date of Birth is required"),
     gender: yup.string().oneOf(["Male", "Female", "Other"], "Select a valid gender").required("Gender is required"),
     contact: yup

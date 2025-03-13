@@ -6,6 +6,7 @@ import AdminAuthCheck from "../CostomHooks/AdminAuthCheck";
 import Category from "../pages/Admin/Category";
 import Services from "../pages/Admin/Services";
 import UserManagement from "../pages/Admin/UserManagment";
+import ExpertMangement from "../pages/Admin/ExpertMangement";
 
 const AdminRoute = () => {
   const loading = AdminAuthCheck()
@@ -29,6 +30,7 @@ const AdminRoute = () => {
       <Route path="/categories" element={<Category/>}></Route>
       <Route path="/services" element={<Services/>}></Route>
       <Route path="/users" element={<UserManagement/>}> </Route>
+      <Route path="/experts" element={<ExpertMangement/>} />
     </Routes>
   );
 };

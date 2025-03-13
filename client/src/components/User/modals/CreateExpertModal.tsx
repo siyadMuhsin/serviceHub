@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expertSchemaValidation } from "../../../validations/expertValidation";
-import { Category, Service, ExpertInfo } from "../../../Interfaces/interfaces";
+import { Category, Service, ExpertData } from "../../../Interfaces/interfaces";
 
 import { getServices } from "../../../services/Admin/service.service";
 import { getCategories } from "../../../services/Admin/category.service";
@@ -10,7 +10,7 @@ import { getCategories } from "../../../services/Admin/category.service";
 interface CreateExpertModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onCreate: (expert: ExpertInfo) => void;
+    onCreate: (expert: ExpertData) => void;
     categories: Category[];
     services: Service[];
 }
@@ -23,11 +23,11 @@ const CreateExpertModal: React.FC<CreateExpertModalProps> = ({ isOpen, onClose, 
         watch,
         setValue,
         formState: { errors },
-    } = useForm<ExpertInfo>({
+    } = useForm<ExpertData>({
         resolver: yupResolver(expertSchemaValidation),
     });
-    const [services,setServices]=useState()
-    const [categories,setCategories]=useState()
+    const [services, setServices] = useState<Service[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(()=>{
         const fetchData=async()=>{
@@ -59,15 +59,15 @@ const CreateExpertModal: React.FC<CreateExpertModalProps> = ({ isOpen, onClose, 
             <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-lg">
                 <h2 className="text-lg font-semibold mb-4">Create Expert Account</h2>
 
-                <form onSubmit={handleSubmit(onCreate)} className="space-y-2">
-                    {/* Full Name */}
+                <form onSubmit={handleSubmit((data) => onCreate(data))} className="space-y-2">
+                    {/* Account Name */}
                     <input
                         type="text"
-                        {...register("fullName")}
-                        placeholder="Full Name"
+                        {...register("AccountName")}
+                        placeholder="Account Name"
                         className="w-full p-2 border border-gray-300 rounded"
                     />
-                    <p className="text-red-500 text-sm">{errors.fullName?.message}</p>
+                    <p className="text-red-500 text-sm">{errors.AccountName?.message}</p>
 
                     {/* DOB */}
                     <input type="date" {...register("dob")} className="w-full p-2 border border-gray-300 rounded" />

@@ -7,6 +7,7 @@ import userController from "../../controllers/Admin/user.controller";
 import { verifyAdmin } from "../../middlewares/adminSecure";
 import TokenController from "../../controllers/Token.controller";
 import upload from "../../config/multer";
+import expertController from "../../controllers/Expert/expert.controller";
 const router= express.Router()
 
 
@@ -38,4 +39,5 @@ router.put("/service/:id",upload.single('image'), servicesController.updateServi
 router.get('/users',userController.getUsers)
 router.patch('/user/:id',userController.block_unblockUser)
 
+router.get('/experts',expertController.getExperts)
 export default router
