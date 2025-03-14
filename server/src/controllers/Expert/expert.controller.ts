@@ -19,13 +19,11 @@ class ExpertController{
 
     async getExperts(req: Request, res: Response) {
         try {
-            console.log(req.query)
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
             const filter=req.query.filter as string 
-            const response = await ExpertService.getExpertBy_limit(page, limit,filter);
-            // console.log(response);
-
+            const search=req.query.search as string
+            const response = await ExpertService.getExpertBy_limit(page, limit,filter,search);
             res.status(response.success ? 200 : 400).json(response);
         } catch (error) {
             console.error('Error fetching experts:', error);
@@ -63,6 +61,18 @@ class ExpertController{
             res.status(response.success?200:400).json(response)
         } catch (error) {
             console.error('Error in blockAndUnlockExpert:', error);
+            res.status(500).json({ success: false, message: 'Internal server error' });
+            return
+        }
+    }
+    async getExpertData(req:Request,res:Response){
+        try {
+            const {id}=req.params
+            const response= await expertService.getExpertData(id)
+            res.status(response.success?200:400).json(response)
+            return
+        } catch (error) {
+            console.log(error)
             res.status(500).json({ success: false, message: 'Internal server error' });
             return
         }

@@ -9,7 +9,8 @@ import {
   get_experts,
 } from "../../services/Admin/expert.service";
 import Loading from "../../components/Loading";
-
+import debounce from "../../Utils/debouce";
+import { Link } from "react-router-dom";
 interface Expert {
   _id?: string;
   accountName: string;
@@ -30,6 +31,7 @@ function ExpertManagement() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const [searchQuary,setSearchQuery]=useState<string>('')
   const itemsPerPage = 8;
 
   // Fetch experts
@@ -37,7 +39,7 @@ function ExpertManagement() {
     setLoading(true);
     const fetchExperts = async () => {
       try {
-        const response = await get_experts(currentPage, itemsPerPage, filter);
+        const response = await get_experts(currentPage, itemsPerPage, filter,searchQuary);
         if (response.success) {
           console.log(response.experts);
           setExperts(response.experts || []);
@@ -50,7 +52,7 @@ function ExpertManagement() {
 
     fetchExperts();
     setLoading(false);
-  }, [currentPage, filter]);
+  }, [currentPage, filter,searchQuary]);
 
   const handleFilterChange = (status: string) => {
     setFilter(status);
@@ -95,8 +97,13 @@ function ExpertManagement() {
     }finally{
       setLoading(false)
     }
-
   }
+
+    const handleSearchChange = debounce((value: string) => {
+      setSearchQuery(value);
+      setCurrentPage(0); // Reset to the first page when searching
+    }, 300); // 300ms delay
+  
   return (
     <>
       <Header />
@@ -108,7 +115,8 @@ function ExpertManagement() {
           <h2 className="text-2xl font-semibold mb-4">Expert Management</h2>
 
           {/* Filter Options */}
-          <div className="mb-4 space-x-2">
+          <div className=" flex justify-between">
+            <div className="mb-4 space-x-2">
             {["all", "pending", "approved", "rejected"].map((status) => (
               <button
                 key={status}
@@ -121,6 +129,17 @@ function ExpertManagement() {
               </button>
             ))}
           </div>
+          <div>
+            <input
+             type="text" 
+            defaultValue={searchQuary}
+             onChange={(e)=>handleSearchChange(e.target.value)}
+            placeholder="search Experts"
+            className="p-2 rounded bg-[#2A2A3C] text-white placeholder-gray-400"/>
+          </div>
+
+          </div>
+          
 
           <div className="overflow-x-auto">
             <table className="w-full table-auto border-collapse border border-gray-600">
@@ -212,9 +231,12 @@ function ExpertManagement() {
                       )}
                     </td>
                     <td className="border border-gray-500 px-4 py-2 space-x-2">
-                      <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+                      <Link 
+                      to={`/admin/expert/${expert._id}`}
+                      key={expert._id}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
                         View
-                      </button>
+                      </Link>
                     </td>
                   </tr>
                 ))}

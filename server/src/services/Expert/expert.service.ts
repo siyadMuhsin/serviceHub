@@ -4,6 +4,7 @@ import cloudinary from "../../config/cloudinary";
 import ExpertRepository from "../../repositories/Expert/Expert.respository";
 import UserRepository from "../../repositories/UserRepository";
 import { sendExpertStatusUpdate } from "../../utils/emailService";
+import exp from "constants";
 class ExpertService {
     async createExpert(data: Partial<IExpert>, file: Express.Multer.File,userId:string): Promise<IExpert> {
       
@@ -47,11 +48,14 @@ class ExpertService {
     async getExperts(): Promise<IExpert[]> {
         return await ExpertRepository.getExperts();
     }
-    async getExpertBy_limit(page: number, limit: number,filter:string) {
+    async getExpertBy_limit(page: number, limit: number,filter:string,search:string) {
         try {
             const query: any = {};
             if (filter && filter !== 'all') {
                 query.status = filter;
+            }
+            if(search){   
+            query.accountName= { $regex: search, $options: "i" } 
             }
             const { experts, totalRecords } = await ExpertRepository.getExpertBy_limit(page, limit,query);
             const totalPages = Math.ceil(totalRecords / limit);
@@ -105,6 +109,18 @@ class ExpertService {
         } catch (error) {
             console.error('Error in block_unblock:', error);
             throw new Error('Error updating expert status');
+        }
+    }
+    async getExpertData(id:string){
+        try {
+            const expert=await ExpertRepository.findById(id)
+            if(expert){
+                return {success:true,expert}
+            }
+            return {success:false,message:"Expert not found"}
+        } catch (error) {
+            console.log(error)
+            throw new Error('Error finding expert data');
         }
     }
 }

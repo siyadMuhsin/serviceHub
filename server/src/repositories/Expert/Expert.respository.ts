@@ -34,7 +34,7 @@ class ExpertRepository {
         }
     }
     async findById(id:string):Promise<IExpert| null>{
-        return await Expert.findById(id).populate("userId")
+        return await Expert.findById(id).populate("userId categoryId serviceId")
     }
     async findByIdAndUpdate(id:string,update:Partial<IExpert>){
         return await Expert.findByIdAndUpdate(id,update,{new:true})

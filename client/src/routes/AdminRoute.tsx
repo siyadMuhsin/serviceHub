@@ -7,6 +7,7 @@ import Category from "../pages/Admin/Category";
 import Services from "../pages/Admin/Services";
 import UserManagement from "../pages/Admin/UserManagment";
 import ExpertMangement from "../pages/Admin/ExpertMangement";
+import ExpertDetailsPage from "../pages/Admin/ExpertDetailsPage";
 
 const AdminRoute = () => {
   const loading = AdminAuthCheck()
@@ -31,6 +32,7 @@ const AdminRoute = () => {
       <Route path="/services" element={<Services/>}></Route>
       <Route path="/users" element={<UserManagement/>}> </Route>
       <Route path="/experts" element={<ExpertMangement/>} />
+      <Route path="/expert/:id" element={<ExpertDetailsPage/>}/> 
     </Routes>
   );
 };
