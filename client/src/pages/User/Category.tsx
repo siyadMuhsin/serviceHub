@@ -4,6 +4,7 @@ import { get_categoryBy_limit } from "../../services/category.service";
 import Pagination from "../../components/Pagination"; // Import the custom Pagination component
 import debounce from "../../Utils/debouce"; // Import the debounce utility
 
+
 const Category: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");

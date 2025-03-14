@@ -45,3 +45,23 @@ export const sendResetMail=async(email:string,token:string)=>{
     }
     await transporter.sendMail(mailOptions)
 }
+
+
+export const sendExpertStatusUpdate = async (email: string, status: string) => {
+    const subject = status === 'approved' 
+        ? 'Your Expert Account Has Been Approved!' 
+        : 'Your Expert Account Has Been Rejected';
+
+    const text = status === 'approved' 
+        ? `Congratulations! Your expert account has been approved. You can now log in and access all expert features.`
+        : `We're sorry to inform you that your expert account request has been rejected. If you have any questions, please contact support.`;
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject,
+        text
+    };
+
+    await transporter.sendMail(mailOptions);
+};

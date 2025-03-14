@@ -34,10 +34,12 @@ class TokenController {
         console.log('admin refresh token ')
         try {
             const token = req.cookies.adminRefreshToken;
+        
             if (!token) {  
                 res.status(400).json({ success: false, message: 'Unauthorized' });
                 return
             }
+        
             const decoded: any = await verifyToken(token, process.env.REFRESH_SECRET as string);
             const newAccessToken = generateAccessToken(decoded.userId,'admin');
     

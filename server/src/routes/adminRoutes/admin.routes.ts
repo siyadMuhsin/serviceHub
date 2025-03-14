@@ -39,5 +39,9 @@ router.put("/service/:id",upload.single('image'), servicesController.updateServi
 router.get('/users',userController.getUsers)
 router.patch('/user/:id',userController.block_unblockUser)
 
+//expert management
+
 router.get('/experts',expertController.getExperts)
+router.patch('/service/:id',expertController.actionChange)
+router.patch('/service/block/:id',expertController.blockAndUnlockExpert)
 export default router

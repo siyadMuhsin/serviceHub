@@ -118,9 +118,9 @@ class CategoryController {
   async categoriesByLimit(req: Request, res: Response): Promise<void> {
     try {
       const page = parseInt(req.query.page as string) || 1;
+      console.log("page from category",page,req.query.page)
       const limit = parseInt(req.query.limit as string) || 10;
       const search = typeof req.query.searchQuary === 'string' ? req.query.searchQuary : '';
-            console.log(search)
       const { categories, total } = await CategoryServices.getCategoriesByLimit(page, limit,search);
       res.status(200).json({
         categories,

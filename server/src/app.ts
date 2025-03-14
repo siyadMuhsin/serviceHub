@@ -2,7 +2,7 @@ import express,{ Express,Request,Response } from "express";
 import connectDB from "./config/db.";
 import dotenv from 'dotenv'
 import authRoutes from "./routes/authRoutes";
-import adminRoute from './routes/adminRoutes/admin.route'
+import adminRoute from './routes/adminRoutes/admin.routes'
 import expertRoute from './routes/expertRoutes/expert.routes'
 import userRoute from './routes/userRoutes/user.routes'
 import cookieParser from 'cookie-parser'

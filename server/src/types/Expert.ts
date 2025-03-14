@@ -1,7 +1,7 @@
-
+import { IUser } from "../models/Usermodel";
 import mongoose,{Document} from "mongoose";
 export interface IExpert extends Document {
-    userId: mongoose.Types.ObjectId;
+    userId: IUser;
     serviceId: mongoose.Types.ObjectId;
     categoryId: mongoose.Types.ObjectId;
     accountName: string;

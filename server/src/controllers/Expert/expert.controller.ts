@@ -1,6 +1,7 @@
 import { Request,Response } from "express";
 import ExpertService from "../../services/Expert/expert.service";
 import { AuthRequest } from "../../types/User";
+import expertService from "../../services/Expert/expert.service";
 class ExpertController{
     async createExpert(req: AuthRequest, res: Response) {
         try {
@@ -22,7 +23,6 @@ class ExpertController{
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
             const filter=req.query.filter as string 
-console.log(page,limit)
             const response = await ExpertService.getExpertBy_limit(page, limit,filter);
             // console.log(response);
 
@@ -33,5 +33,39 @@ console.log(page,limit)
         }
     }
 
+    async actionChange(req:Request,res:Response):Promise<void>{
+        try {
+            const { id } = req.params;
+            const { action } = req.body;
+            if (!id || !action) {
+                 res.status(400).json({ success: false, message: 'Missing required parameters' });
+                 return
+            }
+            const response = await expertService.actionChange(id, action);
+    
+            res.status(response?.success?200:400).json(response)
+        } catch (error) {
+            console.error('Error in actionChange:', error);
+            res.status(500).json({ success: false, message: 'Internal server error' });
+            return
+        }
+    }
+
+    async blockAndUnlockExpert(req:Request,res:Response){
+        try {
+            const {id}= req.params;
+            const {active}=req.body
+            if (!id || typeof active !== 'boolean') {
+                res.status(400).json({ success: false, message: 'Missing or invalid parameters' });
+                return
+            }
+            const response= await ExpertService.block_unblock(id,active)
+            res.status(response.success?200:400).json(response)
+        } catch (error) {
+            console.error('Error in blockAndUnlockExpert:', error);
+            res.status(500).json({ success: false, message: 'Internal server error' });
+            return
+        }
+    }
 }
 export default new ExpertController()

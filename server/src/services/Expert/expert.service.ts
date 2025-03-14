@@ -3,7 +3,7 @@ import { IExpert } from "../../types/Expert";
 import cloudinary from "../../config/cloudinary";
 import ExpertRepository from "../../repositories/Expert/Expert.respository";
 import UserRepository from "../../repositories/UserRepository";
-
+import { sendExpertStatusUpdate } from "../../utils/emailService";
 class ExpertService {
     async createExpert(data: Partial<IExpert>, file: Express.Multer.File,userId:string): Promise<IExpert> {
       
@@ -65,6 +65,46 @@ class ExpertService {
         } catch (error) {
             console.error('Error fetching experts:', error);
             return { success: false, message: 'Failed to fetch experts.' };
+        }
+    }
+    async actionChange (id:string,action:string){
+        try {
+            const existingExpert = await ExpertRepository.findById(id);
+            if (!existingExpert) {
+                return { success: false, message: 'Expert does not exist' };
+            }
+            const updatedExpert = await ExpertRepository.findByIdAndUpdate(id, { status: action });
+            if (!updatedExpert) {
+                return { success: false, message: 'Failed to update expert status' };
+            }
+    
+            // Send email after successful update
+            await sendExpertStatusUpdate(existingExpert.userId.email, action);
+    
+            return { success: true, data: updatedExpert };
+        } catch (error) {
+            console.error('Error in actionChange:', error);
+            throw new Error('Error updating expert status');
+        }
+
+    }
+    async block_unblock(id:string,active:boolean){
+        try {
+            console.log(id)
+            const expert= await ExpertRepository.findById(id)
+            if (!expert) {
+                return { success: false, message: 'Expert does not exist' };
+            }
+            const query:any={}
+            query.isActive=!active
+            const updatedExpert = await ExpertRepository.findByIdAndUpdate(id, query);
+            if (!updatedExpert) {
+                return { success: false, message: 'Failed to update expert status' };
+            }
+            return { success: true, message: `Expert ${active ? 'unblocked' : 'blocked'} successfully`, data: updatedExpert };
+        } catch (error) {
+            console.error('Error in block_unblock:', error);
+            throw new Error('Error updating expert status');
         }
     }
 }
