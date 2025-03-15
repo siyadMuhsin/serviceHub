@@ -4,7 +4,7 @@ import Footer from "./Footer";
 const ServiceMarketplace = () => {
   return (
     <>
-    <div className=" flex-grow font-sans  overflow-y-auto h-[100vh]">
+    <div className=" flex-grow font-sans  ">
       {/* Hero Section */}
       <div className="w-full h-96 bg-gray-100 flex items-center">
         {/* Left Content Section */}
@@ -149,7 +149,7 @@ const ServiceMarketplace = () => {
           <TestimonialCard name="Natasha Kelvin" image={"/profile4.jfif"} />
         </div>
       </div>
-      <Footer/>
+    
     </div>
     
     </>

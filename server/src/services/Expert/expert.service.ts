@@ -114,9 +114,11 @@ class ExpertService {
     async getExpertData(id:string){
         try {
             const expert=await ExpertRepository.findById(id)
+            console.log(expert)
             if(expert){
                 return {success:true,expert}
             }
+           
             return {success:false,message:"Expert not found"}
         } catch (error) {
             console.log(error)

@@ -28,8 +28,8 @@ const userSchema = new Schema<IUser>(
     googleId: { type: String, required: false },
     profile_imaga: { type: String, required: false },
     expertStatus:{type:String,enum: ['pending', 'approved', 'rejected'],default:'pending'},
-    resetPasswordToken: { type: String }, // Changed to String
-    resetPasswordExpires: { type: Date }, // Changed to Date
+    resetPasswordToken: { type: String }, 
+    resetPasswordExpires: { type: Date },
     isVerified: { type: Boolean, default: false },
   },
   { timestamps: true }
