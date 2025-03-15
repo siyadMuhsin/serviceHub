@@ -9,16 +9,18 @@ import { FaRegUser, FaBars } from "react-icons/fa";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdEmail, MdLocationOn } from "react-icons/md";
 import { BsChatDots } from "react-icons/bs";
-import { createExpertAccount } from "../../services/User/createExpertAccount";
+import { createExpertAccount,switchAccount } from "../../services/User/createExpertAccount";
 import { changeRole } from "../../Slice/authSlice";
 import { toast } from "react-toastify";
 import CreateExpertModal from "./modals/CreateExpertModal";
 import Loading from "../Loading";
 import { ExpertData} from "@/Interfaces/interfaces";
 
+interface IUser{
+  expertStatus:string
+}
 
 const Navbar: React.FC = () => {
-  // const { categories, services } = useSelector((state: any) => state.categoryService);
   const { user, isAuthenticated } = useSelector((state: any) => state.auth);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
@@ -28,6 +30,7 @@ const Navbar: React.FC = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+ 
 
   const handleLogout = async () => {
     const response = await LogoutUser();
@@ -41,9 +44,7 @@ const Navbar: React.FC = () => {
   };
 
   const handleCreateExpert = async (expertData: ExpertData) => {
-    console.log('fds')
-    setIsLoading(true); // Show loading when request starts
-console.log(expertData)
+    setIsLoading(true);
     try {
       const formData = new FormData();
       formData.append("accountName", expertData.AccountName);
@@ -70,9 +71,29 @@ console.log(expertData)
     } catch (error) {
       console.error("Error uploading expert:", error);
     } finally {
-      setIsLoading(false); // Hide loading when request is completed
+      setIsLoading(false);
     }
   };
+
+  const handleSwitchAccount = async () => {
+    try {
+      setIsLoading(true);
+      const newRole= user.role==="user"?"expert":"user"
+      console.log(user)
+      const response = await switchAccount(newRole); // Assume this function makes the API call
+      if (response.success) {
+        dispatch(changeRole("expert"));
+        toast.success("Switched to Expert Account successfully");
+      }
+    } catch (error) {
+      console.error("Error switching to expert account:", error);
+      toast.error("Failed to switch to Expert Account");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  console.log('navbar..............')
 
   return (
     <header className="w-full">
@@ -113,20 +134,28 @@ console.log(expertData)
         </nav>
 
         {/* Become Expert Button */}
-        {user && user.role === "user" ? (
-  <button
-    onClick={() => setIsModalOpen(true)}
-    className="px-4 py-2 bg-green-500 text-white rounded text-sm md:text-base"
-  >
-    Become Expert Account
-  </button>
-) : user.expertStatus === 'pending' ? (
-  <span className="text-yellow-500 text-sm">Request Pending Approval...</span>
-) : (
-  <button className="py-2 text-blue-500 rounded text-sm md:text-base">
-    Switch to Expert Account
-  </button>
-)}
+        {isAuthenticated && user && user.role === "user" ? (
+  user.expertStatus === "default" ? (
+    <button
+      onClick={() => setIsModalOpen(true)}
+      className="px-4 py-2 bg-green-500 text-white rounded text-sm md:text-base"
+    >
+      Become Expert Account
+    </button>
+  ) : user.expertStatus === 'pending' ? (
+    <span className="text-yellow-500 text-sm">Request Pending Approval...</span>
+  ) : user.expertStatus === "approved" ? (
+    <button
+      onClick={handleSwitchAccount}
+      className="py-2 text-blue-500 rounded text-sm md:text-base"
+    >
+      Switch to Expert Account
+    </button>
+  ) : (
+    <span className="text-yellow-500 text-sm">Request is rejected...</span>
+  )
+) : null}
+
         {/* Search Bar & Icons */}
         <div className="flex items-center gap-4">
           {/* Search Bar */}
@@ -267,7 +296,6 @@ console.log(expertData)
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreate={handleCreateExpert}
-       
       />
     </header>
   );

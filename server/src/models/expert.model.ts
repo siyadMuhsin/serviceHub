@@ -1,6 +1,7 @@
 import { IExpert } from "../types/Expert";
 import mongoose,{Schema} from "mongoose";
 
+
 const ExpertSchema = new Schema<IExpert>(
     {
         userId: { type: Schema.Types.ObjectId, ref: "User", required: true },

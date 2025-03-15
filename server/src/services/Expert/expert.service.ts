@@ -8,8 +8,7 @@ import exp from "constants";
 class ExpertService {
     async createExpert(data: Partial<IExpert>, file: Express.Multer.File,userId:string): Promise<IExpert> {
       
-        try {
-           
+        try {           
             // Wrap Cloudinary upload_stream in a Promise
             const result: any = await new Promise((resolve, reject) => {
                 const uploadStream = cloudinary.uploader.upload_stream(
@@ -36,7 +35,7 @@ class ExpertService {
             const url = result.secure_url;
             
            const response= await ExpertRepository.createExpert({ ...data, certificateUrl: url, },userId);
-             await UserRepository.findByIdAndUpdate(userId,{role:"expert"})
+             await UserRepository.findByIdAndUpdate(userId,{expertStatus:"pending"})
              return response
         } catch (error: any) {
             console.log(error);
@@ -81,7 +80,7 @@ class ExpertService {
             if (!updatedExpert) {
                 return { success: false, message: 'Failed to update expert status' };
             }
-    
+            await UserRepository.findByIdAndUpdate(updatedExpert.userId._id,{expertStatus:`${action=='approved' ? 'approved':'rejected'}`})
             // Send email after successful update
             await sendExpertStatusUpdate(existingExpert.userId.email, action);
     

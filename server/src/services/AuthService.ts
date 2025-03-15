@@ -225,6 +225,35 @@ class AuthService {
       return { success: false, message: "An error occurred. Please try again." };
     }
   }
+
+  async switchRole(userId:string,role:string){
+    try {
+      const newRole= role==='expert'?"expert":"user"
+      console.log(role)
+      const user = await UserRepository.findUserById(userId);
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+
+    if (newRole === "expert" && user.expertStatus !== "approved") {
+      return {
+        success: false,
+        message: "Expert account not approved",
+      }
+    }
+    const accessToken = generateAccessToken(user._id, newRole);
+    const refreshToken = generateRefreshToken(user._id, newRole);
+    return{
+      success: true,
+      message: `Role switched to ${newRole} successfully`,
+      accessToken,
+      refreshToken,
+    };
+    } catch (error) {
+      console.error("Error switching role:", error);
+      return { success: false, message: "Internal server error" };
+    }
+  }
 }
 
 export default new AuthService();

@@ -147,6 +147,40 @@ class AuthController {
     res.json(response)
   }
 
+
+
+
+  //switch role
+ static async switchRole(req:AuthRequest,res:Response){
+    try {
+      const { role } = req.body; // New role ("user" or "expert")
+      const userId = req.user.userId;
+      const response=await AuthService.switchRole(userId,role)
+console.log(response)
+      if(response.success){
+        res.cookie("accessToken", response.accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        });
+        res.cookie('refreshToken',response.refreshToken,{
+          httpOnly:true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        })
+        console.log('changed')
+        res.status(200).json(response)
+        return
+      }
+
+      res.status(400).json(response)
+
+    } catch (error) {
+       console.error("Error switching role:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  }
+
 }
 
 export default AuthController;

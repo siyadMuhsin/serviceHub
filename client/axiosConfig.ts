@@ -2,12 +2,13 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import { store } from "./src/store";
 import { logout } from "./src/Slice/authSlice";
 import { adminLogout } from "./src/Slice/adminAuthSlice";
-
+import { useNavigate } from "react-router-dom";
 // Define the API response structure
 interface ApiResponse {
   success: boolean;
   [key: string]: any;
 }
+
 
 // Create an Axios instance for user API
 const userAPI: AxiosInstance = axios.create({
@@ -35,6 +36,7 @@ userAPI.interceptors.response.use(
       } catch (refreshError) {
         console.error("Session expired, logging out...");
         store.dispatch(logout());
+
       }
     }
     return Promise.reject(error);

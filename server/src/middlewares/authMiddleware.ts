@@ -4,14 +4,11 @@ import { AuthRequest } from "../types/User";
 import jwt ,{JwtPayload}from "jsonwebtoken";
 dotenv.config()
 
-// interface AuthRequest extends Request {
-//   user?: any; // You can replace `any` with a proper user type if available
-// }
 
 
 const verifyToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
   try {
-    console.log('verify token')
+    
     const token = req.cookies?.accessToken; // Get token from cookie
     if (!token) {
       // creating new access token
@@ -29,6 +26,7 @@ const verifyToken = (req: AuthRequest, res: Response, next: NextFunction): void 
 
     const decoded = jwt.verify(token, secretKey); // Ensure type consistency
     req.user = decoded; // Attach user info to request object
+    console.log(req.user)
 
     next(); // Move to the next middleware
   } catch (err) {

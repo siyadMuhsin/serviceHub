@@ -400,12 +400,12 @@ const handleGoogleSignIn = useGoogleLogin({
                   Sign up here
                 </b>
               </p>
-              <p>
+              {/* <p>
                   <span>Are you a Service Expert? </span>
                   <b onClick={() => navigate('/expert/auth')} className="pointer">
                     login here
                   </b>
-                </p>
+                </p> */}
             </form>
           </div>
         </div>

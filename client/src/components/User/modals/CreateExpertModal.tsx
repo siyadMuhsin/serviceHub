@@ -70,9 +70,20 @@ const CreateExpertModal: React.FC<CreateExpertModalProps> = ({ isOpen, onClose, 
                     <p className="text-red-500 text-sm">{errors.AccountName?.message}</p>
 
                     {/* DOB */}
-                    <input type="date" {...register("dob")} className="w-full p-2 border border-gray-300 rounded" />
-                    <p className="text-red-500 text-sm">{errors.dob?.message}</p>
-
+                    
+                    <div className="relative w-full">
+  <label htmlFor="dob" className=" text-gray-400 top-2 left-2 text-sm transition-all pointer-events-none">
+    Date of Birth
+  </label>
+  <input
+    type="date"
+    id="dob"
+    {...register("dob")}
+    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 "
+    
+  />
+  <p className="text-red-500 text-sm">{errors.dob?.message}</p>
+</div>
                     {/* Gender */}
                     <select {...register("gender")} className="w-full p-2 border border-gray-300 rounded">
                         <option value="">Select Gender</option>

@@ -14,10 +14,21 @@ export const createExpertAccount = async(formDate:FormData)=>{
     }
 }
 
-export const category_serviceFetch=async()=>{
+export const switchAccount=async (role:string)=>{
+    console.log(role)
     try {
-        const response= await userAPI.get('/categories')
+        const response = await userAPI.post("/switch-role/", { role });
+        return response.data
     } catch (error) {
+        return error.data
         
     }
 }
+
+// export const category_serviceFetch=async()=>{
+//     try {
+//         const response= await userAPI.get('/categories')
+//     } catch (error) {
+        
+//     }
+// }
