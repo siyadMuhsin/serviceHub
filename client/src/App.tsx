@@ -4,6 +4,7 @@ import AppRoutes from "./routes/AppRoutes";
 import AdminRoutes from "./routes/AdminRoute";
 import useFetchData from "./CostomHooks/useFetchData";
 import Loading from "./components/Loading";
+import ExpertRoutes from "./routes/ExpertRoutes";
 
 
 
@@ -20,6 +21,7 @@ if(loading){
       <Routes>
       <Route path="/*" element={<AppRoutes />} />
       <Route path="/admin/*" element={<AdminRoutes />} />
+      <Route path="/expert/*" element={<ExpertRoutes/>} />
       </Routes>
      
           {/* <Route path="/mentor/*" element={<MentorRoutes />} />

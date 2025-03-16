@@ -74,6 +74,26 @@ console.log(expertData)
     }
   };
 
+
+
+  const handleSwitchAccount = async () => {
+    // try {
+    //   setIsLoading(true);
+    //   const newRole= user.role==="user"?"expert":"user"
+      
+    //   const response = await switchAccount(newRole); // Assume this function makes the API call
+    //   if (response.success) {
+    //     dispatch(changeRole("expert"));
+    //     toast.success("Switched to Expert Account successfully");
+    //     navigate('/expert')
+    //   }
+    // } catch (error) {
+    //   console.error("Error switching to expert account:", error);
+    //   toast.error("Failed to switch to Expert Account");
+    // } finally {
+    //   setIsLoading(false);
+    // }
+  };
   return (
     <header className="w-full">
       {/* Top Bar */}
@@ -113,20 +133,27 @@ console.log(expertData)
         </nav>
 
         {/* Become Expert Button */}
-        {user && user.role === "user" ? (
-  <button
-    onClick={() => setIsModalOpen(true)}
-    className="px-4 py-2 bg-green-500 text-white rounded text-sm md:text-base"
-  >
-    Become Expert Account
-  </button>
-) : user.expertStatus === 'pending' ? (
-  <span className="text-yellow-500 text-sm">Request Pending Approval...</span>
-) : (
-  <button className="py-2 text-blue-500 rounded text-sm md:text-base">
-    Switch to Expert Account
-  </button>
-)}
+        {isAuthenticated && user && user.role === "user" ? (
+  user.expertStatus === "default" ? (
+    <button
+      onClick={() => setIsModalOpen(true)}
+      className="px-4 py-2 bg-green-500 text-white rounded text-sm md:text-base"
+    >
+      Become Expert Account
+    </button>
+  ) : user.expertStatus === 'pending' ? (
+    <span className="text-yellow-500 text-sm">Request Pending Approval...</span>
+  ) : user.expertStatus === "approved" ? (
+    <button
+      onClick={handleSwitchAccount}
+      className="py-2 text-blue-500 rounded text-sm md:text-base"
+    >
+      Switch to Expert Account
+    </button>
+  ) : (
+    <span className="text-yellow-500 text-sm">Request is rejected...</span>
+  )
+) : null}
         {/* Search Bar & Icons */}
         <div className="flex items-center gap-4">
           {/* Search Bar */}

@@ -9,12 +9,12 @@ import Navbar from "../components/User/Navbar";
 import Footer from "../components/User/Footer";
 import Category from "../pages/User/Category";
 import Service from "../pages/User/Service";
-
+import Loading from "@/components/Loading";
 const AppRoutes = () => {
   const loading = useAuthCheck();
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    return <Loading/>
   }
 
   return (
@@ -43,16 +43,18 @@ const AppRoutes = () => {
         />
       </Routes>
 
-      <Navbar />
+     
       {/* Protect all other user routes */}
       <ProtectedRoute>
+      <Navbar />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/categories" element={<Category/>} />
           <Route path="/categories/:id" element={<Service/>} />
         </Routes>
+        <Footer />
       </ProtectedRoute>
-      <Footer />
+     
     </>
   );
 };

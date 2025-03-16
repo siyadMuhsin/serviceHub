@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./Login.css";
+import styles from "./Login.module.css";
 import { FaGoogle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -26,35 +26,49 @@ import {
 import { toast } from "react-toastify";
 import { useGoogleLogin } from "@react-oauth/google";
 
-const Login = () => {
+// Type definitions
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+interface GoogleUser {
+  access_token?: string;
+  [key: string]: any;
+}
+
+const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error, otpSent, otpVerified,isAuthenticated } = useSelector(
+  const { loading, error, otpSent, otpVerified, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
 
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState<string>("");
   const [timer, setTimer] = useState<number>(0);
   const [isResendDisabled, setIsResendDisabled] = useState<boolean>(true);
-const [googleUser,setGoogleUser]=useState<object |null >(null)
+  const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
+
   useEffect(() => {
     const container = document.getElementById("container");
     if (container) {
       setTimeout(() => {
-        container.classList.add("sign-in");
+        container.classList.add(styles.signIn);
       }, 200);
     }
   }, []);
 
   useEffect(() => {
-    let interval: number | void ; // Use `number` for browser environment
+    let interval: number | NodeJS.Timeout; // Use proper type for both browser and Node environments
     const storedTimerEnd = localStorage.getItem("otpTimerEnd");
     if (storedTimerEnd) {
       const timerEnd = parseInt(storedTimerEnd, 10);
@@ -73,7 +87,7 @@ const [googleUser,setGoogleUser]=useState<object |null >(null)
     };
   }, []);
 
-  const startTimer = (timerEnd: number) => {
+  const startTimer = (timerEnd: number): NodeJS.Timeout => {
     const interval = setInterval(() => {
       const now = Date.now();
       const remainingTime = Math.max(0, Math.floor((timerEnd - now) / 1000));
@@ -90,7 +104,7 @@ const [googleUser,setGoogleUser]=useState<object |null >(null)
     return interval; // Return the interval ID
   };
 
-  const handleResendOtp = async () => {
+  const handleResendOtp = async (): Promise<void> => {
     try {
       const response = await resendOtp(formData.email);
       if (response.success) {
@@ -108,12 +122,12 @@ const [googleUser,setGoogleUser]=useState<object |null >(null)
     }
   };
 
-  const toggleAuthMode = () => {
+  const toggleAuthMode = (): void => {
     setIsSignUp((prev) => !prev);
     const container = document.getElementById("container");
     if (container) {
-      container.classList.toggle("sign-in");
-      container.classList.toggle("sign-up");
+      container.classList.toggle(styles.signIn);
+      container.classList.toggle(styles.signUp);
     }
     setFormData({
       name: "",
@@ -123,20 +137,20 @@ const [googleUser,setGoogleUser]=useState<object |null >(null)
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     if (isSignUp) {
       if (formData.password !== formData.confirmPassword) {
         toast.error("Passwords do not match!");
         return;
       }
-      const checkValid= validation(formData)
-      if(!checkValid)return ;
+      const checkValid = validation(formData);
+      if (!checkValid) return;
       try {
         dispatch(signUpStart());
 
@@ -181,13 +195,13 @@ const [googleUser,setGoogleUser]=useState<object |null >(null)
         toast.error(error.message || "An error occurred during registration");
       }
     } else {
-      const checkValid= validation({email:formData.email,password:formData.password})
-      if(!checkValid)return ;
+      const checkValid = validation({email: formData.email, password: formData.password});
+      if (!checkValid) return;
       dispatch(loginStart());
 
-      const response = await loginUser(formData.email, formData.password);
-
       try {
+        const response = await loginUser(formData.email, formData.password);
+
         if (response?.success) {
           dispatch(loginSuccess(response));
           toast.success("Login successful!");
@@ -203,7 +217,7 @@ const [googleUser,setGoogleUser]=useState<object |null >(null)
     }
   };
 
-  const handleOtpSubmit = async (e: React.FormEvent) => {
+  const handleOtpSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     try {
       dispatch(verifyOtpStart());
@@ -226,40 +240,41 @@ const [googleUser,setGoogleUser]=useState<object |null >(null)
     }
   };
 
-const handleGoogleSignIn = useGoogleLogin({
-      onSuccess: (codeResponse) => setGoogleUser(codeResponse),
-      onError: (error) => {
-        console.log("Google error:", error);
-      },
-      flow:'implicit'
-    });
-    useEffect(() => {
-      const getData = async () => {
-        if (googleUser && googleUser.access_token) {
-          
-          try {
-            const response=await googleSignIn(googleUser);
-            if(response.success){
-              toast.success('login successfully')
-              dispatch(loginSuccess(response))
-            }
-            
-          } catch (error) {
-            console.error("Google Sign-In API Error:", error);
+  const handleGoogleSignIn = useGoogleLogin({
+    onSuccess: (codeResponse) => setGoogleUser(codeResponse),
+    onError: (error) => {
+      console.log("Google error:", error);
+    },
+    flow: 'implicit'
+  });
+  
+  useEffect(() => {
+    const getData = async () => {
+      if (googleUser && googleUser.access_token) {
+        try {
+          const response = await googleSignIn(googleUser);
+          if (response.success) {
+            toast.success('Login successfully');
+            dispatch(loginSuccess(response));
+            navigate("/");
           }
+        } catch (error) {
+          console.error("Google Sign-In API Error:", error);
         }
-      };
-      getData();
-    }, [googleUser]);
+      }
+    };
+    getData();
+  }, [googleUser, dispatch, navigate]);
+
   return (
-    <div id="container" className="container">
-      <div className="row">
+    <div id="container" className={styles.container}>
+      <div className={styles.row}>
         {/* SIGN UP */}
-        <div className="col align-items-center flex-col sign-up">
-          <div className="form-wrapper align-items-center">
+        <div className={`${styles.col} ${styles.alignItemsCenter} ${styles.flexCol} ${styles.signUp}`}>
+          <div className={`${styles.formWrapper} ${styles.alignItemsCenter}`}>
             {!otpSent ? (
-              <form className="form sign-up" onSubmit={handleSubmit}>
-                <div className="input-group">
+              <form className={`${styles.form} ${styles.signUp}`} onSubmit={handleSubmit}>
+                <div className={styles.inputGroup}>
                   <i className="bx bxs-user"></i>
                   <input
                     type="text"
@@ -270,7 +285,7 @@ const handleGoogleSignIn = useGoogleLogin({
                     required
                   />
                 </div>
-                <div className="input-group">
+                <div className={styles.inputGroup}>
                   <i className="bx bx-mail-send"></i>
                   <input
                     type="email"
@@ -281,7 +296,7 @@ const handleGoogleSignIn = useGoogleLogin({
                     required
                   />
                 </div>
-                <div className="input-group">
+                <div className={styles.inputGroup}>
                   <i className="bx bxs-lock-alt"></i>
                   <input
                     type="password"
@@ -292,7 +307,7 @@ const handleGoogleSignIn = useGoogleLogin({
                     required
                   />
                 </div>
-                <div className="input-group">
+                <div className={styles.inputGroup}>
                   <i className="bx bxs-lock-alt"></i>
                   <input
                     type="password"
@@ -303,28 +318,27 @@ const handleGoogleSignIn = useGoogleLogin({
                     required
                   />
                 </div>
-                <button className="action" type="submit" disabled={loading}>
+                <button className={styles.action} type="submit" disabled={loading}>
                   {loading ? "Loading..." : "Sign up"}
                 </button>
                 <button
-                  className="google-btn"
+                  className={styles.googleBtn}
                   type="button"
-                  onClick={handleGoogleSignIn}
+                  onClick={() => handleGoogleSignIn()}
                 >
-                  <FaGoogle className="google-icon" /> Sign up with Google
+                  <FaGoogle className={styles.googleIcon} /> Sign up with Google
                 </button>
 
                 <p>
                   <span>Already have an account?</span>
-                  <b onClick={toggleAuthMode} className="pointer">
+                  <b onClick={toggleAuthMode} className={styles.pointer}>
                     Sign in here
                   </b>
                 </p>
-              
               </form>
             ) : (
-              <form className="form sign-up" onSubmit={handleOtpSubmit}>
-                <div className="input-group">
+              <form className={`${styles.form} ${styles.signUp}`} onSubmit={handleOtpSubmit}>
+                <div className={styles.inputGroup}>
                   <i className="bx bxs-lock-alt"></i>
                   <input
                     type="text"
@@ -334,10 +348,10 @@ const handleGoogleSignIn = useGoogleLogin({
                     required
                   />
                 </div>
-                <button className="action" type="submit" disabled={loading}>
+                <button className={styles.action} type="submit" disabled={loading}>
                   {loading ? "Loading..." : "Verify OTP"}
                 </button>
-                <div className="otp-timer">
+                <div className={styles.otpTimer}>
                   {timer > 0 ? (
                     <p>Time remaining: {timer} seconds</p>
                   ) : (
@@ -356,10 +370,10 @@ const handleGoogleSignIn = useGoogleLogin({
         </div>
 
         {/* SIGN IN */}
-        <div className="col align-items-center flex-col sign-in">
-          <div className="form-wrapper align-items-center">
-            <form className="form sign-in" onSubmit={handleSubmit}>
-              <div className="input-group">
+        <div className={`${styles.col} ${styles.alignItemsCenter} ${styles.flexCol} ${styles.signIn}`}>
+          <div className={`${styles.formWrapper} ${styles.alignItemsCenter}`}>
+            <form className={`${styles.form} ${styles.signIn}`} onSubmit={handleSubmit}>
+              <div className={styles.inputGroup}>
                 <i className="bx bxs-user"></i>
                 <input
                   type="text"
@@ -370,7 +384,7 @@ const handleGoogleSignIn = useGoogleLogin({
                   required
                 />
               </div>
-              <div className="input-group">
+              <div className={styles.inputGroup}>
                 <i className="bx bxs-lock-alt"></i>
                 <input
                   type="password"
@@ -381,56 +395,57 @@ const handleGoogleSignIn = useGoogleLogin({
                   required
                 />
               </div>
-              <button className="action" type="submit" disabled={loading}>
+              <button className={styles.action} type="submit" disabled={loading}>
                 {loading ? "Loading..." : "Sign In"}
               </button>
               <button
-                className="google-btn"
+                className={styles.googleBtn}
                 type="button"
-                onClick={handleGoogleSignIn}
+                onClick={() => handleGoogleSignIn()}
               >
-                <FaGoogle className="google-icon" /> Sign in with Google
+                <FaGoogle className={styles.googleIcon} /> Sign in with Google
               </button>
               <p>
-                <b onClick={()=>navigate('/forget-password')} className="cursor-pointer">Forgot password?</b>
-              </p>
-              <p>
-                <span>Don't have an account?</span>
-                <b onClick={toggleAuthMode} className="pointer">
-                  Sign up here
+                <b onClick={() => navigate('/forget-password')} className={styles.cursorPointer}>
+                  Forgot password?
                 </b>
               </p>
               <p>
-                  <span>Are you a Service Expert? </span>
-                  <b onClick={() => navigate('/expert/auth')} className="pointer">
-                    login here
-                  </b>
-                </p>
+                <span>Don't have an account?</span>
+                <b onClick={toggleAuthMode} className={styles.pointer}>
+                  Sign up here
+                </b>
+              </p>
+              {/* <p>
+                <span>Are you a Service Expert? </span>
+                <b onClick={() => navigate('/expert/auth')} className={styles.pointer}>
+                  login here
+                </b>
+              </p> */}
             </form>
           </div>
         </div>
       </div>
 
       {/* CONTENT SECTION */}
-      <div className="row content-row">
+      <div className={`${styles.row} ${styles.contentRow}`}>
         {/* SIGN IN CONTENT */}
-        <div className="col align-items-center flex-col">
-          <div className="text sign-in">
+        <div className={`${styles.col} ${styles.alignItemsCenter} ${styles.flexCol}`}>
+          <div className={`${styles.text} ${styles.signIn}`}>
             <h2>Welcome</h2>
             <p>Sign in to continue</p>
           </div>
         </div>
 
         {/* SIGN UP CONTENT */}
-        <div className="col align-items-center flex-col">
-          <div className="text sign-up">
+        <div className={`${styles.col} ${styles.alignItemsCenter} ${styles.flexCol}`}>
+          <div className={`${styles.text} ${styles.signUp}`}>
             <h2>Join with us</h2>
             <p>Create an account to get started</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+            </div>
+            </div>
+            </div>
+            </div>
+  )}
 
-export default Login;
+export default Login

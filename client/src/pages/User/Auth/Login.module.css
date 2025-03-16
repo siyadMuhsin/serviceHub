@@ -1,0 +1,376 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
+* {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+} 
+
+html,
+body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.container {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100vh;
+}
+
+.col {
+  width: 50%;
+}
+
+.alignItemsCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 28rem;
+}
+
+.form {
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  width: 100%;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  transform: scale(0);
+  transition: .5s ease-in-out;
+  transition-delay: 1s;
+}
+
+.inputGroup {
+  position: relative;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.inputGroup i {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  color: #757575;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 1rem 3rem;
+  font-size: 1rem;
+  background-color: #efefef;
+  border-radius: .5rem;
+  border: 0.125rem solid #ffffff;
+  outline: none;
+}
+
+.inputGroup input:focus {
+  border: 0.125rem solid #013A63;
+}
+
+.action {
+  cursor: pointer;
+  width: 100%;
+  padding: 0.6rem 0;
+  border-radius: 0.5rem;
+  border: none;
+  background-color: #013A63 !important;
+  color: #ffffff !important;
+  font-size: 1.2rem;
+  outline: none;
+}
+
+.form p {
+  margin: 1rem 0;
+  font-size: .7rem;
+}
+
+.flexCol {
+  flex-direction: column;
+}
+
+.socialList {
+  margin: 2rem 0;
+  padding: 1rem;
+  border-radius: 1.5rem;
+  width: 100%;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  transform: scale(0);
+  transition: .5s ease-in-out;
+  transition-delay: 1.2s;
+}
+
+.socialList > div {
+  color: #ffffff;
+  margin: 0 .5rem;
+  padding: .7rem;
+  cursor: pointer;
+  border-radius: .5rem;
+  cursor: pointer;
+  transform: scale(0);
+  transition: .5s ease-in-out;
+}
+
+.socialList > div:nth-child(1) {
+  transition-delay: 1.4s;
+}
+
+.socialList > div:nth-child(2) {
+  transition-delay: 1.6s;
+}
+
+.socialList > div:nth-child(3) {
+  transition-delay: 1.8s;
+}
+
+.socialList > div:nth-child(4) {
+  transition-delay: 2s;
+}
+
+.socialList > div > i {
+  font-size: 1.5rem;
+  transition: .4s ease-in-out;
+}
+
+.socialList > div:hover i {
+  transform: scale(1.5);
+}
+
+.facebookBg {
+  background-color: #4267B2;
+}
+
+.googleBg {
+  background-color: #DB4437;
+}
+
+.twitterBg {
+  background-color: #1DA1F2;
+}
+
+.instaBg {
+  background-color: #E1306C;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.container.signIn .form.signIn,
+.container.signIn .socialList.signIn,
+.container.signIn .socialList.signIn > div,
+.container.signUp .form.signUp,
+.container.signUp .socialList.signUp,
+.container.signUp .socialList.signUp > div {
+  transform: scale(1);
+}
+
+.contentRow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 6;
+  width: 100%;
+}
+
+.text {
+  margin: 4rem;
+  color: #ffffff;
+}
+
+.text h2 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 2rem 0;
+  transition: 1s ease-in-out;
+}
+
+.text p {
+  font-weight: 600;
+  transition: 1s ease-in-out;
+  transition-delay: .2s;
+}
+
+.img img {
+  width: 30vw;
+  transition: 1s ease-in-out;
+  transition-delay: .4s;
+}
+
+.text.signIn h2,
+.text.signIn p,
+.img.signIn img {
+  transform: translateX(-250%);
+}
+
+.text.signUp h2,
+.text.signUp p,
+.img.signUp img {
+  transform: translateX(250%);
+}
+
+.container.signIn .text.signIn h2,
+.container.signIn .text.signIn p,
+.container.signIn .img.signIn img,
+.container.signUp .text.signUp h2,
+.container.signUp .text.signUp p,
+.container.signUp .img.signUp img {
+  transform: translateX(0);
+}
+
+/* BACKGROUND */
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 300vw;
+  transform: translate(35%, 0);
+  background-image: linear-gradient(-45deg, #013A63 0%, #013A63 100%);
+  transition: 1s ease-in-out;
+  z-index: 6;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  border-bottom-right-radius: max(50vw, 50vh);
+  border-top-left-radius: max(50vw, 50vh);
+}
+
+.container.signIn::before {
+  transform: translate(0, 0);
+  right: 50%;
+}
+
+.container.signUp::before {
+  transform: translate(100%, 0);
+  right: 50%;
+}
+
+/* RESPONSIVE */
+@media only screen and (max-width: 425px) {
+  .container::before,
+  .container.signIn::before,
+  .container.signUp::before {
+    height: 100vh;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0;
+    z-index: 0;
+    transform: none;
+    right: 0;
+  }
+
+  .container.signIn .col.signIn,
+  .container.signUp .col.signUp {
+    transform: translateY(0);
+  }
+
+  .contentRow {
+    align-items: flex-start !important;
+  }
+
+  .contentRow .col {
+    transform: translateY(0);
+    background-color: unset;
+  }
+
+  .col {
+    width: 100%;
+    position: absolute;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-top-left-radius: 2rem;
+    border-top-right-radius: 2rem;
+    transform: translateY(100%);
+    transition: 1s ease-in-out;
+  }
+
+  .row {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  .form,
+  .socialList {
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .text {
+    margin: 0;
+  }
+
+  .text p {
+    display: none;
+  }
+
+  .text h2 {
+    margin: .5rem;
+    font-size: 2rem;
+  }
+}
+
+.googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #db4437;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.googleBtn:hover {
+  background-color: #c1351d;
+}
+
+.googleIcon {
+  margin-right: 8px;
+  font-size: 20px;
+}
+
+.otpTimer {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.otpTimer p {
+  margin-bottom: 10px;
+}
+
+.otpTimer button {
+  background-color: transparent;
+  color: #013A63;
+  border: 1px solid #013A63;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.otpTimer button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cursorPointer {
+  cursor: pointer;
+}
