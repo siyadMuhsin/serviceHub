@@ -76,24 +76,12 @@ console.log(expertData)
 
 
 
-  const handleSwitchAccount = async () => {
-    // try {
-    //   setIsLoading(true);
-    //   const newRole= user.role==="user"?"expert":"user"
-      
-    //   const response = await switchAccount(newRole); // Assume this function makes the API call
-    //   if (response.success) {
-    //     dispatch(changeRole("expert"));
-    //     toast.success("Switched to Expert Account successfully");
-    //     navigate('/expert')
-    //   }
-    // } catch (error) {
-    //   console.error("Error switching to expert account:", error);
-    //   toast.error("Failed to switch to Expert Account");
-    // } finally {
-    //   setIsLoading(false);
-    // }
-  };
+  const handleSwitchAccount = () => {
+        dispatch(changeRole("expert"));
+        toast.success("Switched to Expert Account successfully");
+        navigate('/expert')
+    }
+  
   return (
     <header className="w-full">
       {/* Top Bar */}

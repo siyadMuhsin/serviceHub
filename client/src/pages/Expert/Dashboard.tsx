@@ -1,5 +1,5 @@
 import { Bell, User, FileText, CheckCircle, Clock, Users } from "lucide-react"
-import { AppSidebar } from "@/components/Expert/Sidebar"
+
 import { Footer } from "@/components/Expert/Footer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"

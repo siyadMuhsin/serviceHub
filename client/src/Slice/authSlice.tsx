@@ -5,6 +5,7 @@ interface AuthState {
   user: any;
   loading: boolean;
   error: string | null;
+role:string
   otpSent: boolean;
   otpVerified: boolean;
   isAuthenticated:boolean;
@@ -13,6 +14,7 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   loading: false,
+  role:'user',
   error: null,
   otpSent: false,
   otpVerified: false,
@@ -60,10 +62,8 @@ const authSlice = createSlice({
       state.otpVerified = false;
     },
     changeRole(state, action) {
-      console.log("from redux",action)
-      if (state.user) {
-          state.user.role = action.payload; // ✅ Change role in Redux state
-      }
+      console.log(action.payload)
+    state.role=action.payload
   },
     setUser:(state,action)=>{
       state.user=action.payload.user

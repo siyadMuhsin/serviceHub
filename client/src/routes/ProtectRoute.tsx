@@ -22,3 +22,25 @@ const AdminLoginRoute =({children}:{children:React.ReactNode})=>{
   return !adminAuthenticated ?children :<Navigate to ='/admin/dashboard' replace />
 }
 export { ProtectedRoute, LoginRoute,AdminProtectRoute ,AdminLoginRoute};
+
+
+
+
+
+
+
+interface ProtectedExpertRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedExpertRoute: React.FC<ProtectedExpertRouteProps> = ({ children }) => {
+  const { role } = useSelector((state: any) => state.auth);
+
+  if (role !== 'expert') {
+    return <Navigate to="/" replace />; 
+  }
+
+  return <>{children}</>;
+};
+
+export default ProtectedExpertRoute;

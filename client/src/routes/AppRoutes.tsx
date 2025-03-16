@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Login from "../pages/User/Auth/Login";
 import Landing from "../pages/User/Home/Landing";
 import { ProtectedRoute, LoginRoute } from "./ProtectRoute";
@@ -10,11 +10,24 @@ import Footer from "../components/User/Footer";
 import Category from "../pages/User/Category";
 import Service from "../pages/User/Service";
 import Loading from "@/components/Loading";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+
 const AppRoutes = () => {
   const loading = useAuthCheck();
+  const navigate = useNavigate();
+
+  const { role } = useSelector((state) => state.auth);
+
+  // ✅ Fix: Use useEffect to handle navigation after rendering
+  // useEffect(() => {
+  //   if (role === 'expert') {
+  //     navigate('/expert');
+  //   }
+  // }, [role, navigate]); // ✅ Add dependencies to avoid unnecessary re-renders
 
   if (loading) {
-    return <Loading/>
+    return <Loading />;
   }
 
   return (
@@ -37,24 +50,19 @@ const AppRoutes = () => {
             </LoginRoute>
           }
         />
-        <Route
-          path="/reset-password/:token"
-          element={<ResetPassword />}
-        />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
 
-     
       {/* Protect all other user routes */}
       <ProtectedRoute>
-      <Navbar />
+        <Navbar />
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/categories" element={<Category/>} />
-          <Route path="/categories/:id" element={<Service/>} />
+          <Route path="/categories" element={<Category />} />
+          <Route path="/categories/:id" element={<Service />} />
         </Routes>
         <Footer />
       </ProtectedRoute>
-     
     </>
   );
 };
