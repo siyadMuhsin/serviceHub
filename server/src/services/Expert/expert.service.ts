@@ -38,7 +38,7 @@ class ExpertService {
             const url = result.secure_url;
             
            const response= await ExpertRepository.createExpert({ ...data, certificateUrl: url, },userId);
-             await UserRepository.findByIdAndUpdate(userId,{role:"expert"})
+             await UserRepository.findByIdAndUpdate(userId,{expertStatus:"pending"})
              return response
         } catch (error: any) {
             console.log(error);
@@ -61,7 +61,6 @@ class ExpertService {
             }
             const { experts, totalRecords } = await ExpertRepository.getExpertBy_limit(page, limit,query);
             const totalPages = Math.ceil(totalRecords / limit);
-
             return { 
                 success: true, 
                 experts, 
@@ -85,13 +84,9 @@ class ExpertService {
                 return { success: false, message: 'Failed to update expert status' };
             }
           
-            if(action ==='approved'){
                 const userId: string = updatedExpert.userId.toString()
-                await UserRepository.findByIdAndUpdate(userId,{role:'expert'})
-              
-            }
-            await sendExpertStatusUpdate(existingExpert.userId.email, action);
-    
+                await UserRepository.findByIdAndUpdate(userId,{role:'expert',expertStatus:action==="approved"?"approved":"rejected"})
+                await sendExpertStatusUpdate(existingExpert.userId.email, action);
             return { success: true, data: updatedExpert };
         } catch (error) {
             console.error('Error in actionChange:', error);

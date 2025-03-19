@@ -55,7 +55,8 @@ export const verifyExpert=async(req:AuthRequest,res:Response,next:NextFunction)=
     }
     const decoded = await TokenVerify(token, secretKey); // Ensure type consistency
     if (decoded.role !== 'expert' || !decoded.expertId) {
-      return res.status(403).json({ success: false, message: 'Access denied: Not an expert' });
+      res.status(403).json({ success: false, message: 'Access denied: Not an expert' });
+      return
     }
     req.expert = decoded; // Attach user info to request object
     next()

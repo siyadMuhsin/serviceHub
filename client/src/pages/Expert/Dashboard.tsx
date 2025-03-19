@@ -34,12 +34,13 @@ export default function Dashboard() {
     const fetchData=async()=>{
       try {
         const response= await get_expert()
+        console.log('expert dashboad')
         console.log(response)
       } catch (error) {
         
       }
     }
-  })
+  },[])
   return (
   
     <div className="flex flex-col w-[100%]">

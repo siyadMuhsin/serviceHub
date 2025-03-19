@@ -26,6 +26,7 @@ import {
   switchExpert,
 } from "../../../services/User/ExpertAccount";
 import { ExpertData } from "@/Interfaces/interfaces";
+import Loading from "@/components/Loading";
 export const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export const ProfilePage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const handleCreateExpert = async (expertData: ExpertData) => {
-    console.log("fds");
+   
     setIsLoading(true); // Show loading when request starts
     console.log(expertData);
     try {
@@ -226,6 +227,8 @@ export const ProfilePage: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         onCreate={handleCreateExpert}
       />
+
+      {loading&& <Loading/>}
     </div>
   );
 };
