@@ -39,6 +39,9 @@ class ExpertRepository {
     async findByIdAndUpdate(id:string,update:Partial<IExpert>){
         return await Expert.findByIdAndUpdate(id,update,{new:true})
     }
+    async findOne(query:{}):Promise<IExpert | null>{
+        return await Expert.findOne(query).populate("userId serviceId categoryId")
+    }
 }
 
 export default new ExpertRepository();

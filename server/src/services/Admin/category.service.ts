@@ -51,7 +51,9 @@ class CategoryService {
 
   async getAllCategories() {
     try {
+      console.log('get all categories')
       const categories = await CategoryRepository.getAllCategories();
+      console.log(categories.length)
       return { success: true, categories };
     } catch (error: any) {
       console.error("Error in getAllCategories:", error);

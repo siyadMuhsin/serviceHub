@@ -10,22 +10,25 @@ export const get_experts=async(page:number,limit:number,filter:string,search:str
     }
 }
 
-export const expert_change_action=async(id:string,action:string)=>{
+export const expert_change_action = async (id: string, action: string) => {
     try {
-        const response= await adminAPI.patch(`/expert/${id}`,{action})
-        return response.data
+      const response = await adminAPI.patch(`/expert/${id}`, { action });
+      return response.data; // Return the API response
     } catch (error) {
-        return error.data
-        
+      return {
+        success: false,
+        message: error.response?.data?.message || "An unexpected error occurred",
+      };
     }
-}
+  };
 export const block_unlbock_expert=async(id:string,active:boolean)=>{
     try {
-        console.log(id)
+        console.log(active)
         const response= await adminAPI.patch(`/expert/block/${id}`,{active})
+        console.log(response)
         return response.data
     } catch (error) {
-        return error.data
+        return {success:false,error:error?.response.data}
     }
 
 }

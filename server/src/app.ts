@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 import authRoutes from "./routes/authRoutes";
 import adminRoute from './routes/adminRoutes/admin.routes'
 import expertRoute from './routes/expertRoutes/expert.routes'
-import userRoute from './routes/userRoutes/user.routes'
+import userRoute from './routes/user.routes'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 const app=express()

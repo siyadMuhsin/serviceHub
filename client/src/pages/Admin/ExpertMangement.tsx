@@ -11,6 +11,7 @@ import {
 import Loading from "../../components/Loading";
 import debounce from "../../Utils/debouce";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 interface Expert {
   _id?: string;
   accountName: string;
@@ -20,7 +21,7 @@ interface Expert {
   experience?: number;
   subscription: string;
   contact: string;
-  isActive:boolean;
+  isBlocked:boolean;
   status?: string;
 }
 
@@ -67,16 +68,21 @@ function ExpertManagement() {
     setLoading(true);
     try {
       const response = await expert_change_action(id, action);
-      if (response.success) {
+      if (response?.success) {
+        // Update the expert's status in the state
         setExperts((prev) =>
           prev.map((expert) =>
             expert._id === id ? { ...expert, status: action } : expert
           )
         );
+        toast.success(`Expert status updated to ${action}`); // Notify success
+      } else {
+        toast.error(response?.message || "Failed to update expert status"); // Handle API error
       }
     } catch (error) {
+      toast.error(error.message || "An unexpected error occurred"); // Handle unexpected errors
     } finally {
-      setLoading(false);
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -85,15 +91,22 @@ function ExpertManagement() {
     try {
       setLoading(true)
       const response= await block_unlbock_expert(id,active)
-      if(response.success){
+      console.log("dd",response)
+      if(response?.success){
+        
+        
         setExperts((prev)=>
           prev.map((expert)=>(
-            expert._id===id ? {...expert,isActive:!active}:expert
+            expert._id===id ? {...expert,isBlocked:!active}:expert
           ))
         )
       }
+      else{
+        toast.error(response?.message)
+      }
     } catch (error) {
       console.log(error)
+      toast.error(error?.message)
     }finally{
       setLoading(false)
     }
@@ -205,9 +218,9 @@ function ExpertManagement() {
                       {expert.status === "approved" && (
                         <div>
                           {/* "#10b981" : "#ef4444" */}
-                          {expert.isActive ? (
+                          {expert.isBlocked ? (
                             <button
-                            onClick={()=>handleBlockUnblock(expert._id,expert.isActive)}
+                            onClick={()=>handleBlockUnblock(expert._id,expert.isBlocked)}
                               style={{ border: "1px solid #ef4444" }} // Custom border color
                               className="px-2 py-1  text-white rounded hover:bg-red-600"
                             >
@@ -215,7 +228,7 @@ function ExpertManagement() {
                             </button>
                           ) : (
                             <button
-                            onClick={()=>handleBlockUnblock(expert._id,expert.isActive)}
+                            onClick={()=>handleBlockUnblock(expert._id,expert.isBlocked)}
                               style={{ border: "1px solid #10b981" }} // Custom border color
                               className="px-2 py-1  text-white rounded hover:bg-green-600"
                             >

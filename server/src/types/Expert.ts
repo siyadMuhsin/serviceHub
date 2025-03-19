@@ -10,7 +10,7 @@ export interface IExpert extends Document {
     gender: "Male" | "Female" | "Other";
     contact: string;
     experience: number;
-    isApproved:boolean;
+    isBlocked:boolean;
     certificateUrl: string; // Cloudinary URL
     createdAt?: Date;
     updatedAt?: Date;

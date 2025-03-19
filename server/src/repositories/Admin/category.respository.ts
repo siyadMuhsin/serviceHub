@@ -24,9 +24,11 @@ class CategoryRepository{
       }
 
       async getCategoriesByLimit(page: number, limit: number,search:string) {
-        const query = search
-      ? { name: { $regex: search, $options: "i" } } // Case-insensitive search
-      : {};
+        const query:any ={isActive:true}
+        if(search){
+          query.name={ $regex: search, $options: "i" }
+        }
+      
 
     const skip = (page - 1) * limit;
 

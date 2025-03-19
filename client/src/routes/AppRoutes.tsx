@@ -12,12 +12,13 @@ import Service from "../pages/User/Service";
 import Loading from "@/components/Loading";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import Profile, { ProfilePage } from "@/pages/User/Home/Profile";
 
 const AppRoutes = () => {
   const loading = useAuthCheck();
   const navigate = useNavigate();
 
-  const { role } = useSelector((state) => state.auth);
+ 
 
   // ✅ Fix: Use useEffect to handle navigation after rendering
   // useEffect(() => {
@@ -60,6 +61,7 @@ const AppRoutes = () => {
           <Route path="/" element={<Landing />} />
           <Route path="/categories" element={<Category />} />
           <Route path="/categories/:id" element={<Service />} />
+          <Route path="/profile" element={<ProfilePage/>} />
         </Routes>
         <Footer />
       </ProtectedRoute>

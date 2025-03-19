@@ -39,7 +39,7 @@ class ServiceRepository {
     try {
       const skip = (page - 1) * limit;
       const categoryObjectId = new ObjectId(categoryId);
-      const query: any = { categoryId:categoryObjectId };
+      const query: any = { categoryId:categoryObjectId,isActive:true };
     if (search) {
         query.name = { $regex: search, $options: 'i' }; 
     }

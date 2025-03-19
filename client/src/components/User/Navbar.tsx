@@ -9,7 +9,7 @@ import { FaRegUser, FaBars } from "react-icons/fa";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdEmail, MdLocationOn } from "react-icons/md";
 import { BsChatDots } from "react-icons/bs";
-import { createExpertAccount } from "../../services/User/createExpertAccount";
+
 import { changeRole } from "../../Slice/authSlice";
 import { toast } from "react-toastify";
 import CreateExpertModal from "./modals/CreateExpertModal";
@@ -40,47 +40,9 @@ const Navbar: React.FC = () => {
     setShowLogoutModal(false);
   };
 
-  const handleCreateExpert = async (expertData: ExpertData) => {
-    console.log('fds')
-    setIsLoading(true); // Show loading when request starts
-console.log(expertData)
-    try {
-      const formData = new FormData();
-      formData.append("accountName", expertData.AccountName);
-      formData.append("dob", expertData.dob);
-      formData.append("gender", expertData.gender);
-      formData.append("contact", expertData.contact);
-      formData.append("experience", expertData.experience);
-      formData.append("serviceId", expertData.service);
-      formData.append("categoryId", expertData.category);
-
-      if (expertData.certificate instanceof File) {
-        formData.append("certificate", expertData.certificate);
-      } else if (expertData.certificate && expertData.certificate[0]) {
-        formData.append("certificate", expertData.certificate[0]);
-      }
-
-      const response = await createExpertAccount(formData);
-
-      if (response.success) {
-        dispatch(changeRole("expert"));
-        setIsModalOpen(false);
-        toast.success(response.message);
-      }
-    } catch (error) {
-      console.error("Error uploading expert:", error);
-    } finally {
-      setIsLoading(false); // Hide loading when request is completed
-    }
-  };
+ 
 
 
-
-  const handleSwitchAccount = () => {
-        dispatch(changeRole("expert"));
-        toast.success("Switched to Expert Account successfully");
-        navigate('/expert')
-    }
   
   return (
     <header className="w-full">
@@ -121,27 +83,7 @@ console.log(expertData)
         </nav>
 
         {/* Become Expert Button */}
-        {isAuthenticated && user && user.role === "user" ? (
-  user.expertStatus === "default" ? (
-    <button
-      onClick={() => setIsModalOpen(true)}
-      className="px-4 py-2 bg-green-500 text-white rounded text-sm md:text-base"
-    >
-      Become Expert Account
-    </button>
-  ) : user.expertStatus === 'pending' ? (
-    <span className="text-yellow-500 text-sm">Request Pending Approval...</span>
-  ) : user.expertStatus === "approved" ? (
-    <button
-      onClick={handleSwitchAccount}
-      className="py-2 text-blue-500 rounded text-sm md:text-base"
-    >
-      Switch to Expert Account
-    </button>
-  ) : (
-    <span className="text-yellow-500 text-sm">Request is rejected...</span>
-  )
-) : null}
+
         {/* Search Bar & Icons */}
         <div className="flex items-center gap-4">
           {/* Search Bar */}
@@ -277,13 +219,7 @@ console.log(expertData)
         onCancel={onCancel}
       />
 
-      {/* Create Expert Modal */}
-      <CreateExpertModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onCreate={handleCreateExpert}
-       
-      />
+     
     </header>
   );
 };

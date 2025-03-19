@@ -105,6 +105,12 @@ class AuthService {
       if (!isMatch) {
         return { success: false, message: "Password is incorrect" };
       }
+      if (user.isBlocked) {
+        return {
+          success: false,
+          message: "Admin has blocked your account",
+        };
+      }
        // Generate Tokens
        const accessToken = generateAccessToken(user._id,'user');
        const refreshToken = generateRefreshToken(user._id,'user');
@@ -139,7 +145,14 @@ class AuthService {
   ) {
     try {
       const existingUser = await UserRepository.findUserByEmail(email);
+     
       if (existingUser) {
+        if(existingUser.isBlocked){
+          return {
+            success:false,
+             message: "Admin has blocked your account"
+          }
+        }
         if (existingUser.isGoogleUser) {
           return {
             success: true,

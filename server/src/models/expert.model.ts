@@ -10,7 +10,7 @@ const ExpertSchema = new Schema<IExpert>(
         dob: { type: Date, required: true },
         gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
         contact: { type: String, required: true },
-        isApproved:{type:Boolean,default:false},
+        isBlocked:{type:Boolean,default:false},
         status:{type:String,enum: ['pending', 'approved', 'rejected'],default:'pending'},
         experience: { type: Number, required: true },
         certificateUrl: { type: String, required: true }, 

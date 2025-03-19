@@ -13,3 +13,11 @@ export const createExpertAccount = async(formDate:FormData)=>{
         
     }
 }
+export const switchExpert=async()=>{
+    try {
+        const response=await userAPI.get('/switch_expert')
+        return response.data
+    } catch (error) {
+        return error?.response?.data
+    }
+}

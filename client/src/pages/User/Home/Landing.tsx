@@ -7,7 +7,7 @@ import {
   setInitialCategories,
   setInitialServices,
 } from "../../../Slice/categoryServiceSlice";
-import { createExpertAccount } from "../../../services/User/createExpertAccount";
+import { createExpertAccount } from "../../../services/User/ExpertAccount";
 import Loading from "../../../components/Loading";
 import { changeRole } from "../../../Slice/authSlice";
 import UserHome from "../../../components/User/UserHome";

@@ -5,6 +5,7 @@ import ExpertRepository from "../../repositories/Expert/Expert.respository";
 import UserRepository from "../../repositories/UserRepository";
 import { sendExpertStatusUpdate } from "../../utils/emailService";
 import exp from "constants";
+import { ObjectId } from "mongodb";
 class ExpertService {
     async createExpert(data: Partial<IExpert>, file: Express.Multer.File,userId:string): Promise<IExpert> {
       
@@ -77,12 +78,17 @@ class ExpertService {
             if (!existingExpert) {
                 return { success: false, message: 'Expert does not exist' };
             }
+            
             const updatedExpert = await ExpertRepository.findByIdAndUpdate(id, { status: action });
             if (!updatedExpert) {
                 return { success: false, message: 'Failed to update expert status' };
             }
-    
-            // Send email after successful update
+          
+            if(action ==='approved'){
+                const userId: string = updatedExpert.userId.toString()
+                await UserRepository.findByIdAndUpdate(userId,{role:'expert'})
+              
+            }
             await sendExpertStatusUpdate(existingExpert.userId.email, action);
     
             return { success: true, data: updatedExpert };
@@ -124,6 +130,23 @@ class ExpertService {
             console.log(error)
             throw new Error('Error finding expert data');
         }
+    }
+
+    async switch_expert(userId:string){
+        try {
+            const expert = await ExpertRepository.findOne({ userId: userId });
+            if (!expert) {
+                return { success: false, message: "Cannot switch to expert account: User not found" };
+            }
+            if (expert.status !== 'approved') {
+                return { success: false, message: "Your request has not been accepted" };
+            }
+            return { success: true, message: "Switched to expert account successfully" };
+        } catch (error) {
+            console.error("Error in switch_expert service:", error);
+            throw error; // Propagate the error to the controller
+        }
+
     }
 }
 
