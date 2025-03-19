@@ -1,10 +1,10 @@
 // ProfilePage.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Bell,
   Eye,
   Home,
-  User,
+ User,
   Lock,
   Heart,
   Briefcase,
@@ -16,27 +16,47 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDispatch, useSelector } from "react-redux";
-import { AuthState, changeRole } from "@/Slice/authSlice";
+import { AuthState, changeRole, updateUser } from "@/Slice/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { RootState } from "@reduxjs/toolkit/dist/query";
 import CreateExpertModal from "@/components/User/modals/CreateExpertModal";
+
 import {
   createExpertAccount,
   switchExpert,
 } from "../../../services/User/ExpertAccount";
-import { ExpertData } from "@/Interfaces/interfaces";
+import { ExpertData, IUser } from "@/Interfaces/interfaces";
 import Loading from "@/components/Loading";
+import { get_userData } from "@/services/User/AuthServices";
 export const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useSelector(
+  const { isAuthenticated, user:reduxUser } = useSelector(
     (state: AuthState) => state.auth 
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
+  const [user,setUser]= useState<IUser>()
+
+  useEffect(()=>{
+    const fetchUser=async()=>{
+try {
+  const response=await get_userData()
+ 
+  if(response.success){
+    setUser(response.user)
+  }else{
+    toast.error(response.message)
+  }
+} catch (error) {
+  toast.error(error.message || "User data fetching error")
+}
+    }
+fetchUser()
+  },[])
+console.log(isAuthenticated,user)
   const handleCreateExpert = async (expertData: ExpertData) => {
-   
     setIsLoading(true); // Show loading when request starts
     console.log(expertData);
     try {
@@ -57,10 +77,16 @@ export const ProfilePage: React.FC = () => {
 
       const response = await createExpertAccount(formData);
 
-      if (response.success) {
-        dispatch(changeRole("expert"));
-        setIsModalOpen(false);
+      if (response?.success) {
+        
+setUser((prev) => ({
+  ...prev, 
+  expertStatus:"pending", 
+}));
+  setIsModalOpen(false);
         toast.success(response.message);
+      }else{
+        toast.error(response.message)
       }
     } catch (error) {
       console.error("Error uploading expert:", error);

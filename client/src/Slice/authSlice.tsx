@@ -69,9 +69,14 @@ const authSlice = createSlice({
       state.user=action.payload.user
 
     },
-
-
-    
+    updateUser: (state, action) => {
+      if (action.payload) {
+        state.user = {
+          ...state.user, 
+          ...action.payload, 
+        };
+      }
+    },
     // login actions
     loginStart:(state)=>{
       state.loading= true;
@@ -109,6 +114,7 @@ export const {
   loginStart,
   loginSuccess,
   changeRole,
+  updateUser,
   setUser,
   logout
 } = authSlice.actions;

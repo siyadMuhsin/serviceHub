@@ -87,7 +87,7 @@ class AuthController {
     }
     try {
       const response = await AuthService.findUser(userId);
-      // console.log(response);
+  
       res.json(response);
       return;
     } catch (err: any) {

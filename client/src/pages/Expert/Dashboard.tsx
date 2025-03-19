@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { get_expert } from "@/services/Expert/expert.service"
+import { toast } from "react-toastify"
 
 const recentRequests = [
   {
@@ -30,17 +31,26 @@ const recentRequests = [
 ]
 
 export default function Dashboard() {
+  const [loading,setLoading]=useState<boolean>(true)
+  const [expert,setExpert]=useState<any>()
   useEffect(()=>{
+    
     const fetchData=async()=>{
       try {
         const response= await get_expert()
-        console.log('expert dashboad')
-        console.log(response)
+       if(response.success){
+      
+        setExpert(response.expert)
+       }
       } catch (error) {
-        
+        toast.error(error.message || "error in fetching expert date")
+      }finally{
+        setLoading(false)
       }
     }
+    fetchData()
   },[])
+
   return (
   
     <div className="flex flex-col w-[100%]">
@@ -49,7 +59,7 @@ export default function Dashboard() {
           <div className="container mx-auto px-4 py-6">
             {/* Header with welcome message and buttons */}
             <div className="mb-8 flex items-center justify-between rounded-lg bg-gray-50 p-4 shadow-sm">
-              <h2 className="text-xl font-medium text-gray-700">Welcome, John Doe 👋</h2>
+              <h2 className="text-xl font-medium text-gray-700">Welcome,{expert?.accountName} 👋</h2>
               <div className="flex items-center gap-4">
                 <Button variant="link" size="icon" className="relative">
                   <Bell className="h-5 w-5" />

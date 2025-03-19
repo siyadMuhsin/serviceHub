@@ -10,6 +10,11 @@ export const createExpertAccount = async(formDate:FormData)=>{
         })
         return response.data
     } catch (error) {
+       
+        // throw new Error(error)
+        return {success:false,message:error.response?.data?.error}
+
+
         
     }
 }

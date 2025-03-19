@@ -12,6 +12,8 @@ import Loading from "../../components/Loading";
 import debounce from "../../Utils/debouce";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { updateUser } from "@/Slice/authSlice";
 interface Expert {
   _id?: string;
   accountName: string;
@@ -34,7 +36,7 @@ function ExpertManagement() {
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuary,setSearchQuery]=useState<string>('')
   const itemsPerPage = 8;
-
+const dispatch= useDispatch()
   // Fetch experts
   useEffect(() => {
     setLoading(true);
@@ -70,11 +72,13 @@ function ExpertManagement() {
       const response = await expert_change_action(id, action);
       if (response?.success) {
         // Update the expert's status in the state
+        
         setExperts((prev) =>
           prev.map((expert) =>
             expert._id === id ? { ...expert, status: action } : expert
           )
-        );
+        )
+        
         toast.success(`Expert status updated to ${action}`); // Notify success
       } else {
         toast.error(response?.message || "Failed to update expert status"); // Handle API error
@@ -92,9 +96,7 @@ function ExpertManagement() {
       setLoading(true)
       const response= await block_unlbock_expert(id,active)
       console.log("dd",response)
-      if(response?.success){
-        
-        
+      if(response?.success){ 
         setExperts((prev)=>
           prev.map((expert)=>(
             expert._id===id ? {...expert,isBlocked:!active}:expert
@@ -114,7 +116,7 @@ function ExpertManagement() {
 
     const handleSearchChange = debounce((value: string) => {
       setSearchQuery(value);
-      setCurrentPage(0); // Reset to the first page when searching
+      setCurrentPage(0); 
     }, 300); // 300ms delay
   
   return (

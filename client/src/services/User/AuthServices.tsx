@@ -95,3 +95,13 @@ export const resetPassword=async(token:string|undefined , newPassword:string)=>{
   const response= await userAPI.post('/auth/reset-password',{token,newPassword})
 return response
 }
+
+export const get_userData=async()=>{
+  try {
+    const response= await userAPI.get('/auth/me')
+    return response.data
+  } catch (error) {
+    return {success:false,error:error.response.data}
+    
+  }
+}

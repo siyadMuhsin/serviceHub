@@ -28,5 +28,6 @@ console.log(id)
             return
         }
     }
+
 }
 export default new UsersController()

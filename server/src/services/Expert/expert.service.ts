@@ -9,10 +9,12 @@ import { ObjectId } from "mongodb";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt";
 class ExpertService {
     async createExpert(data: Partial<IExpert>, file: Express.Multer.File,userId:string): Promise<IExpert> {
-      
-        try {
-           
+       
             // Wrap Cloudinary upload_stream in a Promise
+            const existingExpert= await ExpertRepository.findOne({accountName:data.accountName})
+            if(existingExpert){
+                throw new Error("The Account Name already used");
+            }
             const result: any = await new Promise((resolve, reject) => {
                 const uploadStream = cloudinary.uploader.upload_stream(
                     {
@@ -40,10 +42,10 @@ class ExpertService {
            const response= await ExpertRepository.createExpert({ ...data, certificateUrl: url, },userId);
              await UserRepository.findByIdAndUpdate(userId,{expertStatus:"pending"})
              return response
-        } catch (error: any) {
-            console.log(error);
-            throw new Error(`Error in ExpertService: ${error.message}`);
-        }
+        // } catch (error: any) {
+        //     console.log(error);
+        //     throw new Error(`Error in ExpertService: ${error.message}`);
+        // }
     }
     
     
@@ -116,7 +118,6 @@ class ExpertService {
     async getExpertData(id:string){
         try {
             const expert=await ExpertRepository.findById(id)
-            console.log(expert)
             if(expert){
                 return {success:true,expert}
             }

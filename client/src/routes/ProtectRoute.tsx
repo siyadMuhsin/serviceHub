@@ -2,8 +2,8 @@ import { useSelector } from "react-redux";
 import { Navigate ,Outlet} from "react-router-dom";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useSelector((state: any) => state.auth);
-
+  const { isAuthenticated ,role} = useSelector((state: any) => state.auth);
+if(role==="expert")return <Navigate to={'/expert'}/>;
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 const LoginRoute = ({ children }: { children: React.ReactNode }) => {
