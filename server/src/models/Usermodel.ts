@@ -27,7 +27,7 @@ const userSchema = new Schema<IUser>(
     isBlocked:{type:Boolean,default:false},
     googleId: { type: String, required: false },
     profile_imaga: { type: String, required: false },
-    expertStatus:{type:String,enum: ['pending', 'approved', 'rejected'],default:'pending'},
+    expertStatus:{type:String,enum: ['default','pending', 'approved', 'rejected'],default:'default'},
     resetPasswordToken: { type: String }, 
     resetPasswordExpires: { type: Date },
     isVerified: { type: Boolean, default: false },

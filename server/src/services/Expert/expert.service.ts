@@ -6,6 +6,7 @@ import UserRepository from "../../repositories/UserRepository";
 import { sendExpertStatusUpdate } from "../../utils/emailService";
 import exp from "constants";
 import { ObjectId } from "mongodb";
+import { generateAccessToken, generateRefreshToken } from "../../utils/jwt";
 class ExpertService {
     async createExpert(data: Partial<IExpert>, file: Express.Multer.File,userId:string): Promise<IExpert> {
       
@@ -141,7 +142,9 @@ class ExpertService {
             if (expert.status !== 'approved') {
                 return { success: false, message: "Your request has not been accepted" };
             }
-            return { success: true, message: "Switched to expert account successfully" };
+            const accessToken = generateAccessToken(userId, 'expert', expert.id);
+            const refreshToken = generateRefreshToken(userId, 'expert', expert.id);
+            return { success: true, message: "Switched to expert account successfully",accessToken,refreshToken };
         } catch (error) {
             console.error("Error in switch_expert service:", error);
             throw error; // Propagate the error to the controller

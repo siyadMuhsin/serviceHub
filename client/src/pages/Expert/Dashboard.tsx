@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { useEffect } from "react"
+import { get_expert } from "@/services/Expert/expert.service"
 
 const recentRequests = [
   {
@@ -32,7 +33,8 @@ export default function Dashboard() {
   useEffect(()=>{
     const fetchData=async()=>{
       try {
-        const response= await get_expert
+        const response= await get_expert()
+        console.log(response)
       } catch (error) {
         
       }

@@ -8,4 +8,5 @@ import { Request } from "express";
 export interface AuthRequest extends Request {
   user?: any; // You can replace `any` with a proper user type if available
   admin?:any;
+  expert?:any;
 }

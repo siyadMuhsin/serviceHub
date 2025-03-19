@@ -120,7 +120,24 @@ class ExpertController {
              return
         }
         const response = await expertService.switch_expert(userId);
-       res.status(response.success?200:400).json(response)
+        if(response.success){
+          res.cookie("accessToken",response.accessToken,{
+            httpOnly: false, 
+             secure: process.env.NODE_ENV === 'production', 
+             sameSite: 'strict',
+             maxAge: 15 * 60 * 1000, 
+          })
+
+          res.cookie("refreshToken",response.refreshToken,{
+            httpOnly:true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite:'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
+          })
+          res.status(200).json(response)
+          return
+        }
+       res.status(400).json(response)
     } catch (error) {
         console.error("Error in switch_expert controller:", error);
          res.status(500).json({ success: false, message: "Internal server error" });

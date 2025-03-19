@@ -24,7 +24,7 @@ connectDB()
 app.use('/',userRoute)
 app.use('/auth',authRoutes)
 app.use('/admin',adminRoute)
-app.use('/experts',expertRoute)
+app.use('/expert',expertRoute)
 const PORT=process.env.PORT || 3000
 app.listen(PORT,()=>{
     console.log("server running succesfully")

@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import { store } from "./src/store";
 import { logout } from "./src/Slice/authSlice";
 import { adminLogout } from "./src/Slice/adminAuthSlice";
+import { error } from "console";
 
 // Define the API response structure
 interface ApiResponse {
@@ -73,5 +74,33 @@ adminAPI.interceptors.response.use(
   }
 );
 
-export { userAPI, adminAPI };
+const expertAPI: AxiosInstance = axios.create({
+  baseURL: "http://localhost:3000/expert/",
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
+});
+expertAPI.interceptors.response.use(
+  (response: AxiosResponse) => response, // Success handler
+  async (error: AxiosError) => {
+    if (error.response && error.response.status === 401) {
+      try {
+        console.log("Refreshing expert token...");
+        const response = await expertAPI.post<ApiResponse>("/auth/refresh");
+        if (!response.data.success) {
+          store.dispatch(logout());
+          return;
+        }
+        if (error.config) {
+          return expertAPI.request(error.config);
+        }
+      } catch (refreshError) {
+        console.error("Expert session expired, logging out...");
+        store.dispatch(logout()); // Log out the expert
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export { userAPI, adminAPI ,expertAPI};
 
