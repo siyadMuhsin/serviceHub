@@ -13,11 +13,8 @@ dotenv.config()
 
 const verifyToken =async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    console.log('verify token')
     const token = req.cookies?.accessToken; // Get token from cookie
     if (!token) {
-      // creating new access token
-
       res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
       return
     }

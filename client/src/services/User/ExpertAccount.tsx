@@ -1,4 +1,4 @@
-import { userAPI } from "../../../axiosConfig"
+import { expertAPI, userAPI } from "../../../axiosConfig"
 
 export const createExpertAccount = async(formDate:FormData)=>{
     try {
@@ -21,6 +21,15 @@ export const createExpertAccount = async(formDate:FormData)=>{
 export const switchExpert=async()=>{
     try {
         const response=await userAPI.get('/switch_expert')
+        return response.data
+    } catch (error) {
+        return error?.response?.data
+    }
+}
+
+export const switchUser=async()=>{
+    try {
+        const response=await expertAPI.get('/switch_user')
         return response.data
     } catch (error) {
         return error?.response?.data

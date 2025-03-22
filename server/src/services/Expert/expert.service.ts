@@ -147,6 +147,25 @@ class ExpertService {
         }
 
     }
+    async switch_user (expertId:string){
+        try {
+            const expert = await ExpertRepository.findById(expertId);
+            console.log(expert)
+            if (!expert) {
+                return { success: false, message: "Cannot switch to expert account: User not found" };
+            }
+
+            const accessToken = generateAccessToken(expert.userId._id, 'user');
+            const refreshToken = generateRefreshToken(expert.userId._id, 'user');
+            
+            return { success: true, message: "Switched to user account successfully",accessToken,refreshToken };
+        } catch (error) {
+            console.error("Error in switch_user service:", error);
+            throw error; // Propagate the error to the controller
+        }
+
+
+    }
 }
 
 export default new ExpertService();

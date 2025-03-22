@@ -30,10 +30,22 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const response = await LogoutUser();
-    setShowLogoutModal(false);
-    navigate("/login");
-    dispatch(logout());
+    try{
+      setIsLoading(true)
+      const response = await LogoutUser();
+      if(response.success){
+        navigate("/login")
+        dispatch(logout());
+        setShowLogoutModal(false)
+      }else{
+        toast.error(response.message || "Cannot log out now!")
+      }
+    }catch(err){
+      console.error("Logout Error:", err);
+      toast.error("Something went wrong! Try again.");
+    }finally{
+      setIsLoading(false)
+    }
   };
 
   const onCancel = () => {

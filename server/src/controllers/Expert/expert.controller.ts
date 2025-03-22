@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import ExpertService from "../../services/Expert/expert.service";
 import { AuthRequest } from "../../types/User";
 import expertService from "../../services/Expert/expert.service";
+import { setAuthCookies } from "../../utils/setAuthCookies ";
 class ExpertController {
   async createExpert(req: AuthRequest, res: Response) {
     try {
@@ -115,6 +116,7 @@ class ExpertController {
 
   async switch_expert(req:AuthRequest,res:Response){
     try {
+      console.log('switch to expert')
         const userId = req.user?.userId; // Ensure userId is extracted correctly
         if (!userId) {
              res.status(400).json({ success: false, message: "User not found" });
@@ -122,21 +124,13 @@ class ExpertController {
         }
         const response = await expertService.switch_expert(userId);
         if(response.success){
-          res.cookie("accessToken",response.accessToken,{
-            httpOnly: false, 
-             secure: process.env.NODE_ENV === 'production', 
-             sameSite: 'strict',
-             maxAge: 15 * 60 * 1000, 
-          })
-
-          res.cookie("refreshToken",response.refreshToken,{
-            httpOnly:true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite:'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000, 
-          })
-          res.status(200).json(response)
-          return
+         
+          if (response.accessToken && response.refreshToken) {
+            await setAuthCookies(res, response.accessToken, response.refreshToken);
+            res.status(200).json(response)
+            return
+          }
+        
         }
        res.status(400).json(response)
     } catch (error) {
@@ -145,6 +139,28 @@ class ExpertController {
     }
 
   }
-
+  async switch_user(req:AuthRequest,res:Response){
+    console.log('switch to user')
+    try{
+      const expertId=req?.expert?.expertId
+      if (!expertId) {
+        res.status(400).json({ success: false, message: "Expert not found" });
+        return
+   }
+   const response = await expertService.switch_user(expertId)
+   if(response.success){
+    if (response.accessToken && response.refreshToken) {
+      await setAuthCookies(res, response.accessToken, response.refreshToken);
+     
+    }
+    res.status(200).json(response)
+    return
+   }
+   res.status(400).json(response)
+    }catch(err){
+      console.error("Error in switch_user controller:", err);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  }  
 }
 export default new ExpertController();

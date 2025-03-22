@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import Cookie from 'js-cookie'
+
 import { useDispatch } from "react-redux";
-import { loginSuccess, logout } from "../Slice/authSlice";
+import { changeRole, loginSuccess, logout } from "../Slice/authSlice";
 import { userAPI, adminAPI } from "../../axiosConfig";
-import {
-  setInitialCategories,
-  setInitialServices,
-} from "../Slice/categoryServiceSlice";
+import { getRoleFromToken } from "@/Utils/jwt.decode";
+
 const useAuthCheck = () => {
   const dispatch = useDispatch();
 
@@ -17,7 +17,14 @@ const useAuthCheck = () => {
         // ✅ Fetch user info
         const response = await userAPI.get("/auth/me", { withCredentials: true });
         if (response.data.success) {
-        
+          
+         
+            let role= getRoleFromToken()
+            if(role==="expert"){
+              dispatch(changeRole("expert"))
+            }
+          
+          
           dispatch(loginSuccess(response.data));
         } else {
           dispatch(logout());

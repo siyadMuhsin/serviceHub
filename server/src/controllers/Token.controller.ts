@@ -5,7 +5,6 @@ class TokenController {
   async userRefreshToken(req: Request, res: Response): Promise<void> {
     try {
       const token = req.cookies.refreshToken;
-      console.log("refresh tokken creatign", token);
       if (!token) {
         res.status(400).json({ success: false, message: "Unauthorized" });
         return;
@@ -16,7 +15,7 @@ class TokenController {
       );
       const newAccessToken = generateAccessToken(decoded.userId, "user");
       res.cookie("accessToken", newAccessToken, {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 15 * 60 * 1000, // 15 minutes
