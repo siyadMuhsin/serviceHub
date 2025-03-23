@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import { get_servicesByCategory_limit } from "../../services/category.service";
 import debounce from "../../Utils/debouce";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const Service: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +20,7 @@ const Service: React.FC = () => {
   const itemsPerPage = 8;
   const [totalPages, setTotalPages] = useState<number>(0);
 
-  // ✅ Debounced search handler
+  // Debounced search handler
   const debouncedSetSearchQuery = useCallback(
     debounce((value: string) => {
       setSearchQuery(value);
@@ -26,14 +29,14 @@ const Service: React.FC = () => {
     []
   );
 
-  // ✅ Handle search input change
+  // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchInput(value);
     debouncedSetSearchQuery(value);
   };
 
-  // ✅ Fetch services from the backend
+  // Fetch services from the backend
   const fetchServices = async () => {
     try {
       setIsLoading(true);
@@ -44,7 +47,6 @@ const Service: React.FC = () => {
         searchQuery
       );
       if (response.success) {
-        console.log('success',response.services)
         setServices(response.services || []);
         setTotalPages(response.totalPages || 0);
       } else {
@@ -58,76 +60,139 @@ const Service: React.FC = () => {
     }
   };
 
-  // ✅ Trigger fetching when category ID, page, or search query changes
+  // Trigger fetching when category ID, page, or search query changes
   useEffect(() => {
     fetchServices();
   }, [id, currentPage, searchQuery]);
 
-  // ✅ Handle page change
+  // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        {/* Header with consistent styling to match Category page */}
         <div className="flex justify-between">
-          <div className="text-center mb-12">
-            <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Services in This Category
-            </h1>
-            <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-              Browse our selection of professional services tailored to your needs.
-            </p>
+          <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+              Services Available
+            </span>
+          </h1>
+          <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+            Explore professional services tailored to meet your specific requirements
+          </p>
+
           </div>
-          <div>
-            <input
-              type="text"
-              placeholder="Search services..."
-              value={searchInput}
-              onChange={handleSearchChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          
+
+          {/* Search Input with Icon - consistent with Category page */}
+          <div className="mt-8 max-w-md  relative">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Input
+                type="text"
+                placeholder="Search services..."
+                value={searchInput}
+                onChange={handleSearchChange}
+                className="pl-10 py-6 rounded-full border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Services List */}
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+          </div>
+        ) : error ? (
+          <Card className="max-w-md mx-auto bg-white">
+            <CardContent className="flex flex-col items-center justify-center pt-10 pb-10">
+              <div className="text-red-500 mb-4">⚠️</div>
+              <h4 className="text-xl font-medium text-gray-700">
+                Error
+              </h4>
+              <p className="mt-2 text-gray-500 text-center">
+                {error}
+              </p>
+            </CardContent>
+          </Card>
+        ) : services.length === 0 ? (
+          <Card className="max-w-md mx-auto bg-white">
+            <CardContent className="flex flex-col items-center justify-center pt-10 pb-10">
+              <Search size={48} className="text-gray-300 mb-4" />
+              <h4 className="text-xl font-medium text-gray-700">
+                No services found
+              </h4>
+              <p className="mt-2 text-gray-500 text-center">
+                Please try a different search term.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {services.map((service) => (
+              <Link
+                to={`/services/${service._id}`}
+                key={service._id}
+                className="group outline-none focus:ring-2 focus:ring-blue-500 rounded-xl"
+              >
+                <Card className="overflow-hidden border-0 shadow-md transition-all duration-300 group-hover:shadow-xl group-hover:translate-y-[-8px] h-full flex flex-col">
+                  {/* Image with overlay effect - matching Category styling */}
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                    <img
+                      src={service.image}
+                      alt={service.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  </div>
+                  
+                  <CardHeader className="pt-6 pb-2">
+                    <h2 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                      {service.name}
+                    </h2>
+                  </CardHeader>
+                  
+                  <CardContent className="py-2 flex-grow">
+                    <p className="text-gray-600 line-clamp-3">
+                      {service.description || "Professional service tailored to meet your specific requirements."}
+                    </p>
+                  </CardContent>
+                  
+                  <CardFooter className="pt-2 pb-6">
+                    <div className="text-sm text-blue-600 font-medium flex items-center">
+                      View experts
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className="h-4 w-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-1" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </CardFooter>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination - positioned consistently with Category page */}
+        {services.length > 0 && totalPages > 1 && (
+          <div className="mt-16">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
             />
           </div>
-        </div>
-
-        {/* ✅ Show loading state */}
-        {isLoading ? (
-          <div className="text-center text-gray-500">Loading services...</div>
-        ) : error ? (
-          <div className="text-center text-red-500">{error}</div>
-        ) : services.length === 0 ? (
-          <div className="text-center text-gray-500">No services found.</div>
-        ) : (
-          <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {services.map((service) => (
-        <div
-          key={service._id}
-          className="relative overflow-hidden rounded-lg shadow-md"
-        >
-          <img
-            src={service.image}
-            alt={service.name}
-            className="w-full h-44 object-cover"
-          />
-          <div className="absolute bottom-0 left-0 right-0 p-3">
-            <p className="text-white font-bold text-lg text-center">{service.name}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-
-            {/* ✅ Pagination */}
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            )}
-          </>
         )}
       </div>
     </div>

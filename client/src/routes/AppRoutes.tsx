@@ -13,6 +13,7 @@ import Loading from "@/components/Loading";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import Profile, { ProfilePage } from "@/pages/User/Home/Profile";
+import NotFound from "@/pages/User/NotFount";
 
 const AppRoutes = () => {
   const loading = useAuthCheck();
@@ -33,6 +34,7 @@ const AppRoutes = () => {
 
   return (
     <>
+    
       <Routes>
         {/* Auth-related routes */}
         <Route
@@ -62,9 +64,12 @@ const AppRoutes = () => {
           <Route path="/categories" element={<Category />} />
           <Route path="/categories/:id" element={<Service />} />
           <Route path="/profile" element={<ProfilePage/>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </ProtectedRoute>
+
+  
     </>
   );
 };
