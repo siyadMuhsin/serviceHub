@@ -22,6 +22,15 @@ class UserServices{
             return { success: false, message: "Error updating user status" }; 
         }
     }
+    async checkBloked(id:string){
+        try {
+            const user= await UserRepository.findUserById(id)
+            return !user?.isBlocked
+        } catch (error) {
+            return { success: false, message: "Error updating user status" };
+        }
+       
+    }
 }
 
 export default new UserServices

@@ -29,6 +29,7 @@ class ServicesService{
        async getAllServices() {
         try {
             const services = await servicesRepository.getAllServices();
+            console.log(services)
             return { success: true, services };
         } catch (error) {
             return { success: false, message: "Error fetching services", error };
@@ -134,6 +135,18 @@ class ServicesService{
       console.log(search)
       const response=await servicesRepository.getServicesByCategoryLimit(categoryId,limit,page,search)
       return response
+     }
+
+
+     async getServicesToMange(page:number,limit:number,search:string){
+      try {
+        const response= await servicesRepository.getAllServicesByLimit(page,limit,search)
+        return response
+      } catch (error:any) {
+        throw new Error(`Error fetching services: ${error.message}`);
+      }
+
+
      }
 }
 

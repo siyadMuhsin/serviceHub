@@ -50,10 +50,9 @@ class CategoryService {
    */
 
   async getAllCategories() {
+    console.log('categir')
     try {
-      console.log('get all categories')
       const categories = await CategoryRepository.getAllCategories();
-      console.log(categories.length)
       return { success: true, categories };
     } catch (error: any) {
       console.error("Error in getAllCategories:", error);
@@ -173,6 +172,19 @@ class CategoryService {
     
     const result = await CategoryRepository.getCategoriesByLimit(page, limit,search);
     return result;
+  }
+
+  async getCategoryToMange(page:number,limit:number,search:string){
+    try {
+      const isAdmin= true
+      const result=await CategoryRepository.getCategoriesByLimit(page,limit,search,isAdmin)
+      return {success:true ,message:"category get in succuss",result}
+    } catch (error) {
+      console.error("Error in updateCategory:", error);
+      return { success: false, message: "Failed to get categories" };
+      
+    }
+
   }
 }
 

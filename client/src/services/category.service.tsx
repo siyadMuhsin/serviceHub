@@ -20,3 +20,21 @@ export const get_servicesByCategory_limit=async(categoryId:string,page:number,li
     }
 
 }
+export const getAll_categories=async()=>{
+    try {
+        const response= await userAPI.get('/categories/all')
+        return response.data
+    } catch (error) {
+        return error.response.data
+    }
+
+}
+export const getAll_services=async()=>{
+    try {
+        const response= await userAPI.get('/services/all')
+        return response.data
+    } catch (error) {
+        return error.response.data
+        
+    }
+}

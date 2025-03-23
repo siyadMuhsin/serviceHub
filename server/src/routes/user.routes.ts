@@ -9,6 +9,8 @@ const router= Router()
 
 
 router.get('/categories',categoryController.categoriesByLimit)
+router.get('/categories/all',categoryController.getAllCategories)
+router.get('/services/all',servicesController.getAllServices)
 router.get('/services/:categoryId',servicesController.getServicesByCategory_limit)
 router.get('/switch_expert',verifyToken,expertController.switch_expert)
 

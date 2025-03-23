@@ -1,9 +1,9 @@
 import { Form } from "react-router-dom";
 import { adminAPI } from "../../../axiosConfig";
 
-export const getServices = async () => {
+export const getServices = async (page:number,limit:number,search:string) => {
   try {
-    const response = await adminAPI.get("/services");
+    const response = await adminAPI.get(`/services?page=${page+1}&limit=${limit}&search=${search}`);
     console.log(response.data);
     return response.data;
   } catch (error) {

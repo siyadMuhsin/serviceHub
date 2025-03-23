@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { adminLoginService } from "../../../services/Admin/adminAuthService";
 import { useDispatch } from "react-redux";
-import { adminLogin, fetchCategories, fetchServices } from "../../../Slice/adminAuthSlice";
+import { adminLogin} from "../../../Slice/adminAuthSlice";
 import { toast } from "react-toastify";
 
 const AdminLogin: React.FC = () => {
@@ -21,8 +21,8 @@ const AdminLogin: React.FC = () => {
       if (response.success) {
         dispatch(adminLogin());
        
-        dispatch(fetchCategories())
-        dispatch(fetchServices())
+        // dispatch(fetchCategories())
+        // dispatch(fetchServices())
         toast.success("Login successful!");
         navigate("/admin/dashboard");
       } else {

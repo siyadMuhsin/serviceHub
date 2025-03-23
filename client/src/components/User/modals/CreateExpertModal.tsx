@@ -6,6 +6,7 @@ import { Category, Service, ExpertData } from "../../../Interfaces/interfaces";
 
 import { getServices } from "../../../services/Admin/service.service";
 import { getCategories } from "../../../services/Admin/category.service";
+import { getAll_categories, getAll_services } from "@/services/category.service";
 
 interface CreateExpertModalProps {
     isOpen: boolean;
@@ -31,11 +32,11 @@ const CreateExpertModal: React.FC<CreateExpertModalProps> = ({ isOpen, onClose, 
 
     useEffect(()=>{
         const fetchData=async()=>{
-            const serivces=await getServices()
+            const serivces=await getAll_services()
             if(serivces.success){
                 setServices(serivces.services)
             }
-            const categories=await getCategories()
+            const categories=await getAll_categories()
             if(categories.success){
                 setCategories(categories.categories)
             }

@@ -12,14 +12,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDispatch, useSelector } from "react-redux";
 import { AuthState, changeRole, updateUser } from "@/Slice/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { RootState } from "@reduxjs/toolkit/dist/query";
 import CreateExpertModal from "@/components/User/modals/CreateExpertModal";
 
 import {
@@ -32,8 +31,8 @@ import { get_userData } from "@/services/User/AuthServices";
 export const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, user:reduxUser } = useSelector(
-    (state: AuthState) => state.auth 
+  const { isAuthenticated } = useSelector(
+    (state: any) => state.auth 
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);

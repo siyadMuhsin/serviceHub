@@ -10,7 +10,7 @@ class ServiceRepository {
     return await Services.findOne({ name });
   }
   async getAllServices() {
-    return await Services.find().populate("categoryId");
+    return await Services.find({},{name:1}).populate("categoryId" ,"name");
   }
 
   async getServiceById(serviceId: string) {
@@ -50,6 +50,23 @@ class ServiceRepository {
       const totalServices = await Services.countDocuments(query)
       return { services, totalServices };
     } catch (error: any) {
+      throw new Error(`Error fetching services: ${error.message}`);
+    }
+  }
+  async getAllServicesByLimit(page:number,limit:number,search:string){
+    try {
+      const skip= (page-1) * limit
+      const query:any={}
+      if (search) {
+        query.name = { $regex: search, $options: 'i' }; 
+    }
+      const services= await Services.find(query).populate("categoryId")
+      .skip(skip)
+      .limit(limit)
+      .exec()
+      const totalServices= await Services.countDocuments(query)
+      return {services,totalServices}
+    } catch (error:any) {
       throw new Error(`Error fetching services: ${error.message}`);
     }
   }

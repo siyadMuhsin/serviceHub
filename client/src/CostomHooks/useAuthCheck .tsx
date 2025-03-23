@@ -5,10 +5,12 @@ import { useDispatch } from "react-redux";
 import { changeRole, loginSuccess, logout } from "../Slice/authSlice";
 import { userAPI, adminAPI } from "../../axiosConfig";
 import { getRoleFromToken } from "@/Utils/jwt.decode";
+import { Navigate, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const useAuthCheck = () => {
   const dispatch = useDispatch();
-
+const navigate= useNavigate()
   const [loading, setLoading] = useState(true);
   useEffect(() => {
    
@@ -16,6 +18,8 @@ const useAuthCheck = () => {
       try {
         // ✅ Fetch user info
         const response = await userAPI.get("/auth/me", { withCredentials: true });
+       
+       
         if (response.data.success) {
           
          
@@ -31,7 +35,16 @@ const useAuthCheck = () => {
         }
       } catch (error) {
         console.error("Error in fetching user data:", error);
-        dispatch(logout());
+        
+        if(error.response.status==403){
+         
+         toast.error(error.response.data.message)
+          return
+        }else{
+         
+          dispatch(logout());
+        }
+       
       } finally {
         setLoading(false); 
       }

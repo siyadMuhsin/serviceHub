@@ -48,7 +48,6 @@ class CategoryController {
    * Get all categories
    */
   async getAllCategories(req: Request, res: Response): Promise<void> {
-    console.log("category get in");
     try {
       const response = await CategoryServices.getAllCategories();
       res.status(response.success ? 200 : 400).json(response);
@@ -121,6 +120,7 @@ class CategoryController {
    
       const limit = parseInt(req.query.limit as string) || 10;
       const search = typeof req.query.searchQuary === 'string' ? req.query.searchQuary : '';
+      console.log(search)
       const { categories, total } = await CategoryServices.getCategoriesByLimit(page, limit,search);
       res.status(200).json({
         categories,
@@ -132,18 +132,35 @@ class CategoryController {
       res.status(500).json({ error: "Failed to fetch categories" });
     }
   }
-  // async deleteCategory(req: Request, res: Response): Promise<void> {
-  //   try {
-  //     const { id } = req.params;
-  //     const response = await CategoryServices.deleteCategory(id);
-  //     res.status(response.success ? 200 : 404).json(response);
-  //   } catch (err: any) {
-  //     console.error("Error in deleteCategory:", err);
-  //     res
-  //       .status(500)
-  //       .json({ success: false, message: "Internal Server Error" });
-  //   }
-  // }
+ 
+  async getCategoryToManage(req:Request,res:Response){
+    try {
+  
+    const page= parseInt(req.query.page as string)||1 
+    const limit= parseInt(req.query.limit as string) ||8
+    const search = typeof req.query.search == 'string' ? req.query.search : "" ;
+      const { success,message,result }= await CategoryServices.getCategoryToMange(page,limit,search);
+     if(!success || !result){
+      res.status(400).json(message);
+      return
+     }
+     
+     res.status(200).json({
+      success,
+      categories:result?.categories,
+      currentPage: page,
+      totalPages: Math.ceil(result.total / limit),
+      totalItems: result.total,
+    });
+    } catch (err: any) {
+      console.error("Error in getAllCategories:", err);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
+    }
+
+
+  }
 }
 
 export default new CategoryController();

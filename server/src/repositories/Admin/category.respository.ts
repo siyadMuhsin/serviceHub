@@ -6,8 +6,7 @@ class CategoryRepository{
         return await category.save();
     }
     async getAllCategories():Promise<ICategory []>{
-
-        return await Category.find()
+        return await Category.find({},{name:1})
     }
     async getCategoryByName(name:string):Promise<ICategory | null>{
         return await Category.findOne({name})
@@ -23,15 +22,20 @@ class CategoryRepository{
         return !!result;
       }
 
-      async getCategoriesByLimit(page: number, limit: number,search:string) {
-        const query:any ={isActive:true}
+      async getCategoriesByLimit(page: number, limit: number,search:string,isAdmin?:boolean) {
+       
+        const query:any={}
+        
+        if(isAdmin !== true){
+          query.isActive=true
+        }
         if(search){
           query.name={ $regex: search, $options: "i" }
         }
       
 
     const skip = (page - 1) * limit;
-
+console.log(query)
     const categories = await Category.find(query)
       .skip(skip)
       .limit(limit);

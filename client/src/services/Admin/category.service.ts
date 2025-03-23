@@ -1,14 +1,22 @@
 import { adminAPI } from "../../../axiosConfig";
 
-export const getCategories = async () => {
+export const getCategories = async (page:number,limit:number ,search:string) => {
   try {
-    const response = await adminAPI.get("/categories");
+    const response = await adminAPI.get(`/categories?page=${page+1}&limit=${limit}&search=${search}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
     return { categories: [] };
   }
 };
+
+
+
+
+
+
+
+
 export const addCategory = async (formData: FormData) => {
   try {
     const response = await adminAPI.post("/category", formData, {

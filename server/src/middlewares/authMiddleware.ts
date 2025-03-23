@@ -1,8 +1,10 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, response } from "express";
 import dotenv from 'dotenv'
 import { AuthRequest } from "../types/User";
 import jwt ,{JwtPayload}from "jsonwebtoken";
 import { TokenVerify } from "../utils/jwt";
+import servicesService from "../services/Admin/services.service";
+import userService from "../services/Admin/user.service";
 
 dotenv.config()
 
@@ -27,6 +29,12 @@ const verifyToken =async (req: AuthRequest, res: Response, next: NextFunction) =
     }
 
     const decoded =await TokenVerify(token,secretKey)
+    const response =await userService.checkBloked(decoded.userId)
+    console.log(response)
+    if (!response){
+      res.status(403).json({ success: false, message: "Your account has been blocked by the admin." });
+      return 
+    }
   
     req.user = decoded; // Attach user info to request object
 

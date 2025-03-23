@@ -4,6 +4,7 @@ import validation from "../../../validations/formValidation";
 import { useSelector } from "react-redux";
 import { RootState } from "@reduxjs/toolkit/query";
 import { toast } from "react-toastify";
+import { getAll_categories } from "@/services/category.service";
 
 const AddServiceModal: React.FC<any> = ({
   isOpen,
@@ -23,9 +24,10 @@ const AddServiceModal: React.FC<any> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
   const [isNewImage, setIsNewImage] = useState(false);
-  const { categories } = useSelector(
-    (state: RootState) => state.categoryService
-  );
+  const [categories,setCategories]=useState([])
+  // const { categories } = useSelector(
+  //   (state: RootState) => state.categoryService
+  // );
 
   useEffect(() => {
     if (serviceToEdit) {
@@ -38,6 +40,20 @@ const AddServiceModal: React.FC<any> = ({
         setIsNewImage(false);
       }
     }
+    const fetchCategory=async()=>{
+      try {
+        const response= await getAll_categories()
+        if(response.success){
+          setCategories(response.categories)
+        }
+
+      } catch (error) {
+        toast.error(error.message)
+        
+      }
+
+    }
+    fetchCategory()
   }, [serviceToEdit]);
 
   const handleInputChange = (
@@ -90,7 +106,7 @@ const AddServiceModal: React.FC<any> = ({
   };
 
   const closeModal = () => {
-    setService({ name: "", description: "", image: null, categoryId: "" });
+    setService({ _id:"",name: "", description: "", image: null, categoryId: "" });
     setSelectedImage(null);
     setImagePreview(null);
     setCroppedFile(null);
