@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { forgetPassword } from "../../../services/User/AuthServices";
 
@@ -8,14 +7,12 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+console.log('forget password')
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const response = await forgetPassword(email);
-
       if (response.data.success) {
         toast.success("Password reset email sent. Please check your inbox.");
         navigate("/login");

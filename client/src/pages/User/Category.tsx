@@ -12,7 +12,7 @@ const Category: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const itemsPerPage = 8;
+  const itemsPerPage = 4;
 
   // Fetch categories with debounced search
   useEffect(() => {

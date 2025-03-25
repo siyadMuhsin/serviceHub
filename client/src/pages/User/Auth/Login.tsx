@@ -410,7 +410,7 @@ const Login: React.FC = () => {
                 <FaGoogle className={styles.googleIcon} /> Sign in with Google
               </button>
               <p>
-                <b onClick={() => navigate('/forget-password')} className={styles.cursorPointer}>
+                <b onClick={() => navigate('/forget_password')} className={styles.cursorPointer}>
                   Forgot password?
                 </b>
               </p>
