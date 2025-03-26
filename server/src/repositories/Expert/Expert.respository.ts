@@ -3,7 +3,6 @@ import { IExpert } from "../../types/Expert";
 class ExpertRepository {
     async createExpert(data: Partial<IExpert>,userId:string): Promise<IExpert> {
         try {
-            console.log(data)
             const newData= {...data,userId}
             const expert = new Expert(newData);
             return await expert.save();

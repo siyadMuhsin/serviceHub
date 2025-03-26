@@ -4,7 +4,7 @@ import {
   Bell,
   Eye,
   Home,
- User,
+  User,
   Lock,
   Heart,
   Briefcase,
@@ -31,30 +31,28 @@ import { get_userData } from "@/services/User/AuthServices";
 export const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated } = useSelector(
-    (state: any) => state.auth 
-  );
+  const { isAuthenticated } = useSelector((state: any) => state.auth);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
-  const [user,setUser]= useState<IUser>()
+  const [user, setUser] = useState<IUser>();
 
-  useEffect(()=>{
-    const fetchUser=async()=>{
-try {
-  const response=await get_userData()
- 
-  if(response.success){
-    setUser(response.user)
-  }else{
-    toast.error(response.message)
-  }
-} catch (error) {
-  toast.error(error.message || "User data fetching error")
-}
-    }
-fetchUser()
-  },[])
-console.log(isAuthenticated,user)
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await get_userData();
+
+        if (response.success) {
+          setUser(response.user);
+        } else {
+          toast.error(response.message);
+        }
+      } catch (error) {
+        toast.error(error.message || "User data fetching error");
+      }
+    };
+    fetchUser();
+  }, []);
+  console.log(isAuthenticated, user);
   const handleCreateExpert = async (expertData: ExpertData) => {
     setIsLoading(true); // Show loading when request starts
     console.log(expertData);
@@ -77,15 +75,14 @@ console.log(isAuthenticated,user)
       const response = await createExpertAccount(formData);
 
       if (response?.success) {
-        
-setUser((prev) => ({
-  ...prev, 
-  expertStatus:"pending", 
-}));
-  setIsModalOpen(false);
+        setUser((prev) => ({
+          ...prev,
+          expertStatus: "pending",
+        }));
+        setIsModalOpen(false);
         toast.success(response.message);
-      }else{
-        toast.error(response.message)
+      } else {
+        toast.error(response.message);
       }
     } catch (error) {
       console.error("Error uploading expert:", error);
@@ -102,12 +99,12 @@ setUser((prev) => ({
         dispatch(changeRole("expert"));
         toast.success("Switched to Expert Account successfully");
         navigate("/expert");
-      }else{
-        toast.error(response.message || "Failed to switch to expert account")
+      } else {
+        toast.error(response.message || "Failed to switch to expert account");
       }
     } catch (error) {
-        console.error("Error in handleSwitchAccount:", error);
-        toast.error("An unexpected error occurred. Please try again.");
+      console.error("Error in handleSwitchAccount:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -155,37 +152,80 @@ setUser((prev) => ({
             <Heart className="mr-2 h-4 w-4" />
             Saved Services
           </Button>
-          {isAuthenticated && user ? (
-            user.role === "user" ? (
-              user.expertStatus === "default" ? (
+
+          {isAuthenticated && user && (
+            <>
+              {/* User account section */}
+              {user.role === "user" && (
+                <>
+                  {/* Default user - show become expert button */}
+                  {(!user.expertStatus || user.expertStatus === "default") && (
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsModalOpen(true)}
+                      className="w-full justify-start pl-4 mb-1 bg-black text-white hover:bg-gray-800"
+                    >
+                      <Briefcase className="mr-2 h-4 w-4" />
+                      Become Expert Account
+                    </Button>
+                  )}
+
+                  {/* Pending approval */}
+                  {user.expertStatus === "pending" && (
+                    <div className="px-4 py-2 text-sm">
+                      <p className="text-yellow-600">
+                        Request Pending Approval
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Rejected request - ALLOW RE-APPLICATION */}
+                  {user.expertStatus === "rejected" && (
+                    <div className="px-4 py-2">
+                      <p className="text-red-500 text-sm mb-2">
+                        Your request was rejected. You can re-apply.
+                      </p>
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          // You might want to reset some state here if needed
+                          setIsModalOpen(true);
+                        }}
+                        className="w-full justify-start pl-2 mb-1 bg-black text-white hover:bg-gray-800"
+                      >
+                        <Briefcase className=" h-4 w-4" />
+                        Re-apply for Expert
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Approved but not switched yet */}
+                  {user.expertStatus === "approved" && (
+                    <Button
+                      variant="ghost"
+                      onClick={handleSwitchAccount}
+                      className="w-full justify-start pl-4 mb-1 text-green-600 hover:bg-green-50"
+                    >
+                      <Briefcase className="mr-2 h-4 w-4" />
+                      Switch to Expert Account
+                    </Button>
+                  )}
+                </>
+              )}
+
+              {/* Expert account section */}
+              {user.role === "expert" && (
                 <Button
-                  variant="outline"
-                  onClick={() => setIsModalOpen(true)}
-                  className="w-full justify-start pl-4 mb-1 bg-black text-white"
+                  variant="ghost"
+                  onClick={handleSwitchAccount}
+                  className="w-full justify-start pl-4 mb-1"
                 >
-                  <Briefcase className="mr-2 h-4 w-4" />
-                  Become Expert Account
+                  <User className="mr-2 h-4 w-4" />
+                  Switch to User Account
                 </Button>
-              ) : user.expertStatus === "pending" ? (
-                <span className="text-yellow-500 text-sm">
-                  Request Pending Approval...
-                </span>
-              ) : (
-                <span className="text-red-500 text-sm">
-                  Request is rejected...
-                </span>
-              )
-            ) : user.role === "expert" ? (
-              <Button
-                variant="ghost"
-                onClick={handleSwitchAccount}
-                className="w-full justify-start pl-4 mb-1"
-              >
-                <Briefcase className="mr-2 h-4 w-4" />
-                Switch to Expert Account
-              </Button>
-            ) : null
-          ) : null}
+              )}
+            </>
+          )}
         </nav>
       </div>
 
@@ -253,7 +293,7 @@ setUser((prev) => ({
         onCreate={handleCreateExpert}
       />
 
-      {loading&& <Loading/>}
+      {loading && <Loading />}
     </div>
   );
 };

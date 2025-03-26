@@ -8,13 +8,27 @@ import exp from "constants";
 import { ObjectId } from "mongodb";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt";
 class ExpertService {
-    async createExpert(data: Partial<IExpert>, file: Express.Multer.File,userId:string): Promise<IExpert> {
-       
-            // Wrap Cloudinary upload_stream in a Promise
-            const existingExpert= await ExpertRepository.findOne({accountName:data.accountName})
-            if(existingExpert){
-                throw new Error("The Account Name already used");
+    async createExpert(data: Partial<IExpert>, file: Express.Multer.File, userId: string): Promise<any> {
+      
+            // Check if account name is already taken by another user
+            const existingName = await ExpertRepository.findOne({ accountName: data.accountName });
+            console.log(existingName?.userId.toString(),"---",userId)
+            if (existingName && existingName.userId._id.toString() !== userId) {
+                throw new Error("The Account Name is already used by another expert");
             }
+    
+            // Check user's current status
+            const user = await UserRepository.findUserById(userId);
+            if (!user) {
+                throw new Error("User not found");
+            }
+            if (user.expertStatus === 'rejected') {
+                await UserRepository.findByIdAndUpdate(userId, { 
+                    expertStatus: 'pending',
+                });
+            }
+    
+            // Upload certificate to Cloudinary
             const result: any = await new Promise((resolve, reject) => {
                 const uploadStream = cloudinary.uploader.upload_stream(
                     {
@@ -26,26 +40,48 @@ class ExpertService {
                             console.error("Cloudinary Upload Error:", error);
                             reject(new Error("Failed to upload to Cloudinary"));
                         } else {
-                           
                             resolve(result);
                         }
                     }
                 );
                 uploadStream.end(file.buffer);
             });
+    
             if (!result || !result.secure_url) {
                 throw new Error("Cloudinary upload failed");
             }
-            // Create expert with Cloudinary URL
+    
             const url = result.secure_url;
-            
-           const response= await ExpertRepository.createExpert({ ...data, certificateUrl: url, },userId);
-             await UserRepository.findByIdAndUpdate(userId,{expertStatus:"pending"})
-             return response
-        // } catch (error: any) {
-        //     console.log(error);
-        //     throw new Error(`Error in ExpertService: ${error.message}`);
-        // }
+            let response;
+            const existingExpert = await ExpertRepository.findOne({ userId: userId });
+    
+            if (existingExpert) {
+                // Update existing expert profile
+                response = await ExpertRepository.findByIdAndUpdate(
+                    existingExpert._id,
+                    { 
+                        ...data, 
+                        certificateUrl: url,
+                        status: 'pending' // Reset status if updating after rejection
+                    }
+                );
+            } else {
+                // Create new expert profile
+                response = await ExpertRepository.createExpert({ 
+                    ...data, 
+                    certificateUrl: url,
+                    status: 'pending' // Initial status
+                }, userId);
+            }
+    
+            // Update user's expert status to pending
+            await UserRepository.findByIdAndUpdate(userId, { 
+                expertStatus: "pending",
+               
+            });
+    
+            return response;
+       
     }
     
     
@@ -87,7 +123,7 @@ class ExpertService {
             }
           
                 const userId: string = updatedExpert.userId.toString()
-                await UserRepository.findByIdAndUpdate(userId,{role:'expert',expertStatus:action==="approved"?"approved":"rejected"})
+                await UserRepository.findByIdAndUpdate(userId,{role:action==='approved'?'expert':'user',expertStatus:action==="approved"?"approved":"rejected"})
                 await sendExpertStatusUpdate(existingExpert.userId.email, action);
             return { success: true, data: updatedExpert };
         } catch (error) {
