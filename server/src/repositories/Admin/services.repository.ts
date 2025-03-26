@@ -7,7 +7,7 @@ class ServiceRepository {
   }
 
   async getServiceByName(name: string) {
-    return await Services.findOne({ name });
+    return await Services.findOne({  name: { $regex: new RegExp(`^${name}$`, 'i') } });
   }
   async getAllServices() {
     return await Services.find({},{name:1}).populate("categoryId" ,"name");

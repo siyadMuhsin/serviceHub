@@ -9,7 +9,7 @@ class CategoryRepository{
         return await Category.find({},{name:1})
     }
     async getCategoryByName(name:string):Promise<ICategory | null>{
-        return await Category.findOne({name})
+        return await Category.findOne({  name: { $regex: new RegExp(`^${name}$`, 'i')  }})
     }
     async getCategoryById(id: string): Promise<ICategory | null> {
         return await Category.findById(id);

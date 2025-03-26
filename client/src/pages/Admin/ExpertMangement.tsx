@@ -50,6 +50,7 @@ const dispatch= useDispatch()
         }
       } catch (error) {
         console.error("Error fetching experts:", error);
+        toast.error(error.message || "Failed to fetch experts");
       }
     };
 

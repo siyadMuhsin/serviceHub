@@ -31,7 +31,10 @@ class AuthService {
       return { success: true, message: "OTP already sent to this email" };
     }
 
-    if (exitingUser && exitingUser.isVerified && !exitingUser.isGoogleUser) {
+    if (exitingUser && exitingUser.isVerified && !exitingUser.isGoogleUser ) {
+      return { success: false, message: "User with this email already exists" };
+    }
+    if(exitingUser && exitingUser.password){
       return { success: false, message: "User with this email already exists" };
     }
     if (exitingUser && exitingUser.isGoogleUser && !exitingUser.password) {

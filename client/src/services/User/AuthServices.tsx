@@ -43,13 +43,14 @@ export const resendOtp = async (email: string) => {
   }
 };
 export const loginUser = async (email: string, password: string) => {
-  console.log(email, password);
+ 
   try {
     const response = await userAPI.post("/auth/login", { email, password });
-  
+  console.log(response)
     return response.data;
   } catch (error) {
     console.log(error);
+    return error.response.data;
   }
 };
 export const LogoutUser = async () => {
@@ -65,8 +66,6 @@ export const LogoutUser = async () => {
 
 export const googleSignIn = async (googleData: any) => {
   try {
-    console.log("Start Google Sign-In", googleData);
-
     // Make the API request
     const response = await axios.get(
       `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${googleData.access_token}`,
@@ -83,15 +82,23 @@ export const googleSignIn = async (googleData: any) => {
     }
     
   } catch (err: any) {
+   
     console.log(err);
     console.error("Google Sign-In Error:", err.response?.data || err.message);
+    return err.response.data;
   }
 };
 
 
 export const forgetPassword=async(email:string)=>{
+  try {
     const response= await userAPI.post('/auth/forgot-password',{email})
     return response
+  } catch (error) {
+    return error.response
+    
+  }
+  
 
 }
 export const resetPassword=async(token:string|undefined , newPassword:string)=>{

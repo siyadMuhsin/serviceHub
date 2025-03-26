@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import adminService from "../../services/Admin/admin.service";
 import { AuthRequest } from "../../types/User";
-
+import { HttpStatus } from "../../types/httpStatus";
 class AdminController {
   async login(req: Request, res: Response):Promise<void> {
     
@@ -17,13 +17,13 @@ class AdminController {
           response.refreshToken,
           { httpOnly: true, secure: false })
 
-        res.json({ success: true, message: "Login successful"})
+        res.status(HttpStatus.OK).json({ success: true, message: "Login successful"})
         return;
       }
       res.json(response)
       return 
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
     }
   }
 
@@ -40,10 +40,10 @@ class AdminController {
         res.json({ success: false, message: "Unauthorized" });
         return
       }
-       res.status(200).json({ success: true, admin: req.admin });
+       res.status(HttpStatus.OK).json({ success: true, admin: req.admin });
     } catch (error) {
       console.error("Error checking admin:", error);
-       res.json({ success: false, message: "Internal server error" });
+       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
     }
     
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Category } from "../../models/category.model";
-
+import { HttpStatus } from "../../types/httpStatus";
 import CategoryServices from "../../services/Admin/category.service";
 class CategoryController {
   async createCategory(req: Request, res: Response): Promise<void> {
@@ -10,7 +10,7 @@ class CategoryController {
       // Validate required fields
       if (!name || !description) {
         res
-          .status(400)
+          .status(HttpStatus.BAD_REQUEST)
           .json({
             success: false,
             message: "Name and description are required",
@@ -21,7 +21,7 @@ class CategoryController {
       // Validate image upload
       if (!req.file) {
         res
-          .status(400)
+          .status(HttpStatus.BAD_REQUEST)
           .json({ success: false, message: "Image upload is required" });
         return;
       }
@@ -33,12 +33,12 @@ class CategoryController {
         req.file
       );
 
-      res.status(response.success ? 201 : 400).json(response);
+      res.status(response.success ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST).json(response);
       return;
     } catch (error: any) {
       console.error("Error in createCategory Controller:", error);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "Internal server error" });
       return;
     }
@@ -50,11 +50,11 @@ class CategoryController {
   async getAllCategories(req: Request, res: Response): Promise<void> {
     try {
       const response = await CategoryServices.getAllCategories();
-      res.status(response.success ? 200 : 400).json(response);
+      res.status(response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST).json(response);
     } catch (err: any) {
       console.error("Error in getAllCategories:", err);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "Internal Server Error" });
     }
   }
@@ -66,11 +66,11 @@ class CategoryController {
     try {
       const { id } = req.params;
       const response = await CategoryServices.getCategoryById(id);
-      res.status(response.success ? 200 : 404).json(response);
+      res.status(response.success ? HttpStatus.OK : 404).json(response);
     } catch (err: any) {
       console.error("Error in getCategoryById:", err);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "Internal Server Error" });
     }
   }
@@ -83,11 +83,11 @@ class CategoryController {
       console.log(req.params);
       const {id}= req.params
       const response= await CategoryServices.changeStatus(id)
-      res.status(response.success ? 200 : 404).json(response);
+      res.status(response.success ? HttpStatus.OK : 404).json(response);
     } catch (error) {
       console.error("Error in getCategoryById:", error);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "Internal Server Error" });
     }
   }
@@ -101,11 +101,11 @@ class CategoryController {
       
       const { name, description} = req.body;
      const response= await CategoryServices.updateCategory(id,name,description,req.file)
-      res.status(response.success ? 200 : 400).json(response);
+      res.status(response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST).json(response);
     } catch (err: any) {
       console.error("Error in updateCategory:", err);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "Internal Server Error" });
     }
   }
@@ -122,14 +122,14 @@ class CategoryController {
       const search = typeof req.query.searchQuary === 'string' ? req.query.searchQuary : '';
       console.log(search)
       const { categories, total } = await CategoryServices.getCategoriesByLimit(page, limit,search);
-      res.status(200).json({
+      res.status(HttpStatus.OK).json({
         categories,
         currentPage: page,
         totalPages: Math.ceil(total / limit),
         totalItems: total,
       });
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch categories" });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: "Failed to fetch categories" });
     }
   }
  
@@ -141,11 +141,11 @@ class CategoryController {
     const search = typeof req.query.search == 'string' ? req.query.search : "" ;
       const { success,message,result }= await CategoryServices.getCategoryToMange(page,limit,search);
      if(!success || !result){
-      res.status(400).json(message);
+      res.status(HttpStatus.BAD_REQUEST).json(message);
       return
      }
      
-     res.status(200).json({
+     res.status(HttpStatus.OK).json({
       success,
       categories:result?.categories,
       currentPage: page,
@@ -155,7 +155,7 @@ class CategoryController {
     } catch (err: any) {
       console.error("Error in getAllCategories:", err);
       res
-        .status(500)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ success: false, message: "Internal Server Error" });
     }
 

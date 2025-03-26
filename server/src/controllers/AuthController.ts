@@ -1,152 +1,193 @@
-import { Request, response, Response } from "express";
-import jwt,{ Jwt } from "jsonwebtoken";
+import { Request, Response } from "express";
+import jwt, { Jwt } from "jsonwebtoken";
 import AuthService from "../services/AuthService";
 import { AuthRequest } from "../types/User";
 import { generateAccessToken } from "../utils/jwt";
+import { HttpStatus } from "../types/httpStatus"; // Adjust the import path
+
 class AuthController {
   static async register(req: Request, res: Response): Promise<void> {
     try {
       const { name, email, password } = req.body;
       const response = await AuthService.registerUser(name, email, password);
       if (response.success) {
-        res.json({ success: true, message: response.message });
+        res.status(HttpStatus.CREATED).json({ 
+          success: true, 
+          message: response.message 
+        });
       } else {
-        res.json({ success: false, message: response.message });
+        res.status(HttpStatus.BAD_REQUEST).json({ 
+          success: false, 
+          message: response.message 
+        });
       }
-      // return
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
-      return;
+      res.status(HttpStatus.BAD_REQUEST).json({ 
+        success: false, 
+        message: error.message 
+      });
     }
   }
 
   static async verifyOtp(req: Request, res: Response): Promise<void> {
     try {
       const { email, otp } = req.body;
-
       const response = await AuthService.verifyOtp(email, otp);
-      console.log(response);
+
       if (response.success) {
-        res.status(200).json(response);
+        res.status(HttpStatus.OK).json(response);
       } else {
-        res.json(response);
+        res.status(HttpStatus.BAD_REQUEST).json(response);
       }
     } catch (err: any) {
-      console.log(err);
-      res.status(400).json({ success: false, message: err.message });
+      res.status(HttpStatus.BAD_REQUEST).json({ 
+        success: false, 
+        message: err.message 
+      });
     }
   }
 
   static async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-     
       const response = await AuthService.loginUser(email, password);
 
       if (response.success) {
         res.cookie("accessToken", response.accessToken, {
-          httpOnly: true,  // Prevents JavaScript access (helps against XSS)
-          secure: process.env.NODE_ENV === "production", 
-          sameSite: "strict",
-          maxAge: 15 * 60 * 1000 // 15 minutes
-        });
-
-        // Store Refresh Token in Cookie
-        res.cookie("refreshToken", response.refreshToken, {
-          httpOnly: true,  // Cannot be accessed via JavaScript
+          httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
-          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+          maxAge: 15 * 60 * 1000
         });
-        res.status(200).json({ success: true, user: response.user });
-        return;
+
+        res.cookie("refreshToken", response.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(HttpStatus.OK).json({ 
+          success: true, 
+          user: response.user 
+        });
+      } else {
+        res.status(HttpStatus.UNAUTHORIZED).json(response);
       }
-      res.json(response);
-      return;
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
-    }
-  }
-  static async resendOtp(req: Request, res: Response): Promise<void> {
-    try {
-      
-      const { email } = req.body;
-      const response = await AuthService.resendOtp(email);
-      res.json(response);
-    } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
-      return;
-    }
-  }
-  static async getCurrentUser(req: AuthRequest, res: Response): Promise<void> {
-    const userId = req?.user?.userId;
-    
-    if (!userId) {
-      res.json({ success: false, message: "Unauthorized" });
-      return;
-    }
-    try {
-      const response = await AuthService.findUser(userId);
-  
-      res.json(response);
-      return;
-    } catch (err: any) {
-      console.log(err);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+      res.status(HttpStatus.BAD_REQUEST).json({ 
+        error: err.message 
+      });
     }
   }
 
-  static async logoutUser(req: AuthRequest, res: Response) {
-    console.log("logout");
+  static async resendOtp(req: Request, res: Response): Promise<void> {
     try {
-      res.clearCookie('accessToken')
-      res.clearCookie('refreshToken')
-      res.json({ success: true, message: "Logged out successfully" });
+      const { email } = req.body;
+      const response = await AuthService.resendOtp(email);
+      res.status(HttpStatus.OK).json(response);
     } catch (err: any) {
-      res.json({ err: err.message });
+      res.status(HttpStatus.BAD_REQUEST).json({ 
+        success: false, 
+        message: err.message 
+      });
     }
   }
-  static async googleSignIn(req:Request,res:Response){
+
+  static async getCurrentUser(req: AuthRequest, res: Response): Promise<void> {
+    const userId = req?.user?.userId;
+    if (!userId) {
+      res.status(HttpStatus.UNAUTHORIZED).json({ 
+        success: false, 
+        message: "Unauthorized" 
+      });
+      return;
+    }
+
     try {
-      const {id,email,name,picture}=req.body.data
-     
-      const response=await AuthService.saveGoogleUser(id,email,name,picture)
-      if(response?.success){
+      const response = await AuthService.findUser(userId);
+      res.status(HttpStatus.OK).json(response);
+    } catch (err: any) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: "Internal Server Error" 
+      });
+    }
+  }
+
+  static async logoutUser(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
+      res.status(HttpStatus.OK).json({ 
+        success: true, 
+        message: "Logged out successfully" 
+      });
+    } catch (err: any) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        error: err.message 
+      });
+    }
+  }
+
+  static async googleSignIn(req: Request, res: Response): Promise<void> {
+    try {
+      const { id, email, name, picture } = req.body.data;
+      const response = await AuthService.saveGoogleUser(id, email, name, picture);
+
+      if (response?.success) {
         res.cookie("accessToken", response.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
         });
-        res.cookie('refreshToken',response.refreshToken,{
-          httpOnly:true,
+
+        res.cookie('refreshToken', response.refreshToken, {
+          httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
-        })
-        res.status(200).json({ success: true, user: response.user })
-        return;
+        });
+
+        res.status(HttpStatus.OK).json({ 
+          success: true, 
+          user: response.user 
+        });
+      } else {
+        res.status(HttpStatus.BAD_REQUEST).json(response);
       }
-      res.json(response)
-      
-      
-    } catch (err:any) {
-      console.log('google signin error',err)
+    } catch (err: any) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Google sign-in failed"
+      });
     }
-    
-  }
-  static async forgetPassword(req:Request,res:Response){
-      const {email}=req.body
-      const response= await AuthService.forgetPassword(email)
-      res.json(response)
-  }
-  
-  static async resetPassword(req:Request,res:Response){
-    const {token,newPassword}=req.body;
-    const response= await AuthService.resetPassword(token,newPassword)
-    res.json(response)
   }
 
+  static async forgetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+      const response = await AuthService.forgetPassword(email);
+      res.status(HttpStatus.OK).json(response);
+    } catch (err: any) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: err.message
+      });
+    }
+  }
+  
+  static async resetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { token, newPassword } = req.body;
+      const response = await AuthService.resetPassword(token, newPassword);
+      res.status(HttpStatus.OK).json(response);
+    } catch (err: any) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: err.message
+      });
+    }
+  }
 }
 
 export default AuthController;

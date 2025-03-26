@@ -2,15 +2,17 @@ import { Request, Response } from "express";
 import ExpertService from "../../services/Expert/expert.service";
 import { AuthRequest } from "../../types/User";
 import expertService from "../../services/Expert/expert.service";
-import { setAuthCookies } from "../../utils/setAuthCookies ";
+import { setAuthCookies } from "../../utils/setAuthCookies "
+import { HttpStatus } from "../../types/httpStatus"; // Adjust the import path
+
 class ExpertController {
   async createExpert(req: AuthRequest, res: Response) {
     try {
       if (!req.file) {
-        console.log("file not found");
-        res
-          .status(400)
-          .json({ success: false, error: "Certificate file is required!" });
+        res.status(HttpStatus.BAD_REQUEST).json({ 
+          success: false, 
+          error: "Certificate file is required!" 
+        });
         return;
       }
       const expert = await ExpertService.createExpert(
@@ -18,16 +20,15 @@ class ExpertController {
         req.file,
         req.user.userId
       );
-      res
-        .status(201)
-        .json({
-          success: true,
-          message: "Expert created successfully",
-          expert,
-        });
+      res.status(HttpStatus.CREATED).json({
+        success: true,
+        message: "Expert created successfully",
+        expert,
+      });
     } catch (error: any) {
-      // console.log("from controller",error)
-      res.status(500).json({ error: error.message });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        error: error.message 
+      });
     }
   }
 
@@ -43,10 +44,13 @@ class ExpertController {
         filter,
         search
       );
-      res.status(response.success ? 200 : 400).json(response);
+      res.status(response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST).json(response);
     } catch (error) {
       console.error("Error fetching experts:", error);
-      res.status(500).json({ success: false, message: "Server error" });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: "Server error" 
+      });
     }
   }
 
@@ -54,113 +58,132 @@ class ExpertController {
     try {
       const { id } = req.params;
       const { action } = req.body;
-      const validActions = ["approved", "rejected"]; // Add valid actions as needed
+      const validActions = ["approved", "rejected"];
+      
       if (!validActions.includes(action)) {
-        res.status(400).json({ success: false, message: "Invalid action" });
+        res.status(HttpStatus.BAD_REQUEST).json({ 
+          success: false, 
+          message: "Invalid action" 
+        });
         return;
       }
+      
       if (!id || !action) {
-        res
-          .status(400)
-          .json({ success: false, message: "Missing required parameters" });
+        res.status(HttpStatus.BAD_REQUEST).json({ 
+          success: false, 
+          message: "Missing required parameters" 
+        });
         return;
       }
+      
       const response = await expertService.actionChange(id, action);
-
-      res.status(response?.success ? 200 : 400).json(response);
+      res.status(response?.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST).json(response);
     } catch (error) {
       console.error("Error in actionChange:", error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
-      return;
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: "Internal server error" 
+      });
     }
   }
 
   async blockAndUnlockExpert(req: Request, res: Response) {
     try {
-        
       const { id } = req.params;
       const { active } = req.body;
       
-      if (!id || typeof active !=='boolean') {
-        res
-          .status(400)
-          .json({ success: false, message: "Missing or invalid parameters" });
+      if (!id || typeof active !== 'boolean') {
+        res.status(HttpStatus.BAD_REQUEST).json({ 
+          success: false, 
+          message: "Missing or invalid parameters" 
+        });
         return;
       }
+      
       const response = await ExpertService.block_unblock(id, active);
-      res.status(response.success ? 200 : 400).json(response);
+      res.status(response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST).json(response);
     } catch (error) {
       console.error("Error in blockAndUnlockExpert:", error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
-      return;
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: "Internal server error" 
+      });
     }
   }
+
   async getExpertData(req: Request, res: Response) {
     try {
       const { id } = req.params;
       const response = await expertService.getExpertData(id);
-      res.status(response.success ? 200 : 400).json(response);
-      return;
+      res.status(response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST).json(response);
     } catch (error) {
       console.log(error);
-      res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
-      return;
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: "Internal server error" 
+      });
     }
   }
 
-  async switch_expert(req:AuthRequest,res:Response){
+  async switch_expert(req: AuthRequest, res: Response) {
     try {
-      console.log('switch to expert')
-        const userId = req.user?.userId; // Ensure userId is extracted correctly
-        if (!userId) {
-             res.status(400).json({ success: false, message: "User not found" });
-             return
+      const userId = req.user?.userId;
+      if (!userId) {
+        res.status(HttpStatus.BAD_REQUEST).json({ 
+          success: false, 
+          message: "User not found" 
+        });
+        return;
+      }
+      
+      const response = await expertService.switch_expert(userId);
+      if (response.success) {
+        if (response.accessToken && response.refreshToken) {
+          await setAuthCookies(res, response.accessToken, response.refreshToken);
+          res.status(HttpStatus.OK).json(response);
+          return;
         }
-        const response = await expertService.switch_expert(userId);
-        if(response.success){
-         
-          if (response.accessToken && response.refreshToken) {
-            await setAuthCookies(res, response.accessToken, response.refreshToken);
-            res.status(200).json(response)
-            return
-          }
-        
-        }
-       res.status(400).json(response)
+      }
+      
+      res.status(HttpStatus.BAD_REQUEST).json(response);
     } catch (error) {
-        console.error("Error in switch_expert controller:", error);
-         res.status(500).json({ success: false, message: "Internal server error" });
+      console.error("Error in switch_expert controller:", error);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: "Internal server error" 
+      });
     }
-
   }
-  async switch_user(req:AuthRequest,res:Response){
-    console.log('switch to user')
-    try{
-      const expertId=req?.expert?.expertId
+
+  async switch_user(req: AuthRequest, res: Response) {
+    try {
+      const expertId = req?.expert?.expertId;
       if (!expertId) {
-        res.status(400).json({ success: false, message: "Expert not found" });
-        return
-   }
-   const response = await expertService.switch_user(expertId)
-   if(response.success){
-    if (response.accessToken && response.refreshToken) {
-      await setAuthCookies(res, response.accessToken, response.refreshToken);
-     
-    }
-    res.status(200).json(response)
-    return
-   }
-   res.status(400).json(response)
-    }catch(err){
+        res.status(HttpStatus.BAD_REQUEST).json({ 
+          success: false, 
+          message: "Expert not found" 
+        });
+        return;
+      }
+      
+      const response = await expertService.switch_user(expertId);
+      if (response.success) {
+        if (response.accessToken && response.refreshToken) {
+          await setAuthCookies(res, response.accessToken, response.refreshToken);
+        }
+        res.status(HttpStatus.OK).json(response);
+        return;
+      }
+      
+      res.status(HttpStatus.BAD_REQUEST).json(response);
+    } catch (err) {
       console.error("Error in switch_user controller:", err);
-      res.status(500).json({ success: false, message: "Internal server error" });
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+        success: false, 
+        message: "Internal server error" 
+      });
     }
   }  
 }
+
 export default new ExpertController();

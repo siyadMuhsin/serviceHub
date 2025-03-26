@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { generateAccessToken, TokenVerify } from "../utils/jwt";
+import { HttpStatus } from "../types/httpStatus";
 
 class TokenController {
   async userRefreshToken(req: Request, res: Response): Promise<void> {
     try {
       const token = req.cookies.refreshToken;
       if (!token) {
-        res.status(400).json({ success: false, message: "Unauthorized" });
+        res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "Unauthorized" });
         return;
       }
       const decoded: any = await TokenVerify(
@@ -21,11 +22,11 @@ class TokenController {
         maxAge: 15 * 60 * 1000, // 15 minutes
       });
 
-      res.json({ success: true, accessToken: newAccessToken });
+      res.status(HttpStatus.OK).json({ success: true, accessToken: newAccessToken });
       return;
     } catch (err) {
       res
-        .status(403)
+        .status(HttpStatus.FORBIDDEN)
         .json({ success: false, message: "Invalid refresh token" });
       return;
     }
@@ -33,12 +34,11 @@ class TokenController {
 
 
   async adminRefreshToken(req: Request, res: Response) {
-    console.log("admin refresh token ");
     try {
       const token = req.cookies.adminRefreshToken;
 
       if (!token) {
-        res.status(400).json({ success: false, message: "Unauthorized" });
+        res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "Unauthorized" });
         return;
       }
 
@@ -54,11 +54,11 @@ class TokenController {
         sameSite: "strict",
         maxAge: 15 * 60 * 1000, // 15 minutes
       });
-      res.json({ success: true, accessToken: newAccessToken });
+      res.status(HttpStatus.OK).json({ success: true, accessToken: newAccessToken });
       return;
     } catch (err) {
       res
-        .status(403)
+        .status(HttpStatus.FORBIDDEN)
         .json({ success: false, message: "Invalid refresh token" });
       return;
     }
