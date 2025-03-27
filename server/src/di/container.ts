@@ -1,6 +1,6 @@
 import { Container } from 'inversify';
-import { AuthService } from '../services/AuthService';
-import { AuthController } from '../controllers/AuthController';
+import { AuthService } from '../services/auth.service';
+import { AuthController } from '../controllers/auth.controller';
 import { UserRepository } from '../repositories/UserRepository';
 import { AdminRepository } from '../repositories/Admin/admin.repository';
 import { UsersController } from '../controllers/Admin/user.controller';

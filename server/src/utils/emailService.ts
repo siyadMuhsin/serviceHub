@@ -47,14 +47,16 @@ export const sendResetMail=async(email:string,token:string)=>{
 }
 
 
-export const sendExpertStatusUpdate = async (email: string, status: string) => {
+export const sendExpertStatusUpdate = async (email: string, status: string, reason?: string) => {
     const subject = status === 'approved' 
         ? 'Your Expert Account Has Been Approved!' 
         : 'Your Expert Account Has Been Rejected';
 
     const text = status === 'approved' 
         ? `Congratulations! Your expert account has been approved. You can now log in and access all expert features.`
-        : `We're sorry to inform you that your expert account request has been rejected. If you have any questions, please contact support.`;
+        : `We're sorry to inform you that your expert account request has been rejected.
+${reason ? `\nReason: ${reason}\n` : ''}
+If you have any questions, please contact support.`;
 
     const mailOptions = {
         from: process.env.EMAIL_USER,

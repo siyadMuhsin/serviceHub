@@ -108,7 +108,7 @@ export class ExpertService implements IExpertService {
         }
     }
 
-    async actionChange(id: string, action: string) {
+    async actionChange(id: string, action: string,reason?:string) {
         try {
             const existingExpert = await this.expertRepository.findById(id);
             if (!existingExpert) {
@@ -125,7 +125,8 @@ export class ExpertService implements IExpertService {
                 role: action === 'approved' ? 'expert' : 'user',
                 expertStatus: action === "approved" ? "approved" : "rejected"
             });
-            await sendExpertStatusUpdate(existingExpert.userId.email, action);
+
+            await sendExpertStatusUpdate(existingExpert.userId.email, action,reason);
             return { success: true, data: updatedExpert };
         } catch (error) {
             console.error('Error in actionChange:', error);
@@ -171,6 +172,7 @@ export class ExpertService implements IExpertService {
 
     async switch_expert(userId: string) {
         try {
+            console.log('switch to expert')
             const expert = await this.expertRepository.findOne({ userId: userId });
             if (!expert) {
                 return { success: false, message: "Cannot switch to expert account: User not found" };

@@ -11,7 +11,7 @@ export interface IExpertService {
         totalPages?: number;
         message?: string;
     }>;
-    actionChange(id: string, action: string): Promise<{
+    actionChange(id: string, action: string,reason?:string): Promise<{
         success: boolean;
         message?: string;
         data?: IExpert;

@@ -29,6 +29,7 @@ export class ExpertController implements IExpertController {
                 req.file,
                 req.user.userId
             );
+            
             this.sendResponse(res, {
                 success: true,
                 message: "Expert created successfully",
@@ -62,7 +63,7 @@ export class ExpertController implements IExpertController {
     async actionChange(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
-            const { action } = req.body;
+            const { action ,reason} = req.body;
             const validActions = ["approved", "rejected"];
             
             if (!validActions.includes(action)) {
@@ -81,7 +82,7 @@ export class ExpertController implements IExpertController {
                 return;
             }
             
-            const response = await this.expertService.actionChange(id, action);
+            const response = await this.expertService.actionChange(id, action,reason);
             this.sendResponse(res, response, response?.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
             this.sendErrorResponse(res, error);
@@ -168,10 +169,9 @@ export class ExpertController implements IExpertController {
     }
 
     private sendErrorResponse(res: Response, error: any): void {
-        console.error("Error:", error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             success: false,
-            message: error.message || "Internal server error"
+            message: error.message || "Internal server error" 
         });
     }
 }

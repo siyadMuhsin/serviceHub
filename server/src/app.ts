@@ -2,9 +2,9 @@ import express,{ Express,Request,Response } from "express";
 import 'reflect-metadata'
 import connectDB from "./config/db.";
 import dotenv from 'dotenv'
-import authRoutes from "./routes/authRoutes";
-import adminRoute from './routes/adminRoutes/admin.routes'
-import expertRoute from './routes/expertRoutes/expert.routes'
+import authRoutes from "./routes/auth.routes";
+import adminRoute from './routes/admin.routes'
+import expertRoute from './routes/expert.routes'
 import userRoute from './routes/user.routes'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'

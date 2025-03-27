@@ -1,15 +1,15 @@
 
 import express,{ Express } from "express";
-import container from "../../di/container";
-import { ICategoryController } from "../../core/interfaces/controllers/ICategoryController";
-import { verifyAdmin } from "../../middlewares/adminSecure";
-import { IAdminAuthController } from "../../core/interfaces/controllers/IAdminAuthController";
-import { ITokenController } from "../../core/interfaces/controllers/ITokenController";
-import { IUsersController } from "../../core/interfaces/controllers/IUsersController";
-import {TYPES} from '../../di/types'
-import upload from "../../config/multer";
-import { IServiceController } from "../../core/interfaces/controllers/IServiceController";
-import { IExpertController } from "../../core/interfaces/controllers/IExpertController";
+import container from "../di/container";
+import { ICategoryController } from "../core/interfaces/controllers/ICategoryController";
+import { verifyAdmin } from "../middlewares/adminSecure";
+import { IAdminAuthController } from "../core/interfaces/controllers/IAdminAuthController";
+import { ITokenController } from "../core/interfaces/controllers/ITokenController";
+import { IUsersController } from "../core/interfaces/controllers/IUsersController";
+import {TYPES} from '../di/types'
+import upload from "../config/multer";
+import { IServiceController } from "../core/interfaces/controllers/IServiceController";
+import { IExpertController } from "../core/interfaces/controllers/IExpertController";
 const router= express.Router()
 
 
