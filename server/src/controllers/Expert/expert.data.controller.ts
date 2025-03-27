@@ -1,24 +1,41 @@
-
+import { inject, injectable } from 'inversify';
 import { AuthRequest } from "../../types/User";
 import { Response } from "express";
-import expertService from "../../services/Expert/expert.service";
+import { IExpertService } from "../../core/interfaces/services/IExpertService";
 import { HttpStatus } from "../../types/httpStatus";
+import { IExpertDataController } from "../../core/interfaces/controllers/IExpertDataController";
+import { TYPES } from "../../di/types";
 
-class ExpertData{
-    async get_expertData(req:AuthRequest,res:Response):Promise<void>{
+@injectable()
+export class ExpertDataController implements IExpertDataController {
+    constructor(
+        @inject(TYPES.ExpertService) private expertService: IExpertService
+    ) {}
+
+    async get_expertData(req: AuthRequest, res: Response): Promise<void> {
         try {
             const expertId = req.expert?.expertId; 
             if (!expertId) {
-              res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: 'Expert ID is missing' });
-              return;
+                this.sendErrorResponse(res, 'Expert ID is missing', HttpStatus.BAD_REQUEST);
+                return;
             }
-            const response = await expertService.getExpertData(expertId);
-            res.status(response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST).json(response);
-          } catch (error) {
-            console.error('Error fetching expert data:', error);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
-          }
 
+            const response = await this.expertService.getExpertData(expertId);
+            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+        } catch (error) {
+            console.error('Error fetching expert data:', error);
+            this.sendErrorResponse(res, 'Internal server error');
+        }
+    }
+
+    private sendResponse(res: Response, data: any, status: HttpStatus): void {
+        res.status(status).json(data);
+    }
+
+    private sendErrorResponse(res: Response, message: string, status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR): void {
+        res.status(status).json({ 
+            success: false, 
+            message 
+        });
     }
 }
-export default new ExpertData()

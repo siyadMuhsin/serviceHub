@@ -1,191 +1,148 @@
-import { resolve } from "path";
-import CategoryRepository from "../../repositories/Admin/category.respository";
+import { inject, injectable } from 'inversify';
+import { ICategoryRepository } from "../../core/interfaces/repositories/ICategoryRepository";
 import { ICategory } from "../../types/Admin";
-import cloudinary from "../../config/cloudinary";
 import { CloudinaryService } from "../../config/cloudinary";
-import { error } from "console";
-import { Multer } from "multer";
+import { ICategoryService } from '../../core/interfaces/services/ICategoryService';
+import { TYPES } from "../../di/types";
 
-class CategoryService {
-  /**
-   * Create a new category
-   */
-  async createCategory(
-    name: string,
-    description: string,
-    file: Express.Multer.File
-  ) {
-    try {
-      const existingCategory = await CategoryRepository.getCategoryByName(name);
-      if (existingCategory) {
-        return { success: false, message: "Category name is already in use" };
-      }
+@injectable()
+export class CategoryService implements ICategoryService {
+    constructor(
+        @inject(TYPES.CategoryRepository) private categoryRepository: ICategoryRepository
+    ) {}
 
-      const imageUrl = await CloudinaryService.uploadImage(file);
-      if (!imageUrl) {
-        return { success: false, message: "Cloudinary upload failed" };
-      }
+    async createCategory(name: string, description: string, file: Express.Multer.File) {
+        try {
+            const existingCategory = await this.categoryRepository.getCategoryByName(name);
+            if (existingCategory) {
+                return { success: false, message: "Category name is already in use" };
+            }
 
-      const category = await CategoryRepository.createCategory({
-        name,
-        description,
-        image: imageUrl,
-      });
-      return {
-        success: true,
-        message: "Category created successfully",
-        category,
-      };
-    } catch (error: any) {
-      console.error("Error in createCategory Service:", error);
-      return {
-        success: false,
-        message: "Something went wrong. Please try again.",
-      };
-    }
-  }
+            const imageUrl = await CloudinaryService.uploadImage(file);
+            if (!imageUrl) {
+                return { success: false, message: "Cloudinary upload failed" };
+            }
 
-  /**
-   * Get all categories
-   */
-
-  async getAllCategories() {
-    console.log('categir')
-    try {
-      const categories = await CategoryRepository.getAllCategories();
-      return { success: true, categories };
-    } catch (error: any) {
-      console.error("Error in getAllCategories:", error);
-      return { success: false, message: "Failed to fetch categories" };
-    }
-  }
-  /**
-   * soft delete section
-   */
-  async changeStatus(id: string) {
-    try {
-      const category=await CategoryRepository.getCategoryById(id)
-      if(!category){
-        return { success: false, message: "Category not found" };
-      }
-      const updateStatus= !category.isActive
-      const updatedCategory=await CategoryRepository.updateCategory(id,{isActive:updateStatus})
-      
-      return { success: true,
-        message: `Category ${updateStatus ? "listed" : "unlisted"} successfully`,
-        category: updatedCategory}
-    } catch (err:any) {
-      return {success:false,message:err.message}
-    }
-  }
-
-  /**
-   * Get category by ID
-   */
-
-  async getCategoryById(id: string) {
-    try {
-      const category = await CategoryRepository.getCategoryById(id);
-      if (!category) {
-        return { success: false, message: "Category not found" };
-      }
-
-      return { success: true, category };
-    } catch (error: any) {
-      console.error("Error in getCategoryById:", error);
-      return { success: false, message: "Failed to fetch category" };
-    }
-  }
-
-  /**
-   * Update category
-   */
-
-  async updateCategory(
-    id: string,
-    name?: string,
-    description?: string,
-    file?: Express.Multer.File
-  ) {
-    try {
-      let imageUrl: string | null = null;
-  
-      // Upload new image if provided
-      if (file) {
-        imageUrl = await CloudinaryService.uploadImage(file);
-        if (!imageUrl) {
-          return { success: false, message: "Cloudinary upload failed" };
+            const category = await this.categoryRepository.createCategory({
+                name,
+                description,
+                image: imageUrl,
+            });
+            return {
+                success: true,
+                message: "Category created successfully",
+                category,
+            };
+        } catch (error: any) {
+            console.error("Error in createCategory Service:", error);
+            return {
+                success: false,
+                message: "Something went wrong. Please try again.",
+            };
         }
-      }
-  
-      // Get the existing category to retain old image if no new one is uploaded
-      const existingCategory = await CategoryRepository.getCategoryById(id);
-      if (!existingCategory) {
-        return { success: false, message: "Category not found" };
-      }
-  
-      const updatedData: any = {};
-      if (name) updatedData.name = name;
-      if (description) updatedData.description = description;
-      if (imageUrl) {
-        updatedData.image = imageUrl;
-      } else {
-        updatedData.image = existingCategory.image; // Keep old image
-      }
-  
-      // Update category
-      const updatedCategory = await CategoryRepository.updateCategory(id, updatedData);
-      if (!updatedCategory) {
-        return { success: false, message: "Failed to update category" };
-      }
-  
-      return {
-        success: true,
-        message: "Category updated successfully",
-        updatedCategory,
-      };
-    } catch (error: any) {
-      console.error("Error in updateCategory:", error);
-      return { success: false, message: "Failed to update category" };
     }
-  }
-  
-  /**
-   * Delete category
-   */
 
-  // async deleteCategory(id: string) {
-  //   try {
-  //     const isDeleted = await CategoryRepository.deleteCategory(id);
-  //     if (!isDeleted) {
-  //       return { success: false, message: "Category not found" };
-  //     }
-  //     return { success: true, message: "Category deleted successfully" };
-  //   } catch (error: any) {
-  //     console.error("Error in deleteCategory:", error);
-  //     return { success: false, message: "Failed to delete category" };
-  //   }
-  // }
+    async getAllCategories() {
+        try {
+            const categories = await this.categoryRepository.getAllCategories();
+            return { success: true, categories };
+        } catch (error: any) {
+            console.error("Error in getAllCategories:", error);
+            return { success: false, message: "Failed to fetch categories" };
+        }
+    }
 
-  //get categories by limit
-  async getCategoriesByLimit(page: number, limit: number,search:string) {
+    async changeStatus(id: string) {
+        try {
+            const category = await this.categoryRepository.getCategoryById(id);
+            if (!category) {
+                return { success: false, message: "Category not found" };
+            }
+            const updateStatus = !category.isActive;
+            const updatedCategory = await this.categoryRepository.updateCategory(id, { isActive: updateStatus });
+            if(updatedCategory){
+              return { 
+                success: true,
+                message: `Category ${updateStatus ? "listed" : "unlisted"} successfully`,
+                category: updatedCategory 
+            };
+            }else{
+              return {success:false,message:"update category not found"}
+            }
+            
+        } catch (err: any) {
+            return { success: false, message: err.message };
+        }
+    }
+
+    async getCategoryById(id: string) {
+        try {
+            const category = await this.categoryRepository.getCategoryById(id);
+            if (!category) {
+                return { success: false, message: "Category not found" };
+            }
+
+            return { success: true, category };
+        } catch (error: any) {
+            console.error("Error in getCategoryById:", error);
+            return { success: false, message: "Failed to fetch category" };
+        }
+    }
+
+    async updateCategory(id: string, name?: string, description?: string, file?: Express.Multer.File) {
+        try {
+            let imageUrl: string | null = null;
     
-    const result = await CategoryRepository.getCategoriesByLimit(page, limit,search);
-    return result;
-  }
-
-  async getCategoryToMange(page:number,limit:number,search:string){
-    try {
-      const isAdmin= true
-      const result=await CategoryRepository.getCategoriesByLimit(page,limit,search,isAdmin)
-      return {success:true ,message:"category get in succuss",result}
-    } catch (error) {
-      console.error("Error in updateCategory:", error);
-      return { success: false, message: "Failed to get categories" };
-      
+            if (file) {
+                imageUrl = await CloudinaryService.uploadImage(file);
+                if (!imageUrl) {
+                    return { success: false, message: "Cloudinary upload failed" };
+                }
+            }
+    
+            const existingCategory = await this.categoryRepository.getCategoryById(id);
+            if (!existingCategory) {
+                return { success: false, message: "Category not found" };
+            }
+    
+            const updatedData: any = {};
+            if (name) updatedData.name = name;
+            if (description) updatedData.description = description;
+            if (imageUrl) {
+                updatedData.image = imageUrl;
+            } else {
+                updatedData.image = existingCategory.image;
+            }
+    
+            const updatedCategory = await this.categoryRepository.updateCategory(id, updatedData);
+            if (!updatedCategory) {
+                return { success: false, message: "Failed to update category" };
+            }
+    
+            return {
+                success: true,
+                message: "Category updated successfully",
+                updatedCategory,
+            };
+        } catch (error: any) {
+            console.error("Error in updateCategory:", error);
+            return { success: false, message: "Failed to update category" };
+        }
     }
 
-  }
-}
+    async getCategoriesByLimit(page: number, limit: number, search: string) {
+        const result = await this.categoryRepository.getCategoriesByLimit(page, limit, search);
+        return result;
+    }
 
-export default new CategoryService();
+    async getCategoryToMange(page: number, limit: number, search: string) {
+        try {
+            const isAdmin = true;
+            const result = await this.categoryRepository.getCategoriesByLimit(page, limit, search, isAdmin);
+            return { success: true, message: "category get in success", result };
+        } catch (error) {
+            console.error("Error in getCategoryToMange:", error);
+            return { success: false, message: "Failed to get categories" };
+        }
+    }
+}

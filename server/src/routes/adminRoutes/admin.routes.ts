@@ -1,48 +1,59 @@
 
 import express,{ Express } from "express";
-import adminAuthController from "../../controllers/Admin/admin.auth.controller";
-import servicesController from "../../controllers/Admin/services.controller";
-import categoryController from "../../controllers/Admin/category.controller";
-import userController from "../../controllers/Admin/user.controller";
+import container from "../../di/container";
+import { ICategoryController } from "../../core/interfaces/controllers/ICategoryController";
 import { verifyAdmin } from "../../middlewares/adminSecure";
-import TokenController from "../../controllers/Token.controller";
+import { IAdminAuthController } from "../../core/interfaces/controllers/IAdminAuthController";
+import { ITokenController } from "../../core/interfaces/controllers/ITokenController";
+import { IUsersController } from "../../core/interfaces/controllers/IUsersController";
+import {TYPES} from '../../di/types'
 import upload from "../../config/multer";
-import expertController from "../../controllers/Expert/expert.controller";
+import { IServiceController } from "../../core/interfaces/controllers/IServiceController";
+import { IExpertController } from "../../core/interfaces/controllers/IExpertController";
 const router= express.Router()
 
 
-router.post('/login',adminAuthController.login)
-router.post('/logout',adminAuthController.logout)
+const adminAuthController = container.get<IAdminAuthController>(TYPES.AdminAuthController);
+const tokenController = container.get<ITokenController>(TYPES.TokenController);
 
-router.post('/refresh',TokenController.adminRefreshToken)
-router.get('/',verifyAdmin,adminAuthController.checkAdmin)
+router.post('/login', adminAuthController.login.bind(adminAuthController));
+router.post('/logout', adminAuthController.logout.bind(adminAuthController));
+router.post('/refresh', tokenController.adminRefreshToken.bind(tokenController));
+router.get('/', verifyAdmin, adminAuthController.checkAdmin.bind(adminAuthController));
 
 
 
 //category routes
-router.post('/category',upload.single('image'),categoryController.createCategory)
-router.get("/categories", categoryController.getCategoryToManage);
-router.put("/category/:id",upload.single('image'), categoryController.updateCategory);
-router.patch('/category/:id/status',categoryController.list_and_unlist)
+const categoryController = container.get<ICategoryController>(TYPES.CategoryController);
+router.post('/category',upload.single('image'),categoryController.createCategory.bind(categoryController))
+router.get("/categories", categoryController.getCategoryToManage.bind(categoryController));
+router.put("/category/:id",upload.single('image'), categoryController.updateCategory.bind(categoryController));
+router.patch('/category/:id/status',categoryController.list_and_unlist.bind(categoryController))
 
 
 //service routes
-router.post("/service", upload.single('image'),servicesController.createService);
-router.get("/services", servicesController.getServicesToMange);
-router.patch('/service/:id/status',servicesController.ist_and_unlist)
-router.get("/sercvices/:id", servicesController.getServiceById);
-router.get("/services/category/:categoryId", servicesController.getServicesByCategory);
-router.put("/service/:id",upload.single('image'), servicesController.updateService);
+
+const servicesController= container.get<IServiceController>(TYPES.ServiceController)
+router.post("/service", upload.single('image'),servicesController.createService.bind(servicesController));
+router.get("/services", servicesController.getServicesToMange.bind(servicesController));
+router.patch('/service/:id/status',servicesController.ist_and_unlist.bind(servicesController))
+router.get("/sercvices/:id", servicesController.getServiceById.bind(servicesController));
+router.get("/services/category/:categoryId", servicesController.getServicesByCategory.bind(servicesController));
+router.put("/service/:id",upload.single('image'), servicesController.updateService.bind(servicesController));
 
 
-// users routes
-router.get('/users',userController.getUsers)
-router.patch('/user/:id',userController.block_unblockUser)
+
+// User management routes
+const usersController = container.get<IUsersController>(TYPES.UsersController);
+
+router.get('/users', usersController.getUsers.bind(usersController));
+router.patch('/user/:id', usersController.block_unblockUser.bind(usersController));
 
 //expert management
+const expertController= container.get<IExpertController>(TYPES.ExpertController)
 
-router.get('/experts',expertController.getExperts)
-router.patch('/expert/:id',expertController.actionChange)
-router.patch('/expert/block/:id',expertController.blockAndUnlockExpert)
-router.get('/expert/:id',expertController.getExpertData)
+router.get('/experts',expertController.getExperts.bind(expertController))
+router.patch('/expert/:id',expertController.actionChange.bind(expertController))
+router.patch('/expert/block/:id',expertController.blockAndUnlockExpert.bind(expertController))
+router.get('/expert/:id',expertController.getExpertData.bind(expertController))
 export default router

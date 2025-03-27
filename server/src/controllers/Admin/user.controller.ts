@@ -1,33 +1,66 @@
-import { Request,Response } from "express";
-import userService from "../../services/Admin/user.service";
+import { inject, injectable } from 'inversify';
+import { Request, Response } from "express";
+import { IUserService } from "../../core/interfaces/services/IUserService";
 import { HttpStatus } from "../../types/httpStatus";
-class UsersController {
-    async getUsers(req: Request, res: Response):Promise<void> {
-        try {
-            const response = await userService.getUsers();
-            res.status(response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST).json(response);
-            return
-        } catch (error) {
-             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: "An error occurred while fetching users." });
-             return
-        }
-    }
-    async block_unblockUser(req:Request,res:Response):Promise<void>{
-        try {
-        const { id } = req.params;
-        const { block } = req.body;
-        if (typeof block !== "boolean") {
-            res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "Invalid status value" });
-            return
-        }
+import { IUsersController } from "../../core/interfaces/controllers/IUsersController";
+import { TYPES } from "../../di/types";
 
-        const response= await userService.blockUnblockUser(id,block)
-        res.status(response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST).json(response)
+@injectable()
+export class UsersController implements IUsersController {
+    constructor(
+        @inject(TYPES.UserService) private userService: IUserService
+    ) {}
+
+    async getUsers(req: Request, res: Response): Promise<void> {
+        try {
+            const response = await this.userService.getUsers();
+            this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
         } catch (error) {
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
-            return
+            this.handleError(res, "Failed to fetch users", error);
         }
     }
 
+    async block_unblockUser(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            const { block } = req.body;
+
+            if (typeof block !== "boolean") {
+                this.sendResponse(
+                    res, 
+                    { success: false, message: "Invalid status value" }, 
+                    HttpStatus.BAD_REQUEST
+                );
+                return;
+            }
+
+            const response = await this.userService.blockUnblockUser(id, block);
+            this.sendResponse(
+                res, 
+                response, 
+                HttpStatus.OK, 
+                HttpStatus.BAD_REQUEST
+            );
+        } catch (error) {
+            this.handleError(res, "Failed to update user status", error);
+        }
+    }
+
+    private sendResponse(
+        res: Response,
+        data: any,
+        successStatus: HttpStatus,
+        errorStatus?: HttpStatus
+    ): void {
+        const status = data.success ? successStatus : (errorStatus || HttpStatus.BAD_REQUEST);
+        res.status(status).json(data);
+    }
+
+    private handleError(res: Response, message: string, error: unknown): void {
+        console.error(message, error);
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: "Internal server error" 
+        });
+    }
 }
-export default new UsersController()

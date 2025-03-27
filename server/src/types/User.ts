@@ -10,3 +10,12 @@ export interface AuthRequest extends Request {
   admin?:any;
   expert?:any;
 }
+
+export interface AuthResult {
+  message?: string;
+  user?: object;
+  accessToken?: string;
+  refreshToken?:string
+  error?: string;
+  success?: boolean;
+}

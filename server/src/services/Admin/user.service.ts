@@ -1,36 +1,67 @@
-import UserRepository from "../../repositories/UserRepository"
+import { inject, injectable } from 'inversify';
+import { IUserRepository } from '../../core/interfaces/repositories/IUserRepository';
+import { IUserService } from '../../core/interfaces/services/IUserService';
+import { TYPES } from '../../di/types';
 
-class UserServices{
-    async getUsers(){
+@injectable()
+export class UserService implements IUserService {
+    constructor(
+        @inject(TYPES.UserRepository) private userRepository: IUserRepository
+    ) {}
+
+    async getUsers() {
         try {
-            const users= await UserRepository.getAlluser()
-            return {success:true , users}
+            const users = await this.userRepository.getAlluser();
+            return { success: true, users };
         } catch (error) {
-            return {success:false,message:error}
+            console.error("Error fetching users:", error);
+            return { 
+                success: false, 
+                message: "Failed to fetch users" 
+            };
         }
     }
-    async blockUnblockUser(id:string,block:boolean){
+
+    async blockUnblockUser(id: string, block: boolean) {
         try {
-            const user= await UserRepository.findUserById(id)
-            if(!user){
-                return { success: false, message: "User not found" };
+            const user = await this.userRepository.findUserById(id);
+            if (!user) {
+                return { 
+                    success: false, 
+                    message: "User not found" 
+                };
             }
-            const newStatus= !user.isBlocked
-            const updatedUser= await UserRepository.findByIdAndUpdate(id,{isBlocked:newStatus})
-            return { success: true, message: `User ${block ? "blocked" : "unblocked"} successfully`,updatedUser };
+
+            const newStatus = !user.isBlocked;
+            const updatedUser = await this.userRepository.findByIdAndUpdate(id, { 
+                isBlocked: newStatus 
+            });
+
+            return { 
+                success: true, 
+                message: `User ${block ? "blocked" : "unblocked"} successfully`,
+                updatedUser 
+            };
         } catch (error) {
-            return { success: false, message: "Error updating user status" }; 
+            console.error("Error updating user status:", error);
+            return { 
+                success: false, 
+                message: "Failed to update user status" 
+            };
         }
     }
-    async checkBloked(id:string){
+
+    async checkBlocked(id: string) {
         try {
-            const user= await UserRepository.findUserById(id)
-            return !user?.isBlocked
+            const user = await this.userRepository.findUserById(id);
+            
+            return user?.isBlocked ?true:false;
         } catch (error) {
-            return { success: false, message: "Error updating user status" };
+            console.error("Error checking user block status:", error);
+            return { 
+                success: false, 
+                message: "Failed to check user status" 
+            };
         }
-       
     }
 }
-
-export default new UserServices

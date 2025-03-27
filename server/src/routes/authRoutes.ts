@@ -1,30 +1,27 @@
-
-
 import express from 'express';
-import AuthController from '../controllers/AuthController';
-import verifyToken from '../middlewares/authMiddleware';
-// import TokenController from '../controllers/Token.controller';
-import TokenController from '../controllers/Token.controller';
+import container from '../di/container';
+import { IAuthController } from '../core/interfaces/controllers/IAuthController';
+import { ITokenController } from '../core/interfaces/controllers/ITokenController';
+import { IAuthMiddleware } from '../core/interfaces/middleware/IAuthMiddleware';
+
+import { TYPES } from '../di/types';
 
 const router = express.Router();
+//middleware
+const authMiddleware = container.get<IAuthMiddleware>(TYPES.AuthMiddleware);
 
-// Use static methods
-router.post('/register', AuthController.register);
-router.post('/login', AuthController.login);
-router.post('/verify-otp',AuthController.verifyOtp)
-router.post('/resent-otp',AuthController.resendOtp)
-router.post('/logout',verifyToken,AuthController.logoutUser)
+const authController = container.get<IAuthController>(TYPES.AuthController);
+const tokenController = container.get<ITokenController>(TYPES.TokenController);
 
-
-router.post('/forgot-password',AuthController.forgetPassword)
-router.post('/reset-password',AuthController.resetPassword)
-router.post('/google-signin',AuthController.googleSignIn)
-router.get('/me',verifyToken,AuthController.getCurrentUser)
-
-
-router.post('/refresh', TokenController.userRefreshToken);
-
-// create expert account
-router.post('/experts/create')
+router.post('/register', authController.register.bind(authController));
+router.post('/login', authController.login.bind(authController));
+router.post('/verify-otp', authController.verifyOtp.bind(authController));
+router.post('/resent-otp', authController.resendOtp.bind(authController));
+router.post('/logout', authMiddleware.verifyToken.bind(authMiddleware), authController.logoutUser.bind(authController));
+router.post('/forgot-password', authController.forgetPassword.bind(authController));
+router.post('/reset-password', authController.resetPassword.bind(authController));
+router.post('/google-signin', authController.googleSignIn.bind(authController));
+router.get('/me', authMiddleware.verifyToken.bind(authMiddleware), authController.getCurrentUser.bind(authController));
+router.post('/refresh', tokenController.userRefreshToken.bind(tokenController));
 
 export default router;

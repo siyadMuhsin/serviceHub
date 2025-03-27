@@ -1,68 +1,84 @@
+import { injectable } from 'inversify';
 import { Request, Response } from "express";
 import { generateAccessToken, TokenVerify } from "../utils/jwt";
 import { HttpStatus } from "../types/httpStatus";
+import { ITokenController } from "../core/interfaces/controllers/ITokenController";
+import { TYPES } from "../di/types";
 
-class TokenController {
-  async userRefreshToken(req: Request, res: Response): Promise<void> {
-    try {
-      const token = req.cookies.refreshToken;
-      if (!token) {
-        res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "Unauthorized" });
-        return;
-      }
-      const decoded: any = await TokenVerify(
-        token,
-        process.env.REFRESH_SECRET as string
-      );
-      const newAccessToken = generateAccessToken(decoded.userId, "user");
-      res.cookie("accessToken", newAccessToken, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 15 * 60 * 1000, // 15 minutes
-      });
+@injectable()
+export class TokenController implements ITokenController {
+    private readonly refreshTokenSecret: string;
+    private readonly isProduction: boolean;
 
-      res.status(HttpStatus.OK).json({ success: true, accessToken: newAccessToken });
-      return;
-    } catch (err) {
-      res
-        .status(HttpStatus.FORBIDDEN)
-        .json({ success: false, message: "Invalid refresh token" });
-      return;
+    constructor() {
+        this.refreshTokenSecret = process.env.REFRESH_SECRET as string;
+        this.isProduction = process.env.NODE_ENV === "production";
     }
-  }
 
-
-  async adminRefreshToken(req: Request, res: Response) {
-    try {
-      const token = req.cookies.adminRefreshToken;
-
-      if (!token) {
-        res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "Unauthorized" });
-        return;
-      }
-
-      const decoded: any = await TokenVerify(
-        token,
-        process.env.REFRESH_SECRET as string
-      );
-      const newAccessToken = generateAccessToken(decoded.userId, "admin");
-
-      res.cookie("adminAccessToken", newAccessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 15 * 60 * 1000, // 15 minutes
-      });
-      res.status(HttpStatus.OK).json({ success: true, accessToken: newAccessToken });
-      return;
-    } catch (err) {
-      res
-        .status(HttpStatus.FORBIDDEN)
-        .json({ success: false, message: "Invalid refresh token" });
-      return;
+    async userRefreshToken(req: Request, res: Response): Promise<void> {
+        await this.handleRefreshToken(
+            req,
+            res,
+            'refreshToken',
+            'accessToken',
+            'user'
+        );
     }
-  }
+
+    async adminRefreshToken(req: Request, res: Response): Promise<void> {
+        await this.handleRefreshToken(
+            req,
+            res,
+            'adminRefreshToken',
+            'adminAccessToken',
+            'admin'
+        );
+    }
+
+    private async handleRefreshToken(
+        req: Request,
+        res: Response,
+        inputCookieName: string,
+        outputCookieName: string,
+        role: string
+    ): Promise<void> {
+        try {
+            const token = req.cookies[inputCookieName];
+            if (!token) {
+                this.sendErrorResponse(res, HttpStatus.BAD_REQUEST, "Unauthorized");
+                return;
+            }
+
+            const decoded: any = await TokenVerify(token, this.refreshTokenSecret);
+            const newAccessToken = generateAccessToken(decoded.userId, role);
+
+            this.setAccessTokenCookie(res, outputCookieName, newAccessToken);
+            
+            res.status(HttpStatus.OK).json({ 
+                success: true, 
+                accessToken: newAccessToken 
+            });
+        } catch (err) {
+            this.sendErrorResponse(res, HttpStatus.FORBIDDEN, "Invalid refresh token");
+        }
+    }
+
+    private setAccessTokenCookie(res: Response, name: string, token: string): void {
+        res.cookie(name, token, {
+            httpOnly: name.includes('admin'), // Only httpOnly for admin tokens
+            secure: this.isProduction,
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000, // 15 minutes
+        });
+    }
+
+    private sendErrorResponse(res: Response, status: HttpStatus, message: string): void {
+        res.status(status).json({ 
+            success: false, 
+            message 
+        });
+    }
 }
 
-export default new TokenController();
+// Export instance for non-DI usage
+export const tokenController = new TokenController();

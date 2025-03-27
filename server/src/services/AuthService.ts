@@ -1,184 +1,191 @@
+import { inject, injectable } from 'inversify';
 import bcrypt from "bcryptjs";
-import { generateAccessToken,generateRefreshToken } from "../utils/jwt";
-import UserRepository from "../repositories/UserRepository";
-import { error } from "console";
-import {
-  generateOTP,
-  sendMailer,
-  generateResetToken,
-  sendResetMail,
-} from "../utils/emailService";
-import OtpRepository from "../repositories/OtpRepository";
-import { resolveSoa } from "dns";
-import { access } from "fs";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import { IUserRepository } from "../core/interfaces/repositories/IUserRepository";
+import { IOtpRepository } from "../core/interfaces/repositories/IOtpRepository";
+import { generateOTP, sendMailer, generateResetToken, sendResetMail } from "../utils/emailService";
+import { AuthResult } from "../types/User";
+import { IAuthService } from '../core/interfaces/services/IAuthService';
+import { TYPES } from "../di/types";
 
-interface AuthResult {
-  message?: string;
-  user?: object;
-  token?: string;
-  error?: string;
-  success?: boolean;
-}
-class AuthService {
-  async registerUser(
-    name: string,
-    email: string,
-    password: string
-  ): Promise<AuthResult> {
-    const exitingUser = await UserRepository.findUserByEmail(email);
-    const otpSended = await OtpRepository.findByEmail(email);
-    if (otpSended) {
-      return { success: true, message: "OTP already sent to this email" };
-    }
+@injectable()
+export class AuthService implements IAuthService {
+  constructor(
+    @inject(TYPES.UserRepository) private userRepository: IUserRepository,
+    @inject(TYPES.OtpRepository) private otpRepository: IOtpRepository
+  ) {}
 
-    if (exitingUser && exitingUser.isVerified && !exitingUser.isGoogleUser ) {
-      return { success: false, message: "User with this email already exists" };
-    }
-    if(exitingUser && exitingUser.password){
-      return { success: false, message: "User with this email already exists" };
-    }
-    if (exitingUser && exitingUser.isGoogleUser && !exitingUser.password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      await UserRepository.findUserAndUpdate(exitingUser.email, {
-        password: hashedPassword,
-      });
-    }
-    if (!exitingUser) {
-      const hasshedPassword = await bcrypt.hash(password, 10);
-      const newUser = await UserRepository.createUser({
-        name,
-        email,
-        password: hasshedPassword,
-      });
-    }
-
-    const otp = generateOTP();
-    const otpExpires = new Date(Date.now() + 1 * 60 * 1000); //one minutes
-    await OtpRepository.saveOTP(email, otp, otpExpires);
-
-    await sendMailer(email, otp);
-
-    return { success: true, message: "OTP sent to email. Please verify." };
-  }
-  async verifyOtp(email: string, otp: string) {
-    const otpData = await OtpRepository.findOTP(email, otp);
-    if (!otpData) {
-      return { success: false, message: "Invalid OTP or Otp Expired" };
-    }
-    if (otpData.expiresAt < new Date()) {
-      return { success: false, message: "Otp Expired" };
-    }
-    await OtpRepository.deleteOTP(email);
-    await UserRepository.findUserAndUpdate(email, { isVerified: true });
-    return { success: true, message: "Otp verified" };
-  }
-
-  async resendOtp(email: string) {
-    const user = await UserRepository.findUserByEmail(email);
-    if (!user) {
-      return { success: false, message: "User with this email does not exist" };
-    }
-    const otpSended = await OtpRepository.findByEmail(email);
-    if (otpSended) {
-      return { success: true, message: "OTP already sent to this email" };
-    }
-    const otp = generateOTP();
-    const otpExpires = new Date(Date.now() + 1 * 60 * 1000);
-    await OtpRepository.saveOTP(email, otp, otpExpires);
-    await sendMailer(email, otp);
-    return { success: true, messsage: "Otp sended succcessfully" };
-  }
-
-  async loginUser(email: string, password: string) {
+  async registerUser(name: string, email: string, password: string): Promise<AuthResult> {
     try {
-      const user = await UserRepository.findUserByEmail(email);
+      const exitingUser = await this.userRepository.findUserByEmail(email);
+      const otpSended = await this.otpRepository.findByEmail(email);
+      
+      if (otpSended) {
+        return { success: true, message: "OTP already sent to this email" };
+      }
+
+      if (exitingUser && exitingUser.isVerified && !exitingUser.isGoogleUser) {
+        return { success: false, message: "User with this email already exists" };
+      }
+
+      if (exitingUser && exitingUser.password) {
+        return { success: false, message: "User with this email already exists" };
+      }
+
+      if (exitingUser && exitingUser.isGoogleUser && !exitingUser.password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await this.userRepository.findUserAndUpdate(exitingUser.email, {
+          password: hashedPassword,
+        });
+        return this.generateAndSendOtp(email);
+      }
+
+      if (!exitingUser) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await this.userRepository.createUser({
+          name,
+          email,
+          password: hashedPassword,
+        });
+        return this.generateAndSendOtp(email);
+      }
+
+      return { success: false, message: "Registration failed" };
+    } catch (error) {
+      console.error("Error in registerUser:", error);
+      throw new Error("Registration failed");
+    }
+  }
+
+  async verifyOtp(email: string, otp: string): Promise<AuthResult> {
+    try {
+      const otpData = await this.otpRepository.findOTP(email, otp);
+      if (!otpData) {
+        return { success: false, message: "Invalid OTP or OTP Expired" };
+      }
+      if (otpData.expiresAt < new Date()) {
+        return { success: false, message: "OTP Expired" };
+      }
+      
+      await this.otpRepository.deleteOTP(email);
+      await this.userRepository.findUserAndUpdate(email, { isVerified: true });
+      
+      const user = await this.userRepository.findUserByEmail(email);
+      if (!user) {
+        return { success: false, message: "User not found" };
+      }
+
+      return { 
+        success: true, 
+        message: "OTP verified successfully",
+        accessToken: generateAccessToken(user._id, 'user'),
+        refreshToken: generateRefreshToken(user._id, 'user')
+      };
+    } catch (error) {
+      console.error("Error in verifyOtp:", error);
+      throw new Error("OTP verification failed");
+    }
+  }
+
+  async resendOtp(email: string): Promise<AuthResult> {
+    try {
+      const user = await this.userRepository.findUserByEmail(email);
+      if (!user) {
+        return { success: false, message: "User with this email does not exist" };
+      }
+
+      const otpSended = await this.otpRepository.findByEmail(email);
+      if (otpSended) {
+        return { success: true, message: "OTP already sent to this email" };
+      }
+
+      return await this.generateAndSendOtp(email);
+    } catch (error) {
+      console.error("Error in resendOtp:", error);
+      throw new Error("Failed to resend OTP");
+    }
+  }
+
+  async loginUser(email: string, password: string): Promise<AuthResult> {
+    try {
+      const user = await this.userRepository.findUserByEmail(email);
       if (!user) {
         return {
           success: false,
           message: "User with this email does not exist",
         };
       }
+
       if (user && !user.password) {
         return {
           success: false,
-          message: "this is googel user password not set",
+          message: "This is a Google user. Password not set",
         };
       }
+
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return { success: false, message: "Password is incorrect" };
       }
+
       if (user.isBlocked) {
         return {
           success: false,
           message: "Admin has blocked your account",
         };
       }
-       // Generate Tokens
-       const accessToken = generateAccessToken(user._id,'user');
-       const refreshToken = generateRefreshToken(user._id,'user');
 
-       return { 
+      return { 
         success: true, 
-        user: user, 
-        accessToken, 
-        refreshToken 
+        message: "Login successful",
+        user: user,
+        accessToken: generateAccessToken(user._id, 'user'),
+        refreshToken: generateRefreshToken(user._id, 'user')
       };
-    } catch (error: any) {
-      return { success: false, message: error.message };
+    } catch (error) {
+      console.error("Error in loginUser:", error);
+      throw new Error("Login failed");
     }
   }
 
-  async findUser(id: string) {
+  async findUser(id: string): Promise<AuthResult> {
     try {
-      const userDetails = await UserRepository.findUserById(id);
+      const userDetails = await this.userRepository.findUserById(id);
       if (!userDetails) {
         return { success: false, message: "User not found" };
       }
       return { success: true, user: userDetails };
-    } catch (err: any) {
-      return { success: false, message: "Internal Server Error" };
+    } catch (error) {
+      console.error("Error in findUser:", error);
+      throw new Error("Failed to fetch user details");
     }
   }
-  async saveGoogleUser(
-    googleId: string,
-    email: string,
-    name: string,
-    image: string
-  ) {
+
+  async saveGoogleUser(googleId: string, email: string, name: string, image: string): Promise<AuthResult> {
     try {
-      const existingUser = await UserRepository.findUserByEmail(email);
+      const existingUser = await this.userRepository.findUserByEmail(email);
      
       if (existingUser) {
-        if(existingUser.isBlocked){
+        if (existingUser.isBlocked) {
           return {
-            success:false,
-             message: "Admin has blocked your account"
-          }
-        }
-        if (existingUser.isGoogleUser) {
-          return {
-            success: true,
-            user: existingUser,
-            accessToken: generateAccessToken(existingUser._id,'user'),
-            refreshToken:generateRefreshToken(existingUser._id,'user')
+            success: false,
+            message: "Admin has blocked your account"
           };
+        }
+
+        if (existingUser.isGoogleUser) {
+          return this.generateAuthResponse(existingUser);
         } else {
-          const updateUser = await UserRepository.findUserAndUpdate(
+          const updateUser = await this.userRepository.findUserAndUpdate(
             existingUser.email,
             { isGoogleUser: true, googleId: googleId, profile_imaga: image }
           );
           if (updateUser) {
-            return {
-              success: true,
-              user: updateUser,
-              accessToken: generateAccessToken(updateUser._id,'user'),
-              refreshToken:generateRefreshToken(updateUser._id,'user')
-            };
+            return this.generateAuthResponse(updateUser);
           }
         }
       } else {
-        const createUser = await UserRepository.createUser({
+        const createUser = await this.userRepository.createUser({
           googleId,
           email,
           name,
@@ -187,26 +194,24 @@ class AuthService {
           isVerified: true,
         });
         if (createUser) {
-          return {
-            success: true,
-            user: createUser,
-            accessToken: generateAccessToken(createUser._id,'user'),
-            refreshToken:generateRefreshToken(createUser._id,'user')
-          };
+          return this.generateAuthResponse(createUser);
         }
       }
-    } catch (err: any) {
-      console.log(err);
-      console.error("Error in saveGoogleUser:", err);
+
+      return { success: false, message: "Google sign-in failed" };
+    } catch (error) {
+      console.error("Error in saveGoogleUser:", error);
+      throw new Error("Google sign-in failed");
     }
   }
 
-  async forgetPassword(email: string) {
+  async forgetPassword(email: string): Promise<AuthResult> {
     try {
-      const existingUser = await UserRepository.findUserByEmail(email);
+      const existingUser = await this.userRepository.findUserByEmail(email);
       if (!existingUser) {
         return { success: false, message: "Email not found" };
       }
+
       const resetToken = generateResetToken();
       existingUser.resetPasswordToken = resetToken;
       existingUser.resetPasswordExpires = new Date(Date.now() + 300000);
@@ -216,31 +221,44 @@ class AuthService {
       return { success: true, message: "Password reset email sent" };
     } catch (error) {
       console.error("Error in forgetPassword:", error);
-      return {
-        success: false,
-        message: "An error occurred. Please try again.",
-      };
+      throw new Error("Failed to process password reset request");
     }
   }
 
-
-  async resetPassword (token:string,newPassword:string){
+  async resetPassword(token: string, newPassword: string): Promise<AuthResult> {
     try {
-      const user= await UserRepository.findOneBYToken(token)
+      const user = await this.userRepository.findOneBYToken(token);
       if (!user) {
         return { success: false, message: "Invalid or expired token" };
       }
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword; 
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
-    await user.save();
-    return { success: true, message: "Password reset successful" };
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword; 
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+
+      return { success: true, message: "Password reset successful" };
     } catch (error) {
       console.error("Error in resetPassword:", error);
-      return { success: false, message: "An error occurred. Please try again." };
+      throw new Error("Failed to reset password");
     }
   }
-}
 
-export default new AuthService();
+  private async generateAndSendOtp(email: string): Promise<AuthResult> {
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 1 * 60 * 1000); // 1 minute
+    await this.otpRepository.saveOTP(email, otp, otpExpires);
+    await sendMailer(email, otp);
+    return { success: true, message: "OTP sent to email. Please verify." };
+  }
+
+  private generateAuthResponse(user: any): AuthResult {
+    return {
+      success: true,
+      user: user,
+      accessToken: generateAccessToken(user._id, 'user'),
+      refreshToken: generateRefreshToken(user._id, 'user')
+    };
+  }
+}

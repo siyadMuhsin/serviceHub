@@ -1,72 +1,71 @@
-import { Request, Response, NextFunction, response } from "express";
-import dotenv from 'dotenv'
+import { inject, injectable } from 'inversify';
+import { Request, Response, NextFunction } from "express";
 import { AuthRequest } from "../types/User";
-import jwt ,{JwtPayload}from "jsonwebtoken";
-import { TokenVerify } from "../utils/jwt";
-import servicesService from "../services/Admin/services.service";
-import userService from "../services/Admin/user.service";
 import { HttpStatus } from "../types/httpStatus";
+import { IAuthMiddleware } from '../core/interfaces/middleware/IAuthMiddleware';
 
-dotenv.config()
+import { AuthMiddlewareService } from "../services/middleware/authMiddleware.service";
+import { TYPES } from "../di/types";
 
-const verifyToken =async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const token = req.cookies?.accessToken; // Get token from cookie
-    if (!token) {
-      res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "Unauthorized: No token provided" });
-      return
+@injectable()
+export class AuthMiddleware implements IAuthMiddleware {
+    constructor(
+        @inject(TYPES.AuthMiddlewareService) private authMiddlewareService: AuthMiddlewareService
+    ) {}
+
+    async verifyToken(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const token = this.getTokenFromRequest(req);
+            if (!token) {
+                this.sendErrorResponse(res, HttpStatus.UNAUTHORIZED, "Unauthorized: No token provided");
+                return;
+            }
+
+            const decoded = await this.authMiddlewareService.verifyToken(token);
+            const isBlocked = await this.authMiddlewareService.checkUserBlocked(decoded.userId);
+            
+            if (isBlocked) {
+              res.clearCookie('accessToken')
+              res.clearCookie('refreshToken')
+                this.sendErrorResponse(res, HttpStatus.FORBIDDEN, "Your account has been blocked by the admin.");
+                return;
+            }
+
+            req.user = decoded;
+            next();
+        } catch (err) {
+            this.sendErrorResponse(res, HttpStatus.BAD_REQUEST, "Unauthorized: Invalid token");
+        }
     }
 
-    const secretKey = process.env.ACCESS_SECRET;
-    if (!secretKey) {
-      console.error("Missing ACCESS_SECRET in environment variables");
-       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
-       return
+    async verifyExpert(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const token = this.getTokenFromRequest(req);
+            if (!token) {
+                this.sendErrorResponse(res, HttpStatus.UNAUTHORIZED, "Unauthorized: No token provided");
+                return;
+            }
+
+            const decoded = await this.authMiddlewareService.verifyToken(token);
+            if (decoded.role !== 'expert' || !decoded.expertId) {
+                this.sendErrorResponse(res, HttpStatus.FORBIDDEN, 'Access denied: Not an expert');
+                return;
+            }
+
+            req.expert = decoded;
+            next();
+        } catch (error) {
+            this.sendErrorResponse(res, HttpStatus.BAD_REQUEST, "Unauthorized: Invalid token");
+        }
     }
 
-    const decoded =await TokenVerify(token,secretKey)
-    const response =await userService.checkBloked(decoded.userId)
-    console.log(response)
-    if (!response){
-      res.status(HttpStatus.FORBIDDEN).json({ success: false, message: "Your account has been blocked by the admin." });
-      return 
+    private getTokenFromRequest(req: Request): string | null {
+        return req.cookies?.accessToken || 
+               req.headers['authorization']?.split(' ')[1] || 
+               null;
     }
-  
-    req.user = decoded; // Attach user info to request object
 
-    next(); // Move to the next middleware
-  } catch (err) {
-     res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "Unauthorized: Invalid token" });
-  }
-};
-
-export const verifyExpert=async(req:AuthRequest,res:Response,next:NextFunction)=>{
-  try {
-    const token = req.cookies?.accessToken
-    if(!token){
-      res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "Unauthorized: No token provided" });
-      return
+    private sendErrorResponse(res: Response, status: HttpStatus, message: string): void {
+        res.status(status).json({ success: false, message });
     }
-    const secretKey = process.env.ACCESS_SECRET;
-
-    if (!secretKey) {
-      console.error("Missing ACCESS_SECRET in environment variables");
-       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
-       return
-    }
-    const decoded = await TokenVerify(token, secretKey); // Ensure type consistency
-    if (decoded.role !== 'expert' || !decoded.expertId) {
-      res.status(HttpStatus.FORBIDDEN).json({ success: false, message: 'Access denied: Not an expert' });
-      return
-    }
-    req.expert = decoded; // Attach user info to request object
-    next()
-  } catch (error) {
-    res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "Unauthorized: Invalid token" });
-    
-  }
-
 }
-
-
-export default verifyToken;

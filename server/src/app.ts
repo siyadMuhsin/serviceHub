@@ -1,4 +1,5 @@
 import express,{ Express,Request,Response } from "express";
+import 'reflect-metadata'
 import connectDB from "./config/db.";
 import dotenv from 'dotenv'
 import authRoutes from "./routes/authRoutes";
