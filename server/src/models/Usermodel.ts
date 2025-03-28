@@ -14,6 +14,7 @@ export interface IUser extends Document {
     resetPasswordToken: string |undefined; // Changed to string
     resetPasswordExpires: Date |undefined; // Changed to Date
     isVerified: boolean;
+    location?:{lat:number,lng:number} | null
   }
 
 const userSchema = new Schema<IUser>(
@@ -31,6 +32,7 @@ const userSchema = new Schema<IUser>(
     resetPasswordToken: { type: String }, 
     resetPasswordExpires: { type: Date },
     isVerified: { type: Boolean, default: false },
+    location: {lat:{type:Number},lng:{type:Number}}
   },
   { timestamps: true }
 );

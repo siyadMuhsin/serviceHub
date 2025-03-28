@@ -43,6 +43,10 @@ import { ExpertRepository } from '../repositories/Expert/Expert.respository';
 import { IExpertRepository } from '../core/interfaces/repositories/IExpertRepository';
 import { IExpertDataController } from '../core/interfaces/controllers/IExpertDataController';
 import { ExpertDataController } from '../controllers/Expert/expert.data.controller';
+import { IProfileController } from '../core/interfaces/controllers/IProfileController';
+import { ProfileController } from '../controllers/User/profile.controller';
+import { IProfileService } from '../core/interfaces/services/IProfileService';
+import { ProfileService } from '../services/User/profile.service';
 
 const container = new Container();
 
@@ -54,11 +58,13 @@ container.bind<IAdminRepository>(TYPES.AdminRepository).to(AdminRepository);
 container.bind<IAuthService>(TYPES.AuthService).to(AuthService);
 container.bind<IUserService>(TYPES.UserService).to(UserService);
 container.bind<IAdminService>(TYPES.AdminService).to(AdminService);
+container.bind<IProfileService>(TYPES.ProfileService).to(ProfileService)
 // Controllers
 container.bind<IAuthController>(TYPES.AuthController).to(AuthController);
 container.bind<ITokenController>(TYPES.TokenController).to(TokenController);
 container.bind<IUsersController>(TYPES.UsersController).to(UsersController);
 container.bind<IAdminAuthController>(TYPES.AdminAuthController).to(AdminAuthController);
+container.bind<IProfileController>(TYPES.ProfileController).to(ProfileController)
 
 
 //middleware

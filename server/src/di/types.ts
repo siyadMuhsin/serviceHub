@@ -1,3 +1,4 @@
+
 export const TYPES = {
     // Repositories
     UserRepository: Symbol.for('UserRepository'),
@@ -27,5 +28,11 @@ export const TYPES = {
     ExpertController:Symbol.for('ExpertController'),
     //middleware
     AuthMiddlewareService:Symbol.for('AuthMiddlewareService'),
-    AuthMiddleware:Symbol.for('AuthMiddleware')
+    AuthMiddleware:Symbol.for('AuthMiddleware'),
+
+
+    //profle types
+    ProfileService:Symbol.for('ProfileService'),
+    ProfileController:Symbol.for('ProfileController')
+    
   };
