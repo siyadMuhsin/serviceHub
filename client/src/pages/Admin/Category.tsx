@@ -8,15 +8,14 @@ import {
   edit_category,
 } from "../../services/Admin/category.service";
 import AddCategoryModal from "../../components/Admin/Modals/CategoryModal";
-import { useSelector, useDispatch } from "react-redux";
-
 import { toast } from "react-toastify";
 import Loading from "../../components/Loading";
 import Pagination from "../../components/Pagination";
+import { ConfirmationModal } from "@/components/ConfirmModal";
+
 
 const Category: React.FC = () => {
-  // const { categories } = useSelector((state: any) => state.categoryService);
-  const [categories,setCategories]=useState([])
+  const [categories, setCategories] = useState([]);
   const [filterText, setFilterText] = useState("");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,20 +23,24 @@ const Category: React.FC = () => {
   const [editingCategory, setEditCategory] = useState<any>();
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    title: '',
+    description: '',
+    action: '',
+    variant: 'default',
+    categoryId: '',
+    currentStatus: false,
+  });
 
-  const limit= 3
+  const limit = 5;
 
-
-  // Fetch categories with pagination and search
   const fetchCategories = async (page: number, limit: number, search: string) => {
     setIsLoading(true);
     try {
-      console.log(search)
       const response = await getCategories(page, limit, search);
-      console.log(response)
       if (response?.success) {
-        
-        setCategories(response.categories)
+        setCategories(response.categories);
         setTotalPages(response.totalPages);
       } else {
         toast.error(response?.message || "Failed to fetch categories");
@@ -54,7 +57,6 @@ const Category: React.FC = () => {
     fetchCategories(currentPage, limit, filterText);
   }, [currentPage, limit, filterText]);
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent, formData: FormData) => {
     setIsLoading(true);
     e.preventDefault();
@@ -62,14 +64,13 @@ const Category: React.FC = () => {
     if (editingCategory) {
       try {
         const response = await edit_category(editingCategory._id, formData);
-
         if (response?.success) {
           toast.success(response.message);
-         setCategories(prev=>
-          prev.map(category=>
-            category._id==editingCategory._id ? category=response.updatedCategory :category
-          )
-         )
+          setCategories(prev =>
+            prev.map(category =>
+              category._id == editingCategory._id ? response.updatedCategory : category
+            )
+          );
           handleCloseModal();
         } else {
           toast.error(response.message);
@@ -88,10 +89,7 @@ const Category: React.FC = () => {
       if (response.success) {
         toast.success("Category added successfully");
         setIsModalOpen(false);
-        setCategories(prev=>
-        [...prev,response.category]
-        )
-        
+        setCategories(prev => [...prev, response.category]);
       } else {
         toast.error(response.message);
       }
@@ -103,28 +101,47 @@ const Category: React.FC = () => {
     }
   };
 
-  // List and unlist functionality
-  const handleListAndUnlist = async (id: string, status: boolean) => {
+  const showConfirmation = (category: any, action: string) => {
+    setConfirmationModal({
+      isOpen: true,
+      title: action === 'list' ? 'List Category' : 'Unlist Category',
+      description: `Are you sure you want to ${action} this category "${category.name}"?`,
+      action,
+      variant: action === 'unlist' ? 'destructive' : 'default',
+      categoryId: category._id,
+      currentStatus: category.isActive,
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    setIsLoading(true);
     try {
-      const response = await category_list_unlist(id, status);
+      const response = await category_list_unlist(
+        confirmationModal.categoryId, 
+        confirmationModal.currentStatus
+      );
 
       if (response?.success) {
-        console.log(`Category ${status ? "listed" : "unlisted"} successfully`);
-        setCategories((prev) =>
-          prev.map((category) =>
-            category._id === id ? { ...category, isActive: !status } : category
+        setCategories(prev =>
+          prev.map(category =>
+            category._id === confirmationModal.categoryId 
+              ? { ...category, isActive: !confirmationModal.currentStatus } 
+              : category
           )
         );
-       
+        toast.success(`Category ${confirmationModal.action}ed successfully`);
       } else {
-        console.error(response?.message || "Failed to update category status");
+        toast.error(response?.message || "Failed to update category status");
       }
     } catch (error) {
+      toast.error("Error updating category status");
       console.error("Error updating category status:", error);
+    } finally {
+      setIsLoading(false);
+      setConfirmationModal({ ...confirmationModal, isOpen: false });
     }
   };
 
-  // Handle edit category
   const handleEditCategory = (id: string) => {
     const selectedCategory = categories.find((a: any) => a._id == id);
     setEditCategory(selectedCategory);
@@ -136,7 +153,6 @@ const Category: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -149,7 +165,6 @@ const Category: React.FC = () => {
         <main className={`p-5 transition-all duration-300 ${isSidebarExpanded ? "ml-64" : "ml-16"}`}>
           <h2 className="text-2xl font-bold mb-5">Category Management</h2>
 
-          {/* Search and Add Category Buttons */}
           <div className="flex justify-between mb-5">
             <input
               type="text"
@@ -166,7 +181,6 @@ const Category: React.FC = () => {
             </button>
           </div>
 
-          {/* Table */}
           {isLoading && <Loading />}
           <div className="overflow-auto max-h-[calc(100vh-200px)]">
             <table className="min-w-full bg-[#2A2A3C] rounded-lg overflow-hidden">
@@ -218,9 +232,9 @@ const Category: React.FC = () => {
                           Edit
                         </button>
                         <button
-                          onClick={() => handleListAndUnlist(category._id, category.isActive)}
-                          style={{ border: "1px solid #d97706" }}
-                          className="px-2 py-1 text-white rounded hover:bg-yellow-600"
+                          onClick={() => showConfirmation(category, category.isActive ? 'unlist' : 'list')}
+                          style={{ border: `1px solid ${category.isActive ? "#d97706" : "#10b981"}` }}
+                          className={`px-2 py-1 text-white rounded hover:${category.isActive ? "bg-yellow-600" : "bg-green-600"}`}
                         >
                           {category.isActive ? "Unlist" : "List"}
                         </button>
@@ -232,7 +246,6 @@ const Category: React.FC = () => {
             </table>
           </div>
 
-          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -241,7 +254,6 @@ const Category: React.FC = () => {
         </main>
       </div>
 
-      {/* Add Category Modal */}
       {isModalOpen && (
         <AddCategoryModal
           handleSubmit={handleSubmit}
@@ -250,6 +262,16 @@ const Category: React.FC = () => {
           categoryToEdit={editingCategory}
         />
       )}
+
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={() => setConfirmationModal({ ...confirmationModal, isOpen: false })}
+        onConfirm={handleConfirmAction}
+        title={confirmationModal.title}
+        description={confirmationModal.description}
+        confirmText={confirmationModal.action.charAt(0).toUpperCase() + confirmationModal.action.slice(1)}
+        variant={confirmationModal.variant}
+      />
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { adminAPI } from "../../../axiosConfig";
+import { adminAPI } from "../../../config/axiosConfig";
 
 export const getCategories = async (page:number,limit:number ,search:string) => {
   try {

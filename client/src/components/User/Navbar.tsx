@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../Slice/authSlice";
@@ -16,7 +16,10 @@ import CreateExpertModal from "./modals/CreateExpertModal";
 import Loading from "../Loading";
 import { ExpertData} from "@/Interfaces/interfaces";
 import Logo from "./Logo";
+import LocationFetcher from "../Location/GeoLocation";
 
+import { fetchLocationFromCoordinates } from "@/Utils/locationUtils";
+import { number } from "yup";
 
 const Navbar: React.FC = () => {
   // const { categories, services } = useSelector((state: any) => state.categoryService);
@@ -27,9 +30,17 @@ const Navbar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+const [userr,setUser]=useState()
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [locationData, setLocationData] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (user?.location?.lat && user?.location?.lng) {
+      fetchLocationFromCoordinates(user.location.lat, user.location.lng).then(setLocationData);
+    }
+  }, [user]);
+console.log(locationData)
   const handleLogout = async () => {
     try{
       setIsLoading(true)
@@ -54,8 +65,9 @@ const Navbar: React.FC = () => {
   };
 
  
-
-
+  const updateUserLocation = (newLocation: { location: string; latitude: number; longitude: number }) => {
+    setUser({ ...user, ...newLocation });
+  };
   
   return (
     <header className="w-full">
@@ -94,18 +106,24 @@ const Navbar: React.FC = () => {
 
         {/* Menu Items */}
         <nav className="hidden md:flex gap-6 text-gray-700">
+          <div>
           <Link to="/categories" className="hover:text-blue-500">
             Categories
           </Link>
+
+          </div>
+          {user ? (
+  <div className="flex items-center">
+    <LocationFetcher 
+      user={user} 
+      updateUserLocation={locationData} 
+    />
+  </div>
+) : null}
         </nav>
 
-        {/* Become Expert Button */}
-
-        {/* Search Bar & Icons */}
+       
         <div className="flex items-center gap-4">
-          {/* Search Bar */}
-          
-
           {/* Notification Icon */}
           {isAuthenticated && (
             <div className="relative">

@@ -1,4 +1,4 @@
-import { expertAPI } from "axiosConfig"
+import { expertAPI } from "config/axiosConfig"
 
 const get_expert=async()=>{
     try {

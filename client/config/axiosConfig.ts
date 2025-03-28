@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
-import { store } from "./src/store";
-import { logout } from "./src/Slice/authSlice";
-import { adminLogout } from "./src/Slice/adminAuthSlice";
+import { store } from "../src/store";
+import { logout } from "../src/Slice/authSlice";
+import { adminLogout } from "../src/Slice/adminAuthSlice";
 import { error } from "console";
 
 // Define the API response structure

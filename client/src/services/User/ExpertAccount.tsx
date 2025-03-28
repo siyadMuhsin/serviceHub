@@ -1,4 +1,4 @@
-import { expertAPI, userAPI } from "../../../axiosConfig"
+import { expertAPI, userAPI } from "../../../config/axiosConfig"
 
 export const createExpertAccount = async(formDate:FormData)=>{
     try {

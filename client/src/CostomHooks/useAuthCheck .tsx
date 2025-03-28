@@ -3,7 +3,7 @@ import Cookie from 'js-cookie'
 
 import { useDispatch } from "react-redux";
 import { changeRole, loginSuccess, logout } from "../Slice/authSlice";
-import { userAPI, adminAPI } from "../../axiosConfig";
+import { userAPI, adminAPI } from "../../config/axiosConfig";
 import { getRoleFromToken } from "@/Utils/jwt.decode";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";

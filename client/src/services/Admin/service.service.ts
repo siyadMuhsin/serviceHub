@@ -1,5 +1,5 @@
 import { Form } from "react-router-dom";
-import { adminAPI } from "../../../axiosConfig";
+import { adminAPI } from "../../../config/axiosConfig";
 
 export const getServices = async (page:number,limit:number,search:string) => {
   try {

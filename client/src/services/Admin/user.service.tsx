@@ -1,5 +1,5 @@
 import { CodeSandboxLogoIcon } from "@radix-ui/react-icons"
-import { adminAPI } from "axiosConfig"
+import { adminAPI } from "config/axiosConfig"
 
 export const user_block_unbloack = async (id: string, status: boolean) => {
     try {

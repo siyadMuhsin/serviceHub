@@ -3,17 +3,14 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expertSchemaValidation } from "../../../validations/expertValidation";
 import { Category, Service, ExpertData } from "../../../Interfaces/interfaces";
-
-import { getServices } from "../../../services/Admin/service.service";
-import { getCategories } from "../../../services/Admin/category.service";
 import { getAll_categories, getAll_services } from "@/services/category.service";
 
 interface CreateExpertModalProps {
     isOpen: boolean;
     onClose: () => void;
     onCreate: (expert: ExpertData) => void;
-    categories: Category[];
-    services: Service[];
+    categories?: Category[];
+    services?: Service[];
 }
 
 

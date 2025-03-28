@@ -1,4 +1,4 @@
-import { adminAPI } from "axiosConfig";
+import { adminAPI } from "config/axiosConfig";
 export const get_experts=async(page:number,limit:number,filter:string,search:string)=>{
     try {
         const response= await adminAPI.get(`/experts/?page=${page+1}&limit=${limit}&filter=${filter}&search=${search}`)
@@ -10,9 +10,9 @@ export const get_experts=async(page:number,limit:number,filter:string,search:str
     }
 }
 
-export const expert_change_action = async (id: string, action: string) => {
+export const expert_change_action = async (id: string, action: string,reason?:string) => {
     try {
-      const response = await adminAPI.patch(`/expert/${id}`, { action });
+      const response = await adminAPI.patch(`/expert/${id}`, { action ,reason});
       return response.data; // Return the API response
     } catch (error) {
       return {

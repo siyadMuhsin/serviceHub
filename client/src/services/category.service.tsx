@@ -1,4 +1,4 @@
-import { userAPI } from "axiosConfig"
+import { userAPI } from "config/axiosConfig"
 
 export const get_categoryBy_limit=async(page:number,limit:number,searchQuary:string)=>{
     try {

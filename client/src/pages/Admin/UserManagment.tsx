@@ -5,6 +5,8 @@ import Sidebar from "../../components/Admin/Sidebar";
 import { user_block_unbloack, get_users } from "../../services/Admin/user.service";
 import Loading from "../../components/Loading";
 import { Snackbar, Alert } from "@mui/material";
+import { ConfirmationModal } from "@/components/ConfirmModal";
+
 
 const UserManagement: React.FC = () => {
   const [filterText, setFilterText] = useState("");
@@ -16,31 +18,61 @@ const UserManagement: React.FC = () => {
     message: "",
     severity: "success" as "success" | "error",
   });
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    userId: "",
+    isBlocked: false,
+    userName: "",
+  });
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await get_users();
-      if (response.success) {
-        setUsers(response.users);
+      setIsLoading(true);
+      try {
+        const response = await get_users();
+        if (response.success) {
+          setUsers(response.users);
+        }
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: "Failed to fetch users",
+          severity: "error",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchUsers();
   }, []);
 
-  const handleBlock = async (id: string, status: boolean) => {
+  const showConfirmation = (user: any) => {
+    setConfirmationModal({
+      isOpen: true,
+      userId: user._id,
+      isBlocked: !user.isBlocked,
+      userName: user.name,
+    });
+  };
+
+  const handleBlock = async () => {
     try {
-      const response = await user_block_unbloack(id, status);
+      const { userId, isBlocked } = confirmationModal;
+      setIsLoading(true);
+      const response = await user_block_unbloack(userId, isBlocked);
+      
       if (response?.success) {
-        setSnackbar({
-          open: true,
-          message: response.message,
-          severity: "success",
-        });
         setUsers((prevUsers: any) =>
           prevUsers.map((user) =>
-            user._id === id ? { ...user, isBlocked: status } : user
+            user._id === userId ? { ...user, isBlocked } : user
           )
         );
+        setSnackbar({
+          open: true,
+          message: response.message || 
+                  `User ${isBlocked ? "blocked" : "unblocked"} successfully`,
+          severity: "success",
+        });
       } else {
         setSnackbar({
           open: true,
@@ -54,6 +86,9 @@ const UserManagement: React.FC = () => {
         message: "Error updating user status",
         severity: "error",
       });
+    } finally {
+      setIsLoading(false);
+      setConfirmationModal({ ...confirmationModal, isOpen: false });
     }
   };
 
@@ -81,7 +116,7 @@ const UserManagement: React.FC = () => {
       sortable: true,
     },
     {
-      name: "googleUser",
+      name: "Google User",
       selector: (row: any) => row.isGoogleUser,
       cell: (row: any) => (
         <span
@@ -95,20 +130,33 @@ const UserManagement: React.FC = () => {
       width: "120px",
     },
     {
+      name: "Status",
+      cell: (row: any) => (
+        <span
+          className={`px-2 py-1 rounded text-sm text-white ${
+            row.isBlocked ? "bg-red-500" : "bg-green-500"
+          }`}
+        >
+          {row.isBlocked ? "Blocked" : "Active"}
+        </span>
+      ),
+      width: "100px",
+    },
+    {
       name: "Actions",
       cell: (row: any) => (
         <div className="flex space-x-2">
           <button
-            onClick={() => handleBlock(row._id, !row.isBlocked)}
+            onClick={() => showConfirmation(row)}
             className={`px-4 py-2 rounded-md font-semibold ${
-              row.isBlocked ? "bg-red-500 text-white" : "bg-green-500 text-white"
-            }`}
+              row.isBlocked ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
+            } text-white`}
           >
             {row.isBlocked ? "Unblock" : "Block"}
           </button>
         </div>
       ),
-      width: "200px",
+      width: "150px",
     },
   ];
 
@@ -151,17 +199,26 @@ const UserManagement: React.FC = () => {
         </main>
       </div>
 
-      {/* Snackbar for Alerts */
-      }
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={() => setConfirmationModal({ ...confirmationModal, isOpen: false })}
+        onConfirm={handleBlock}
+        title={`${confirmationModal.isBlocked ? "Block" : "Unblock"} User`}
+        description={`Are you sure you want to ${confirmationModal.isBlocked ? "block" : "unblock"} ${confirmationModal.userName}?`}
+        confirmText={confirmationModal.isBlocked ? "Block" : "Unblock"}
+        variant={confirmationModal.isBlocked ? "destructive" : "default"}
+      />
+
+      {/* Snackbar for Alerts */}
       <Snackbar
-      
         open={snackbar.open}
         autoHideDuration={3000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
-        variant="filled"
+          variant="filled"
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
           sx={{ width: "100%" }}

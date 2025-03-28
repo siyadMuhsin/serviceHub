@@ -30,8 +30,10 @@ export interface IUser{
     createdAt: Date;
     isGoogleUser: boolean;
     isBlocked:boolean;
+    phone:string;
     googleId: string;
     profile_imaga: string;
+    location:string;
     expertStatus:string
     resetPasswordToken: string |undefined; // Changed to string
     resetPasswordExpires: Date |undefined; // Changed to Date

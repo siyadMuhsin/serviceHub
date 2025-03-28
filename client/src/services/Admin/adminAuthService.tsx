@@ -1,4 +1,4 @@
-import {adminAPI} from '../../../axiosConfig'
+import {adminAPI} from '../../../config/axiosConfig'
 
 export const adminLoginService = async (email: string, password: string) => {
     try {

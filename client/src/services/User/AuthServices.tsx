@@ -1,6 +1,6 @@
 // services/authService.ts
 import axios from "axios";
-import {userAPI} from "../../../axiosConfig";
+import {userAPI} from "../../../config/axiosConfig";
 
 export const registerUser = async (formData: {
   name: string;

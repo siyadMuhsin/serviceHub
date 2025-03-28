@@ -11,12 +11,13 @@ import {
 import AddServiceModal from "../../components/Admin/Modals/ServiceModal";
 import { add_service } from "../../services/Admin/service.service";
 import { useDispatch, useSelector } from "react-redux";
-
 import Loading from "../../components/Loading";
 import Pagination from "../../components/Pagination";
+import { ConfirmationModal } from "@/components/ConfirmModal";
+
 
 const Services: React.FC = () => {
-  const [services,setServices]=useState([])
+  const [services, setServices] = useState([]);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [filterText, setFilterText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,19 +29,25 @@ const Services: React.FC = () => {
     severity: "success",
   });
   const [currentPage, setCurrentPage] = useState<number>(0);
-
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    title: '',
+    description: '',
+    action: '',
+    variant: 'default' ,
+    serviceId: '',
+    currentStatus: false,
+  });
   const dispatch = useDispatch();
-  const limit= 5
+  const limit = 5;
 
-  // Fetch services with pagination and search
   const fetchServices = async (page: number, limit: number, search: string = "") => {
     try {
       setLoading(true);
       const response = await getServices(page, limit, search);
-      console.log(response)
       if (response?.success) {
-        setServices(response.services)
+        setServices(response.services);
         setTotalPages(response.totalPage);
       } else {
         setSnackbar({ open: true, message: response?.message || "Failed to fetch services", severity: "error" });
@@ -56,44 +63,66 @@ const Services: React.FC = () => {
     fetchServices(currentPage, limit, filterText);
   }, [currentPage, limit, filterText]);
 
-  // Handle status toggle
-  const toggleListStatus = async (id: string, isListed: boolean) => {
-    console.log(isListed)
+  const showConfirmation = (service: any, action: string) => {
+    setConfirmationModal({
+      isOpen: true,
+      title: action === 'list' ? 'List Service' : 'Unlist Service',
+      description: `Are you sure you want to ${action} this service "${service.name}"?`,
+      action,
+      variant: action === 'unlist' ? 'destructive' : 'default',
+      serviceId: service._id,
+      currentStatus: service.isActive,
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await service_list_unlist(id);
+      const response = await service_list_unlist(confirmationModal.serviceId);
       if (response?.success) {
-        setSnackbar({ open: true, message: response.message, severity: "success" })
-        setServices(prev=>
-          prev.map(service=>
-            service._id==id ? {...service,isActive:!isListed}:service 
+        setServices(prev =>
+          prev.map(service =>
+            service._id === confirmationModal.serviceId 
+              ? { ...service, isActive: !confirmationModal.currentStatus } 
+              : service
           )
-        )
-      
+        );
+        setSnackbar({ 
+          open: true, 
+          message: `Service ${confirmationModal.action}ed successfully`, 
+          severity: "success" 
+        });
       } else {
-        setSnackbar({ open: true, message: response?.message || "Failed to update status", severity: "error" });
+        setSnackbar({ 
+          open: true, 
+          message: response?.message || "Failed to update status", 
+          severity: "error" 
+        });
       }
     } catch (error: any) {
-      setSnackbar({ open: true, message: error.message || "Something went wrong. Please try again.", severity: "error" });
+      setSnackbar({ 
+        open: true, 
+        message: error.message || "Something went wrong", 
+        severity: "error" 
+      });
     } finally {
       setLoading(false);
+      setConfirmationModal({ ...confirmationModal, isOpen: false });
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (formData: any) => {
     try {
       setLoading(true);
       let response;
       if (editService) {
         response = await edit_service(editService._id, formData);
-        console.log(response)
         if (response?.success) {
-          setServices(prev=>
-            prev.map(service=>
-              service._id==editService._id ? response.service :service
+          setServices(prev =>
+            prev.map(service =>
+              service._id == editService._id ? response.service : service
             )
-          )
+          );
           setSnackbar({ open: true, message: "Service updated successfully!", severity: "success" });
         } else {
           setSnackbar({ open: true, message: response?.message || "Failed to update service.", severity: "error" });
@@ -101,10 +130,7 @@ const Services: React.FC = () => {
       } else {
         response = await add_service(formData);
         if (response?.success) {
-          setServices(prev=>
-          [...prev,response.service]
-          )
-          
+          setServices(prev => [...prev, response.service]);
           setSnackbar({ open: true, message: response.message || "Service added successfully!", severity: "success" });
         } else {
           setSnackbar({ open: true, message: response?.message || "Failed to add service.", severity: "error" });
@@ -117,24 +143,20 @@ const Services: React.FC = () => {
     }
   };
 
-  // Handle edit
   const handleEdit = (data: any) => {
     setEditService(data);
     setIsModalOpen(true);
   };
 
-  // Handle modal close
   const handleCloseModal = () => {
     setEditService(null);
     setIsModalOpen(false);
   };
 
-  // Handle snackbar close
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -147,7 +169,6 @@ const Services: React.FC = () => {
         <main className={`transition-all duration-300 ${isSidebarExpanded ? "ml-64" : "ml-16"} pt-16 p-5`}>
           <h3 className="text-2xl font-bold mb-5">Service Management</h3>
 
-          {/* Search and Add Service */}
           <div className="flex justify-between mb-5">
             <input
               type="text"
@@ -164,7 +185,6 @@ const Services: React.FC = () => {
             </button>
           </div>
 
-          {/* Table */}
           <div className="overflow-auto max-h-[calc(100vh-200px)]">
             <table className="min-w-full bg-[#2A2A3C] rounded-lg overflow-hidden">
               <thead>
@@ -217,9 +237,11 @@ const Services: React.FC = () => {
                           Edit
                         </button>
                         <button
-                          style={{ border: "1px solid #d97706" }}
-                          onClick={() => toggleListStatus(service._id, service.isActive)}
-                          className={`px-2 py-1 rounded text-white ${service.isActive ? "hover:bg-red-600" : "hover:bg-green-600"}`}
+                          style={{ border: `1px solid ${service.isActive ? "#d97706" : "#10b981"}` }}
+                          onClick={() => showConfirmation(service, service.isActive ? 'unlist' : 'list')}
+                          className={`px-2 py-1 rounded text-white ${
+                            service.isActive ? "hover:bg-red-600" : "hover:bg-green-600"
+                          }`}
                         >
                           {service.isActive ? "Unlist" : "List"}
                         </button>
@@ -231,7 +253,6 @@ const Services: React.FC = () => {
             </table>
           </div>
 
-          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -240,7 +261,6 @@ const Services: React.FC = () => {
         </main>
       </div>
 
-      {/* Add Service Modal */}
       {isModalOpen && (
         <AddServiceModal
           isOpen={isModalOpen}
@@ -250,14 +270,22 @@ const Services: React.FC = () => {
         />
       )}
 
-      {/* Snackbar */}
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={() => setConfirmationModal({ ...confirmationModal, isOpen: false })}
+        onConfirm={handleConfirmAction}
+        title={confirmationModal.title}
+        description={confirmationModal.description}
+        confirmText={confirmationModal.action.charAt(0).toUpperCase() + confirmationModal.action.slice(1)}
+        variant={confirmationModal.variant}
+      />
+
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
         <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
 
-      {/* Loading */}
       {loading && <Loading />}
     </>
   );
