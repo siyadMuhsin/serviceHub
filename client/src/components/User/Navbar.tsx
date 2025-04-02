@@ -40,7 +40,7 @@ const [userr,setUser]=useState()
       fetchLocationFromCoordinates(user.location.lat, user.location.lng).then(setLocationData);
     }
   }, [user]);
-console.log(locationData)
+
   const handleLogout = async () => {
     try{
       setIsLoading(true)
@@ -114,10 +114,9 @@ console.log(locationData)
           </div>
           {user ? (
   <div className="flex items-center">
-    <LocationFetcher 
-      user={user} 
-      updateUserLocation={locationData} 
-    />
+    {user && (
+    <LocationFetcher user={user} updateUserLocation={updateUserLocation} />
+  )}
   </div>
 ) : null}
         </nav>

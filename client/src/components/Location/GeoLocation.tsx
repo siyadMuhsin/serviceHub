@@ -1,170 +1,171 @@
-import React, { useEffect, useState } from "react";
-import { MdLocationOn, MdEdit } from "react-icons/md";
+import { useEffect, useState } from "react";
 import opencage from "opencage-api-client";
-import { toast } from "react-toastify";
+import { addLocation } from "@/services/User/user.service";
+import { fetchLocationFromCoordinates } from "../../Utils/locationUtils";
+import { MdLocationOn } from "react-icons/md";
 
-const API_KEY = "173c9408b3a6422b810bccbc0d6f9d5c"; // Replace with your actual API key
+const API_KEY = "173c9408b3a6422b810bccbc0d6f9d5c"; // Replace with your real API key
 
-const LocationFetcher = ({ user, updateUserLocation }) => {
-  const [location, setLocation] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [locationInput, setLocationInput] = useState("");
+const LocationFetcher = ({ user, updateUserLocation }: { user: any; updateUserLocation: (location: any) => void }) => {
+  const [location, setLocation] = useState<string | null>(null);
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [manualLocation, setManualLocation] = useState<string>("");
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  // Add a state for blinking effect
+  const [isBlinking, setIsBlinking] = useState<boolean>(true);
 
-  // Fetch location details when component mounts or user changes
   useEffect(() => {
-    if (user?.location?.lat && user?.location?.lng) {
-      fetchLocationDetails(user.location.lat, user.location.lng);
+    // Blinking effect for the "Add Location" button
+    if (!user?.location?.lat && !user?.location?.lng) {
+      const blinkInterval = setInterval(() => {
+        setIsBlinking(prev => !prev);
+      }, 800);
+      
+      return () => clearInterval(blinkInterval);
     }
   }, [user]);
 
-  // Fetch location details from coordinates
-  const fetchLocationDetails = async (lat, lng) => {
-    try {
-      const response = await opencage.geocode({
-        key: API_KEY,
-        q: `${lat},${lng}`
+  useEffect(() => {
+    if (user?.location?.lat && user?.location?.lng) {
+      setLoading(true)
+      fetchLocationFromCoordinates(user.location.lat, user.location.lng).then((loc) => {
+        setLocation(loc);
+        setLatitude(user.location.lat);
+        setLongitude(user.location.lng);
       });
-
-      if (response.results.length > 0) {
-        const cityOrTown = response.results[0].components.city || 
-                           response.results[0].components.town || 
-                           response.results[0].components.village || 
-                           "Unknown Location";
-        setLocation(cityOrTown);
-      }
-    } catch (error) {
-      toast.error("Failed to fetch location details");
     }
-  };
+    setLoading(false)
+  }, [user]);
 
-  // Manually search for location
-  const handleLocationSearch = async () => {
-    if (!locationInput.trim()) return;
-
-    try {
-      const response = await opencage.geocode({
-        key: API_KEY,
-        q: locationInput
-      });
-
-      if (response.results.length > 0) {
-        const result = response.results[0];
-        const cityOrTown = result.components.city || 
-                           result.components.town || 
-                           result.components.village || 
-                           "Unknown Location";
-        
-        // Update location in backend and local state
-        updateUserLocation({
-          location: cityOrTown,
-          latitude: result.geometry.lat,
-          longitude: result.geometry.lng
-        });
-
-        setLocation(cityOrTown);
-        setIsEditing(false);
-        toast.success("Location updated successfully");
-      } else {
-        toast.error("Location not found");
-      }
-    } catch (error) {
-      toast.error("Failed to search location");
-    }
-  };
-
-  // Get current GPS location
-  const getCurrentLocation = () => {
+  // Fetch GPS location
+  const fetchCurrentLocation = async () => {
+    setLoading(true);
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          
+          setLatitude(latitude);
+          setLongitude(longitude);
+
           try {
             const response = await opencage.geocode({
               key: API_KEY,
-              q: `${latitude},${longitude}`
+              q: `${latitude},${longitude}`,
             });
 
             if (response.results.length > 0) {
-              const cityOrTown = response.results[0].components.city || 
-                                 response.results[0].components.town || 
-                                 response.results[0].components.village || 
-                                 "Unknown Location";
-              
-              updateUserLocation({
-                location: cityOrTown,
-                latitude,
-                longitude
-              });
-
-              setLocation(cityOrTown);
-              setIsEditing(false);
-              toast.success("Location updated successfully");
+              const formattedAddress = response.results[0].formatted;
+              setLocation(formattedAddress);
+              saveLocation(formattedAddress, latitude, longitude);
             }
           } catch (error) {
-            toast.error("Failed to fetch location details");
+            console.error("Geocoding error:", error);
+            setLocation(null);
+          } finally {
+            setLoading(false);
           }
         },
         (error) => {
-          toast.error("Unable to retrieve your location");
+          console.error("Geolocation error:", error);
+          alert("Failed to fetch location. Please enter manually.");
+          setLoading(false);
         }
       );
     } else {
-      toast.error("Geolocation is not supported by your browser");
+      alert("Geolocation is not supported by your browser.");
+      setLoading(false);
     }
   };
 
-  // Location display when not editing
-  if (!isEditing) {
-    return location ? (
-      <div 
-        className="flex items-center gap-2 text-gray-700 cursor-pointer hover:text-blue-600"
-        onClick={() => setIsEditing(true)}
-      >
-        <MdLocationOn className="text-blue-500 text-xl" />
-        <span className="text-sm font-medium">{location}</span>
-        <MdEdit className="text-gray-500 text-sm" />
-      </div>
-    ) : (
+  // Handle manual location submission
+  const handleManualLocationSubmit = async () => {
+    if (!manualLocation.trim()) return;
+
+    try {
+      const response = await opencage.geocode({
+        key: API_KEY,
+        q: manualLocation,
+      });
+
+      if (response.results.length > 0) {
+        const result = response.results[0];
+        setLocation(result.formatted);
+        setLatitude(result.geometry.lat);
+        setLongitude(result.geometry.lng);
+        saveLocation(result.formatted, result.geometry.lat, result.geometry.lng);
+      } else {
+        alert("Location not found. Try again.");
+      }
+    } catch (error) {
+      console.error("Manual geocoding error:", error);
+      alert("Failed to fetch location.");
+    }
+  };
+
+  // Save location to backend
+  const saveLocation = async (newLocation: string, lat: number, lng: number) => {
+    try {
+      await addLocation(newLocation, lat, lng);
+      updateUserLocation({ location: newLocation, latitude: lat, longitude: lng });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving location:", error);
+      alert("Failed to save location.");
+    }
+  };
+
+  if (loading) {
+    return <p className="font-semibold text-gray-500">Fetching location...</p>;
+  }
+
+  if (!location && !isEditing) {
+    return (
       <button 
-        className="text-blue-500 hover:underline flex items-center gap-1"
+        className={`flex items-center gap-1 text-blue-500 hover:text-blue-700 font-semibold ${isBlinking ? 'animate-pulse' : ''}`} 
         onClick={() => setIsEditing(true)}
       >
-        <MdLocationOn /> Add Location
+        <MdLocationOn className="text-lg" />
+        <span>Add Location</span>
       </button>
     );
   }
 
-  // Location editing view
-  return (
-    <div className="flex flex-col gap-2 bg-white p-3 rounded-lg shadow-md">
-      <input
-        type="text"
-        placeholder="Enter your location"
-        value={locationInput}
-        onChange={(e) => setLocationInput(e.target.value)}
-        className="w-full p-2 border rounded"
-      />
-      <div className="flex gap-2">
-        <button 
-          onClick={handleLocationSearch}
-          className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600"
-        >
-          Save Location
-        </button>
-        <button 
-          onClick={getCurrentLocation}
-          className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600"
-        >
-          Use Current Location
-        </button>
-        <button 
-          onClick={() => setIsEditing(false)}
-          className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300"
-        >
-          Cancel
-        </button>
+  if (isEditing) {
+    return (
+      <div className="mt-2 bg-white p-3 rounded-lg shadow-md border border-gray-300">
+        <input
+          type="text"
+          placeholder="Enter location"
+          className="border p-2 rounded w-full text-black"
+          value={manualLocation}
+          onChange={(e) => setManualLocation(e.target.value)}
+        />
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={handleManualLocationSubmit}
+            className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 transition"
+          >
+            Save
+          </button>
+          <button
+            onClick={fetchCurrentLocation}
+            className="bg-gray-500 text-white px-4 py-1 rounded hover:bg-gray-600 transition"
+          >
+            Use Current
+          </button>
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      <p className="flex items-center gap-1 font-semibold text-gray-700">
+        <MdLocationOn className="text-blue-500" />
+        {location?.split(",").slice(0, 2).join(",")}
+      </p>
     </div>
   );
 };

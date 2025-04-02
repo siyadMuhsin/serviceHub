@@ -44,6 +44,7 @@ export const ProfilePage: React.FC = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  console.log('home page')
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -52,12 +53,13 @@ export const ProfilePage: React.FC = () => {
         const response = await get_userData();
 
         if (response.success) {
+          console.log(response.user)
           setUser(response.user);
           setEditedProfile({
             name: response.user.name,
             email: response.user.email,
             phone: response.user.phone,
-            location: response.user.location,
+            // location: response.user.location,
             profile_imaga: response.user.profile_imaga
           });
         } else {
@@ -344,7 +346,7 @@ export const ProfilePage: React.FC = () => {
                       <div className="space-y-2 text-gray-600">
                         <p>{user.email}</p>
                         <p>{user.phone}</p>
-                        <p>{user.location}</p>
+                        {/* <p>{user.location}</p> */}
                       </div>
                     </div>
                   </div>
@@ -418,13 +420,13 @@ export const ProfilePage: React.FC = () => {
                     </div>
                     <div>
                       <label className="block mb-2">Location</label>
-                      <Input 
+                      {/* <Input 
                         value={editedProfile.location || ''} 
                         onChange={(e) => setEditedProfile(prev => ({
                           ...prev, 
                           location: e.target.value
                         }))}
-                      />
+                      /> */}
                     </div>
                   </div>
                 </div>

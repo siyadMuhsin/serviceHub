@@ -33,7 +33,7 @@ export interface IUser{
     phone:string;
     googleId: string;
     profile_imaga: string;
-    location:string;
+    location:{lat:number,lng:string};
     expertStatus:string
     resetPasswordToken: string |undefined; // Changed to string
     resetPasswordExpires: Date |undefined; // Changed to Date
