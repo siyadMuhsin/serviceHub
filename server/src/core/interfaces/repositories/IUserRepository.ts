@@ -1,4 +1,5 @@
 import { IUser } from "../../../models/Usermodel";
+import { IExpert } from "../../../types/Expert";
 
 export interface IUserRepository {
   getAlluser(): Promise<IUser[]>;
@@ -8,4 +9,6 @@ export interface IUserRepository {
   findByIdAndUpdate(id: string, update: Partial<IUser>): Promise<IUser | null>;
   findUserAndUpdate(email: string, update: Partial<IUser>): Promise<IUser | null>;
   findOneBYToken(token: string): Promise<IUser | null>;
+  findByIdClearToken(token:string,password:string):Promise <IUser |null>;
+  getExpertByUserId(id:string):Promise<IExpert |null>
 }

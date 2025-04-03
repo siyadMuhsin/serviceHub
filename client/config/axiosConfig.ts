@@ -34,7 +34,6 @@ userAPI.interceptors.response.use(
         }
         
       } catch (refreshError) {
-        console.error("Session expired, logging out...");
         store.dispatch(logout());
       }
     }

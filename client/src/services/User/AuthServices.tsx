@@ -1,6 +1,7 @@
 // services/authService.ts
 import axios from "axios";
 import {userAPI} from "../../../config/axiosConfig";
+import { ConnectingAirportsOutlined } from "@mui/icons-material";
 
 export const registerUser = async (formData: {
   name: string;
@@ -102,8 +103,14 @@ export const forgetPassword=async(email:string)=>{
 
 }
 export const resetPassword=async(token:string|undefined , newPassword:string)=>{
-  const response= await userAPI.post('/auth/reset-password',{token,newPassword})
-return response
+  try {
+    const response= await userAPI.post('/auth/reset-password',{token,newPassword})
+    return response
+  } catch (error) {
+   console.log(error)
+   throw new Error (error.response.data.message)
+  }
+
 }
 
 export const get_userData=async()=>{

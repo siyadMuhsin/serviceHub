@@ -178,7 +178,7 @@ export class AuthService implements IAuthService {
         } else {
           const updateUser = await this.userRepository.findUserAndUpdate(
             existingUser.email,
-            { isGoogleUser: true, googleId: googleId, profile_imaga: image }
+            { isGoogleUser: true, googleId: googleId, profile_image: image }
           );
           if (updateUser) {
             return this.generateAuthResponse(updateUser);
@@ -189,7 +189,7 @@ export class AuthService implements IAuthService {
           googleId,
           email,
           name,
-          profile_imaga: image,
+          profile_image: image,
           isGoogleUser: true,
           isVerified: true,
         });
@@ -208,14 +208,16 @@ export class AuthService implements IAuthService {
   async forgetPassword(email: string): Promise<AuthResult> {
     try {
       const existingUser = await this.userRepository.findUserByEmail(email);
+      console.log(existingUser)
       if (!existingUser) {
         return { success: false, message: "Email not found" };
       }
 
       const resetToken = generateResetToken();
-      existingUser.resetPasswordToken = resetToken;
-      existingUser.resetPasswordExpires = new Date(Date.now() + 300000);
-      await existingUser.save();
+
+      const resetPasswordToken = resetToken;
+     const resetPasswordExpires = new Date(Date.now() + 300000);
+     await this.userRepository.findByIdAndUpdate(existingUser._id,{resetPasswordToken,resetPasswordExpires})
 
       await sendResetMail(email, resetToken);
       return { success: true, message: "Password reset email sent" };
@@ -227,17 +229,14 @@ export class AuthService implements IAuthService {
 
   async resetPassword(token: string, newPassword: string): Promise<AuthResult> {
     try {
+      console.log(token)
       const user = await this.userRepository.findOneBYToken(token);
+      console.log(user)
       if (!user) {
         return { success: false, message: "Invalid or expired token" };
       }
-
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      user.password = hashedPassword; 
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpires = undefined;
-      await user.save();
-
+    await this .userRepository.findByIdClearToken(user._id, hashedPassword)
       return { success: true, message: "Password reset successful" };
     } catch (error) {
       console.error("Error in resetPassword:", error);

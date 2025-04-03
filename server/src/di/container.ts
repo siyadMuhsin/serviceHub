@@ -44,9 +44,9 @@ import { IExpertRepository } from '../core/interfaces/repositories/IExpertReposi
 import { IExpertDataController } from '../core/interfaces/controllers/IExpertDataController';
 import { ExpertDataController } from '../controllers/Expert/expert.data.controller';
 import { IProfileController } from '../core/interfaces/controllers/IProfileController';
-import { ProfileController } from '../controllers/User/profile.controller';
+import { ProfileController } from '../controllers/User/user.controller';
 import { IProfileService } from '../core/interfaces/services/IProfileService';
-import { ProfileService } from '../services/User/profile.service';
+import { ProfileService } from '../services/User/user.service';
 
 const container = new Container();
 

@@ -7,6 +7,7 @@ import { IServiceController } from "../core/interfaces/controllers/IServiceContr
 import { IExpertController } from "../core/interfaces/controllers/IExpertController";
 import { IUsersController } from "../core/interfaces/controllers/IUsersController";
 import { IProfileController } from "../core/interfaces/controllers/IProfileController";
+import upload from "../config/multer";
 const router= Router()
 
 const authMiddleware= container.get<IAuthMiddleware>(TYPES.AuthMiddleware)
@@ -24,5 +25,8 @@ router.patch('/location',authMiddleware.verifyToken.bind(authMiddleware),profile
 const expertController= container.get<IExpertController>(TYPES.ExpertController)
 router.get('/switch_expert',authMiddleware.verifyToken.bind(authMiddleware),expertController.switch_expert.bind(expertController))
 
+router.get('/expert',authMiddleware.verifyToken.bind(authMiddleware),profileController.getExistingExpert.bind(profileController))
 
+router.post('/profile/image',upload.single("image"),authMiddleware.verifyToken.bind(authMiddleware),profileController.profileImageUpload.bind(profileController))
+router.put('/profile',authMiddleware.verifyToken.bind(authMiddleware),profileController.profileUpdate.bind(profileController))
 export default router

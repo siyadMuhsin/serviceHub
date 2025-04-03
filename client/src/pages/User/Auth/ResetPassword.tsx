@@ -29,7 +29,7 @@ const ResetPassword = () => {
       }
     } catch (error) {
       console.log(error)
-      toast.error("Error resetting password");
+      toast.error(error.message || "Error resetting password");
     } finally {
       setLoading(false);
     }

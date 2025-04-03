@@ -1,7 +1,7 @@
 
 
 export interface ExpertData {
-    AccountName: string;
+    accountName: string;
     dob: string;
     gender: string;
     contact: string;
@@ -32,7 +32,7 @@ export interface IUser{
     isBlocked:boolean;
     phone:string;
     googleId: string;
-    profile_imaga: string;
+    profile_image: string;
     location:{lat:number,lng:string};
     expertStatus:string
     resetPasswordToken: string |undefined; // Changed to string

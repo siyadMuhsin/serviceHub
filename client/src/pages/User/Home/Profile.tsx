@@ -22,11 +22,15 @@ import { toast } from "react-toastify";
 import CreateExpertModal from "@/components/User/modals/CreateExpertModal";
 import {
   createExpertAccount,
+  existingExpert,
   switchExpert,
 } from "../../../services/User/ExpertAccount";
 import { ExpertData, IUser } from "@/Interfaces/interfaces";
 import Loading from "@/components/Loading";
 import { get_userData, changeUserPassword } from "@/services/User/AuthServices";
+import EditProfile from "@/components/User/EditProfile";
+import { fetchLocationFromCoordinates } from "@/Utils/locationUtils";
+import { updateUserProfile } from "@/services/User/profile.service";
 
 type ProfileViewType = 'overview' | 'edit' | 'password' | 'saved';
 
@@ -38,13 +42,23 @@ export const ProfilePage: React.FC = () => {
   const [loading, setIsLoading] = useState(false);
   const [user, setUser] = useState<IUser | null>(null);
   const [currentView, setCurrentView] = useState<ProfileViewType>('overview');
-  const [editedProfile, setEditedProfile] = useState<Partial<IUser>>({});
+  // const [editedProfile, setEditedProfile] = useState<Partial<IUser>>({});
+  const [locationData,setLocationData]=useState<string>('')
+  const [existingExpertData,setExpertData]=useState({accountName:'',
+    dob:'',
+    gender:'',
+    contact:'',
+    service:{_id:'',name:''},
+    category:{_id:'',name:''},
+    experience:'',
+    certificate:''
+   })
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  console.log('home page')
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -53,15 +67,21 @@ export const ProfilePage: React.FC = () => {
         const response = await get_userData();
 
         if (response.success) {
-          console.log(response.user)
           setUser(response.user);
-          setEditedProfile({
-            name: response.user.name,
-            email: response.user.email,
-            phone: response.user.phone,
-            // location: response.user.location,
-            profile_imaga: response.user.profile_imaga
-          });
+
+
+    if (response.user?.location?.lat && response.user?.location?.lng) {
+     await fetchLocationFromCoordinates(response.user.location.lat, response.user.location.lng).then(setLocationData);
+    }
+  
+
+          // setEditedProfile({
+          //   name: response.user.name,
+          //   email: response.user.email,
+          //   phone: response.user.phone,
+          //   // location: response.user.location,
+          //   profile_image: response.user.profile_imaga
+          // });
         } else {
           toast.error(response.message);
         }
@@ -78,7 +98,7 @@ export const ProfilePage: React.FC = () => {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append("accountName", expertData.AccountName);
+      formData.append("accountName", expertData.accountName);
       formData.append("dob", expertData.dob);
       formData.append("gender", expertData.gender);
       formData.append("contact", expertData.contact);
@@ -131,19 +151,19 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleProfileUpdate = async () => {
-    if (!editedProfile) return;
-
+  const handleProfileUpdate = async (updateProfileData) => {
+    if (!updateProfileData) return;
     try {
       setIsLoading(true);
-      // const response = await updateUserProfile(editedProfile);
-      // if (response.success) {
-      //   setUser(response.user);
-      //   setCurrentView('overview');
-      //   toast.success("Profile updated successfully");
-      // } else {
-      //   toast.error(response.message);
-      // }
+      delete updateProfileData.email
+      const response = await updateUserProfile(updateProfileData);
+      if (response.success) {
+        
+        setCurrentView('overview');
+        toast.success("Profile updated successfully");
+      } else {
+        toast.error(response.message);
+      }
       toast.success("Profile updated successfully (demo)");
       setCurrentView('overview');
     } catch (error: any) {
@@ -194,8 +214,31 @@ export const ProfilePage: React.FC = () => {
     setCurrentView(view);
   };
 
+  const reApplyToExpert=async()=>{
+    try {
+      const existingExpertData= await existingExpert()
+      const data= existingExpertData.expert
+      setExpertData({
+        accountName:data.accountName,
+        dob:data.dob,
+        gender:data.gender,
+        contact:data.contact,
+        service:{_id:data.serviceId._id,name:data.serviceId.name},
+        category:{_id:data.categoryId._id,name:data.categoryId.name},
+        experience:data.experience,
+        certificate:data.certificateUrl
+      })
+
+      setIsModalOpen(true)
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   if (loading) return <Loading />;
   if (!user) return <div className="flex items-center justify-center h-screen">User not found</div>;
+
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -204,7 +247,7 @@ export const ProfilePage: React.FC = () => {
         <div className="flex flex-col items-center py-8">
           <div className="relative">
             <Avatar className="h-24 w-24 mb-2">
-              <AvatarImage src={user.profile_imaga} alt="Profile" />
+              <AvatarImage src={user.profile_image} alt="Profile" />
               <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
             </Avatar>
           </div>
@@ -274,7 +317,7 @@ export const ProfilePage: React.FC = () => {
                       </p>
                       <Button 
                         variant="outline"
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={ reApplyToExpert}
                         className="w-full justify-start pl-2 mb-1 bg-black text-white hover:bg-gray-800"
                       >
                         <Briefcase className="h-4 w-4" />
@@ -303,7 +346,7 @@ export const ProfilePage: React.FC = () => {
                   className="w-full justify-start pl-4 mb-1"
                 >
                   <User className="mr-2 h-4 w-4" />
-                  Switch to User Account
+                  Switch to Expert Account
                 </Button>
               )}
             </>
@@ -336,7 +379,7 @@ export const ProfilePage: React.FC = () => {
                   <div className="flex items-start">
                     <Avatar className="h-20 w-20 mr-6">
                       <AvatarImage 
-                        src={user.profile_imaga || "/api/placeholder/150/150"} 
+                        src={user.profile_image || "/api/placeholder/150/150"} 
                         alt="Profile" 
                       />
                       <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
@@ -346,7 +389,7 @@ export const ProfilePage: React.FC = () => {
                       <div className="space-y-2 text-gray-600">
                         <p>{user.email}</p>
                         <p>{user.phone}</p>
-                        {/* <p>{user.location}</p> */}
+                        <p>{locationData}</p>
                       </div>
                     </div>
                   </div>
@@ -362,77 +405,14 @@ export const ProfilePage: React.FC = () => {
           )}
 
           {/* Edit Profile */}
-          {currentView === 'edit' && (
-            <Card className="mb-6">
-              <CardContent className="pt-6">
-                <div>
-                  <div className="flex items-start justify-between mb-6">
-                    <Avatar className="h-20 w-20 mr-6">
-                      <AvatarImage 
-                        src={user.profile_imaga || "/api/placeholder/150/150"} 
-                        alt="Profile" 
-                      />
-                      <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex space-x-2">
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setCurrentView('overview')}
-                      >
-                        <X className="mr-2 h-4 w-4" /> Cancel
-                      </Button>
-                      <Button onClick={handleProfileUpdate}>
-                        <Save className="mr-2 h-4 w-4" /> Save Changes
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block mb-2">Full Name</label>
-                      <Input 
-                        value={editedProfile.name || ''} 
-                        onChange={(e) => setEditedProfile(prev => ({
-                          ...prev, 
-                          name: e.target.value
-                        }))}
-                      />
-                    </div>
-                    <div>
-                      <label className="block mb-2">Email</label>
-                      <Input 
-                        value={editedProfile.email || ''} 
-                        onChange={(e) => setEditedProfile(prev => ({
-                          ...prev, 
-                          email: e.target.value
-                        }))}
-                      />
-                    </div>
-                    <div>
-                      <label className="block mb-2">Phone</label>
-                      <Input 
-                        value={editedProfile.phone || ''} 
-                        onChange={(e) => setEditedProfile(prev => ({
-                          ...prev, 
-                          phone: e.target.value
-                        }))}
-                      />
-                    </div>
-                    <div>
-                      <label className="block mb-2">Location</label>
-                      {/* <Input 
-                        value={editedProfile.location || ''} 
-                        onChange={(e) => setEditedProfile(prev => ({
-                          ...prev, 
-                          location: e.target.value
-                        }))}
-                      /> */}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {currentView === "edit" && (
+  <EditProfile
+    user={user}
+    onCancel={() => setCurrentView("overview")}
+    locationData={locationData}
+    onUpdateProfile={handleProfileUpdate}
+  />
+)}
 
           {/* Change Password */}
           {currentView === 'password' && (
@@ -508,6 +488,7 @@ export const ProfilePage: React.FC = () => {
       {/* Create Expert Modal */}
       <CreateExpertModal
         isOpen={isModalOpen}
+        existingData={existingExpertData}
         onClose={() => setIsModalOpen(false)}
         onCreate={handleCreateExpert}
       />

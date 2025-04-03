@@ -8,7 +8,7 @@ const eighteenYearsAgo = new Date(
 );
 
 export const expertSchemaValidation = yup.object().shape({
-  AccountName: yup.string().required("Account Name is required"),
+  accountName: yup.string().required("Account Name is required"),
   dob: yup
     .date()
     .max(eighteenYearsAgo, "You must be at least 18 years old")

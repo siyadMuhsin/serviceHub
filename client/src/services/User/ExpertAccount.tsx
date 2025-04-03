@@ -35,3 +35,13 @@ export const switchUser=async()=>{
         return error?.response?.data
     }
 }
+
+export const existingExpert= async()=>{
+    try {
+        const resonse= await userAPI.get('expert')
+        return resonse.data
+    } catch (error) {
+        console.error(error.resonse.data)
+        throw new Error (error.response.data.messsage)
+    }
+}
