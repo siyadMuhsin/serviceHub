@@ -6,7 +6,7 @@ import { IUserRepository } from "../../core/interfaces/repositories/IUserReposit
 import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRepository";
 import { IExpert } from "../../types/Expert";
 import { CloudinaryService } from "../../config/cloudinary";
-import { IUser } from "../../models/Usermodel";
+import { IUser } from "../../models/user.model";
 @injectable()
 export class ProfileService implements IProfileService {
     constructor(

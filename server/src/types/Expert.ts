@@ -1,4 +1,4 @@
-import { IUser } from "../models/Usermodel";
+import { IUser } from "../models/user.model";
 import mongoose,{Document} from "mongoose";
 import { ICategory, IServices } from "./Admin";
 export interface IExpert extends Document {
@@ -13,6 +13,7 @@ export interface IExpert extends Document {
     experience: number;
     isBlocked:boolean;
     certificateUrl: string; // Cloudinary URL
+    subscription:any;
     createdAt?: Date;
     updatedAt?: Date;
 }

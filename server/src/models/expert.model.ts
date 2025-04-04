@@ -13,6 +13,21 @@ const ExpertSchema = new Schema<IExpert>(
         isBlocked:{type:Boolean,default:false},
         status:{type:String,enum: ['pending', 'approved', 'rejected'],default:'pending'},
         experience: { type: Number, required: true },
+        subscription: {
+            plan: {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'Plans'
+            },
+            startDate: {
+              type: Date,
+              default: Date.now
+            },
+            endDate: Date,
+            isActive: {
+              type: Boolean,
+              default: false
+            }
+        },
         certificateUrl: { type: String, required: true }, 
     },
     { timestamps: true }

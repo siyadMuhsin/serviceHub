@@ -8,6 +8,7 @@ import Services from "../pages/Admin/Services";
 import UserManagement from "../pages/Admin/UserManagment";
 import ExpertMangement from "../pages/Admin/ExpertMangement";
 import ExpertDetailsPage from "../pages/Admin/ExpertDetailsPage";
+import Subscriptoin from "@/pages/Admin/Subscriptoin";
 
 const AdminRoute = () => {
   const loading = AdminAuthCheck()
@@ -33,6 +34,7 @@ const AdminRoute = () => {
       <Route path="/users" element={<UserManagement/>}> </Route>
       <Route path="/experts" element={<ExpertMangement/>} />
       <Route path="/expert/:id" element={<ExpertDetailsPage/>}/> 
+      <Route path="/subscription" element={<Subscriptoin/>}/>
     </Routes>
   );
 };

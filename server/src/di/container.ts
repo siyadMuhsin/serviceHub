@@ -47,6 +47,13 @@ import { IProfileController } from '../core/interfaces/controllers/IProfileContr
 import { ProfileController } from '../controllers/User/user.controller';
 import { IProfileService } from '../core/interfaces/services/IProfileService';
 import { ProfileService } from '../services/User/user.service';
+import { IPlansController } from '../core/interfaces/controllers/IPlansController';
+import { PlansController } from '../controllers/Admin/plans.controller';
+import { IPlanService } from '../core/interfaces/services/IPlansService';
+import { PlansService } from '../services/Admin/plans.service';
+import { constants } from 'buffer';
+import { IPlanRespository } from '../core/interfaces/repositories/IPlansRepository';
+import { PlanRepository } from '../repositories/Admin/plans.repository';
 
 const container = new Container();
 
@@ -89,4 +96,8 @@ container.bind<IExpertController>(TYPES.ExpertController).to(ExpertController)
 container.bind<IExpertService>(TYPES.ExpertService).to(ExpertService)
 container.bind<IExpertRepository>(TYPES.ExpertRepository).to(ExpertRepository)
 container.bind<IExpertDataController>(TYPES.ExpertDataController).to(ExpertDataController)
+// subscription management
+container.bind<IPlansController>(TYPES.PlansController).to(PlansController)
+container.bind<IPlanService>(TYPES.PlansService).to(PlansService)
+container.bind<IPlanRespository>(TYPES.PlanRepository).to(PlanRepository)
 export default container;

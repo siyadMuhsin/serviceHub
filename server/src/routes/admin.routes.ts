@@ -10,6 +10,7 @@ import {TYPES} from '../di/types'
 import upload from "../config/multer";
 import { IServiceController } from "../core/interfaces/controllers/IServiceController";
 import { IExpertController } from "../core/interfaces/controllers/IExpertController";
+import { IPlansController } from "../core/interfaces/controllers/IPlansController";
 const router= express.Router()
 
 
@@ -56,4 +57,9 @@ router.get('/experts',expertController.getExperts.bind(expertController))
 router.patch('/expert/:id',expertController.actionChange.bind(expertController))
 router.patch('/expert/block/:id',expertController.blockAndUnlockExpert.bind(expertController))
 router.get('/expert/:id',expertController.getExpertData.bind(expertController))
+
+//subscription management
+const plansController=container.get<IPlansController>(TYPES.PlansController)
+router.post('/plan',plansController.createPlan.bind(plansController))
+router.patch('/plan/:planId',plansController.listAndUnlist.bind(plansController))
 export default router

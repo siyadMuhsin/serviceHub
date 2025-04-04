@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import User, { IUser } from "../models/Usermodel";
+import User, { IUser } from "../models/user.model";
 import { IUserRepository } from "../core/interfaces/repositories/IUserRepository";
 import { IExpert } from '../types/Expert';
 import Expert from '../models/expert.model';

@@ -1,3 +1,4 @@
+import { PlanRepository } from "../repositories/Admin/plans.repository";
 
 export const TYPES = {
     // Repositories
@@ -33,6 +34,11 @@ export const TYPES = {
 
     //profle types
     ProfileService:Symbol.for('ProfileService'),
-    ProfileController:Symbol.for('ProfileController')
+    ProfileController:Symbol.for('ProfileController'),
+
+    //subscrioption
+    PlansController:Symbol.for('PlansController'),
+    PlansService:Symbol.for('PlansService'),
+    PlanRepository:Symbol.for('PlanRepository')
     
   };
