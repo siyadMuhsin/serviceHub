@@ -7,6 +7,8 @@ import { X, Save, Edit3, MapPin } from "lucide-react";
 import { MdLocationOn } from "react-icons/md";
 import opencage from "opencage-api-client";
 import { uploadProfileImage } from "@/services/User/profile.service";
+import Loading from "../Loading";
+import { toast } from "react-toastify";
 
 interface LocationData {
   lat: number;
@@ -24,18 +26,21 @@ interface UserProfile {
 
 interface EditProfileProps {
   user: UserProfile;
+  updateUser:any;
   locationData?: string;
   onCancel: () => void;
   onUpdateProfile: (updatedProfile: Omit<UserProfile, 'profile_image'> & { location: Omit<LocationData, 'address'> }) => Promise<void>;
-  onUploadImage: (file: File) => Promise<string>;
+
 }
 const API_KEY='173c9408b3a6422b810bccbc0d6f9d5c'
 const EditProfile: React.FC<EditProfileProps> = ({
+
   user,
+  updateUser,
   onCancel,
   locationData,
   onUpdateProfile,
-  onUploadImage,
+ 
 }) => {
   const [editedProfile, setEditedProfile] = useState<UserProfile>({
     profile_image: user.profile_image || "",
@@ -47,6 +52,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
 
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [newLocation, setNewLocation] = useState("");
+  const [isLoading,setIsLoading]=useState<boolean>(false)
   const [loading, setLoading] = useState({
     location: false,
     image: false,
@@ -140,13 +146,17 @@ const EditProfile: React.FC<EditProfileProps> = ({
  
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsLoading(true)
+    
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Validate file size (2MB max)
     if (file.size > 2 * 1024 * 1024) {
       alert("File size exceeds 2MB limit");
+      setIsLoading(false)
       return;
+      
     }
 
     try {
@@ -157,15 +167,24 @@ const EditProfile: React.FC<EditProfileProps> = ({
     //   const imageUrl = await onUploadImage(file);
     
       const response = await uploadProfileImage(formData) ;
-      setEditedProfile(prev => ({
-        ...prev,
-        profile_image: response.imageUrl
-      }));
+      if(response.success){
+        setEditedProfile(prev => ({
+          ...prev,
+          profile_image: response.profileImageUrl
+        }));
+
+        updateUser((prev)=>({
+          ...prev,profile_image:response.profileImageUrl
+        }))
+        toast.success(response.message)
+      }
+     
     } catch (error) {
       console.error("Image upload failed:", error);
       alert("Failed to upload image");
     } finally {
       setLoading(prev => ({ ...prev, image: false }));
+      setIsLoading(false)
     }
   };
 
@@ -194,149 +213,155 @@ const EditProfile: React.FC<EditProfileProps> = ({
 
   return (
     <Card className="mb-6">
-      <CardContent className="pt-6">
+  <CardContent className="pt-6">
+    <div>
+      <div className="flex items-start justify-between mb-6">
+        <div className="relative group">
+          <Avatar className="h-20 w-20">
+            <AvatarImage
+              src={editedProfile.profile_image || "/default-avatar.png"}
+              alt="Profile"
+            />
+            <AvatarFallback>
+              {editedProfile.name?.charAt(0).toUpperCase() || "U"}
+            </AvatarFallback>
+          </Avatar>
+          <label
+            htmlFor="profileImageUpload"
+            className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer ${
+              loading.image ? 'cursor-not-allowed' : ''
+            }`}
+          >
+            {loading.image ? 'Uploading...' : 'Change'}
+          </label>
+          <input
+            id="profileImageUpload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageUpload}
+            disabled={loading.image}
+          />
+        </div>
+        
+        <div className="flex space-x-2">
+          <Button variant="outline" onClick={onCancel} disabled={loading.profile}>
+            <X className="mr-2 h-4 w-4" /> Cancel
+          </Button>
+          <Button onClick={handleProfileUpdate} disabled={loading.profile}>
+            {loading.profile ? (
+              "Saving..."
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" /> Save Changes
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex items-center">
-              <Avatar className="h-20 w-20 mr-6">
-                <AvatarImage
-                  src={editedProfile.profile_image || "/default-avatar.png"}
-                  alt="Profile"
-                />
-                <AvatarFallback>
-                  {editedProfile.name?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <label
-                  htmlFor="profileImageUpload"
-                  className={`text-sm font-medium cursor-pointer text-primary ${
-                    loading.image ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+          <label className="block mb-2 text-sm font-medium">Full Name</label>
+          <Input
+            value={editedProfile.name}
+            onChange={(e) =>
+              setEditedProfile((prev) => ({
+                ...prev,
+                name: e.target.value,
+              }))
+            }
+            disabled={loading.profile}
+          />
+        </div>
+        <div>
+          <label className="block mb-2 text-sm font-medium">Email</label>
+          <Input
+            value={editedProfile.email}
+            readOnly
+            className="bg-gray-50"
+          />
+        </div>
+        <div>
+          <label className="block mb-2 text-sm font-medium">Phone</label>
+          <Input
+            value={editedProfile.phone}
+            onChange={(e) =>
+              setEditedProfile((prev) => ({
+                ...prev,
+                phone: e.target.value,
+              }))
+            }
+            type="tel"
+            disabled={loading.profile}
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 text-sm font-medium">Location</label>
+          {isEditingLocation ? (
+            <div className="flex items-center gap-2">
+              <Input
+                value={newLocation}
+                onChange={(e) => setNewLocation(e.target.value)}
+                placeholder="Enter new location"
+                disabled={loading.location}
+                className="flex-grow"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchLocationCoordinates}
+                disabled={loading.location}
+              >
+                {loading.location ? "..." : "Save"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditingLocation(false)}
+                disabled={loading.location}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between border p-2 rounded">
+              <div className="flex items-center overflow-hidden">
+                <MdLocationOn className="text-blue-500 flex-shrink-0 mr-2" />
+                <span className="text-sm truncate">
+                  {editedProfile.location?.address || "No location set"}
+                </span>
+              </div>
+              <div className="flex flex-shrink-0 gap-1 ml-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => setIsEditingLocation(true)}
+                  disabled={loading.location || loading.profile}
                 >
-                  {loading.image ? 'Uploading...' : 'Change Photo'}
-                </label>
-                <input
-                  id="profileImageUpload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageUpload}
-                  disabled={loading.image}
-                />
+                  <Edit3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={fetchCurrentLocation}
+                  disabled={loading.location || loading.profile}
+                >
+                  <MapPin className="h-4 w-4" />
+                </Button>
               </div>
             </div>
-            <div className="flex space-x-2">
-              <Button variant="outline" onClick={onCancel} disabled={loading.profile}>
-                <X className="mr-2 h-4 w-4" /> Cancel
-              </Button>
-              <Button onClick={handleProfileUpdate} disabled={loading.profile}>
-                {loading.profile ? (
-                  "Saving..."
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" /> Save Changes
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block mb-2 text-sm font-medium">Full Name</label>
-              <Input
-                value={editedProfile.name}
-                onChange={(e) =>
-                  setEditedProfile((prev) => ({
-                    ...prev,
-                    name: e.target.value,
-                  }))
-                }
-                disabled={loading.profile}
-              />
-            </div>
-            <div>
-              <label className="block mb-2 text-sm font-medium">Email</label>
-              <Input
-                value={editedProfile.email}
-              />
-            </div>
-            <div>
-              <label className="block mb-2 text-sm font-medium">Phone</label>
-              <Input
-                value={editedProfile.phone}
-                onChange={(e) =>
-                  setEditedProfile((prev) => ({
-                    ...prev,
-                    phone: e.target.value,
-                  }))
-                }
-                type="tel"
-                disabled={loading.profile}
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 text-sm font-medium">Location</label>
-              {isEditingLocation ? (
-                <div className="flex flex-col gap-2">
-                  <Input
-                    value={newLocation}
-                    onChange={(e) => setNewLocation(e.target.value)}
-                    placeholder="Enter new location"
-                    disabled={loading.location}
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={fetchLocationCoordinates}
-                      disabled={loading.location}
-                    >
-                      {loading.location ? "Searching..." : "Save"}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditingLocation(false)}
-                      disabled={loading.location}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between border p-2 rounded">
-                  <div className="flex items-center">
-                    <MdLocationOn className="text-blue-500 mr-2" />
-                    <span className="text-sm">
-                      {editedProfile.location?.address || "No location set"}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsEditingLocation(true)}
-                      disabled={loading.location || loading.profile}
-                    >
-                      <Edit3 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={fetchCurrentLocation}
-                      disabled={loading.location || loading.profile}
-                    >
-                      <MapPin className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      {isLoading &&<Loading/>}
+    </div>
+  </CardContent>
+  
+</Card>
   );
 };
 

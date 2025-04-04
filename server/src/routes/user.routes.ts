@@ -14,6 +14,7 @@ const authMiddleware= container.get<IAuthMiddleware>(TYPES.AuthMiddleware)
 const categoryController = container.get<ICategoryController>(TYPES.CategoryController);
 const servicesController= container.get<IServiceController>(TYPES.ServiceController)
 const profileController= container.get<IProfileController>(TYPES.ProfileController)
+const verifyUser=authMiddleware.verifyToken.bind(authMiddleware)
 
 router.get('/categories',categoryController.categoriesByLimit.bind(categoryController))
 router.get('/categories/all',categoryController.getAllCategories.bind(categoryController))
@@ -29,4 +30,5 @@ router.get('/expert',authMiddleware.verifyToken.bind(authMiddleware),profileCont
 
 router.post('/profile/image',upload.single("image"),authMiddleware.verifyToken.bind(authMiddleware),profileController.profileImageUpload.bind(profileController))
 router.put('/profile',authMiddleware.verifyToken.bind(authMiddleware),profileController.profileUpdate.bind(profileController))
+router.patch('/profile/changePassword',verifyUser,profileController.changePassword.bind(profileController))
 export default router

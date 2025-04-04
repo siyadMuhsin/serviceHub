@@ -5,4 +5,5 @@ export interface IProfileController{
     getExistingExpert(req:AuthRequest,res:Response):Promise<void>;
     profileImageUpload(req:AuthRequest,res:Response):Promise<void>;
     profileUpdate(req:AuthRequest,res:Response):Promise<void>;
+    changePassword(req:AuthRequest,res:Response):Promise<void>;
 }

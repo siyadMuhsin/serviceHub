@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import { IProfileService } from "../../core/interfaces/services/IProfileService";
+import bcrypt from 'bcryptjs'
 import { TYPES } from "../../di/types";
 import { IUserRepository } from "../../core/interfaces/repositories/IUserRepository";
 import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRepository";
@@ -77,4 +78,22 @@ export class ProfileService implements IProfileService {
         }
 
     }
+    async changePassword(userId: string, oldPassword: string, newPassword: string) {
+        try {
+          const user = await this.userRepositry.findUserById(userId);
+          if (!user) {
+            return { success: false, message: 'User not found' };
+          }
+          const isMatch = await bcrypt.compare(oldPassword, user.password);
+          if (!isMatch) {
+            return { success: false, message: 'Current password is incorrect' };
+          }
+          const hashedPassword = await bcrypt.hash(newPassword, 10);
+          await this.userRepositry.findByIdAndUpdate(userId, { password: hashedPassword });
+          return { success: true, message: 'Password changed successfully' };
+        } catch (error) {
+          console.error("Change password error:", error); // optional: for debugging
+          return { success: false, message: 'Failed to change password' };
+        }
+      }
 }

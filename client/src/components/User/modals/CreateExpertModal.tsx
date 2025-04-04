@@ -9,15 +9,13 @@ interface CreateExpertModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreate: (expert: ExpertData) => void;
- 
-  existingData?: ExpertData;
+  existingData?: any;
 }
 
 const CreateExpertModal: React.FC<CreateExpertModalProps> = ({
   isOpen,
   onClose,
   onCreate,
- 
   existingData,
 }) => {
   const {

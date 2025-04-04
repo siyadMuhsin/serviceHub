@@ -21,4 +21,13 @@ const updateUserProfile=async(profileData:any)=>{
         throw new Error (error.response.data.message)  
     }
 }
-export {uploadProfileImage,updateUserProfile}
+const changePassword= async(currentPassword:string,newPassword:string)=>{
+    try {
+        const response= await userAPI.patch('/profile/changePassword',{currentPassword,newPassword})
+        return response.data
+    } catch (error) {
+        throw new Error (error.response.data.message)  
+    }
+
+}
+export {uploadProfileImage,updateUserProfile,changePassword}

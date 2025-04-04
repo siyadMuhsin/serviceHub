@@ -10,7 +10,8 @@ export interface IUser extends Document {
     isBlocked:boolean;
     googleId: string;
     profile_image: string;
-    expertStatus:string
+    expertStatus:string;
+    phone:string;
     resetPasswordToken: string |undefined; // Changed to string
     resetPasswordExpires: Date |undefined; // Changed to Date
     isVerified: boolean;
@@ -28,6 +29,7 @@ const userSchema = new Schema<IUser>(
     isBlocked:{type:Boolean,default:false},
     googleId: { type: String, required: false },
     profile_image: { type: String, required: false },
+    phone:{type:String},
     expertStatus:{type:String,enum: ['default','pending', 'approved', 'rejected'],default:'default'},
     resetPasswordToken: { type: String }, 
     resetPasswordExpires: { type: Date },

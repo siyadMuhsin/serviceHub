@@ -27,10 +27,12 @@ import {
 } from "../../../services/User/ExpertAccount";
 import { ExpertData, IUser } from "@/Interfaces/interfaces";
 import Loading from "@/components/Loading";
-import { get_userData, changeUserPassword } from "@/services/User/AuthServices";
+import { get_userData } from "@/services/User/AuthServices";
 import EditProfile from "@/components/User/EditProfile";
 import { fetchLocationFromCoordinates } from "@/Utils/locationUtils";
 import { updateUserProfile } from "@/services/User/profile.service";
+import { setUserLocation } from "@/Slice/locationSlice";
+import ChangePassword from "@/components/User/ChangePassword";
 
 type ProfileViewType = 'overview' | 'edit' | 'password' | 'saved';
 
@@ -42,7 +44,6 @@ export const ProfilePage: React.FC = () => {
   const [loading, setIsLoading] = useState(false);
   const [user, setUser] = useState<IUser | null>(null);
   const [currentView, setCurrentView] = useState<ProfileViewType>('overview');
-  // const [editedProfile, setEditedProfile] = useState<Partial<IUser>>({});
   const [locationData,setLocationData]=useState<string>('')
   const [existingExpertData,setExpertData]=useState({accountName:'',
     dob:'',
@@ -53,11 +54,7 @@ export const ProfilePage: React.FC = () => {
     experience:'',
     certificate:''
    })
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+
 
 
   useEffect(() => {
@@ -75,13 +72,7 @@ export const ProfilePage: React.FC = () => {
     }
   
 
-          // setEditedProfile({
-          //   name: response.user.name,
-          //   email: response.user.email,
-          //   phone: response.user.phone,
-          //   // location: response.user.location,
-          //   profile_image: response.user.profile_imaga
-          // });
+
         } else {
           toast.error(response.message);
         }
@@ -154,18 +145,27 @@ export const ProfilePage: React.FC = () => {
   const handleProfileUpdate = async (updateProfileData) => {
     if (!updateProfileData) return;
     try {
+      console.log(updateProfileData)
       setIsLoading(true);
       delete updateProfileData.email
       const response = await updateUserProfile(updateProfileData);
       if (response.success) {
-        
-        setCurrentView('overview');
+     const locationData= await fetchLocationFromCoordinates(updateProfileData.location.lat,updateProfileData.location.lng)
+     setLocationData(locationData)
+
+       dispatch(setUserLocation({...updateProfileData.location,address:locationData}))
+        setUser((prev) => ({
+          ...prev,
+          ...updateProfileData, 
+        }));
+        console.log(user)
+        // setCurrentView('overview');
         toast.success("Profile updated successfully");
       } else {
         toast.error(response.message);
       }
-      toast.success("Profile updated successfully (demo)");
-      setCurrentView('overview');
+      // toast.success("Profile updated successfully (demo)");
+      // setCurrentView('overview');
     } catch (error: any) {
       toast.error(error?.message || "Profile update failed");
     } finally {
@@ -173,43 +173,7 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
-  const handlePasswordChange = async () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error("New passwords do not match");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      // const response = await changeUserPassword({
-      //   currentPassword: passwordData.currentPassword,
-      //   newPassword: passwordData.newPassword
-      // });
-      // if (response.success) {
-      //   setCurrentView('overview');
-      //   toast.success("Password changed successfully");
-      //   setPasswordData({
-      //     currentPassword: '',
-      //     newPassword: '',
-      //     confirmPassword: ''
-      // });
-      // } else {
-      //   toast.error(response.message);
-      // }
-      toast.success("Password changed successfully (demo)");
-      setCurrentView('overview');
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-    } catch (error: any) {
-      toast.error(error?.message || "Password change failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+ 
   const handleSidebarClick = (view: ProfileViewType) => {
     setCurrentView(view);
   };
@@ -408,6 +372,7 @@ export const ProfilePage: React.FC = () => {
           {currentView === "edit" && (
   <EditProfile
     user={user}
+    updateUser={setUser}
     onCancel={() => setCurrentView("overview")}
     locationData={locationData}
     onUpdateProfile={handleProfileUpdate}
@@ -416,56 +381,8 @@ export const ProfilePage: React.FC = () => {
 
           {/* Change Password */}
           {currentView === 'password' && (
-            <Card className="mb-6">
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block mb-2">Current Password</label>
-                    <Input 
-                      type="password"
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData(prev => ({
-                        ...prev, 
-                        currentPassword: e.target.value
-                      }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2">New Password</label>
-                    <Input 
-                      type="password"
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData(prev => ({
-                        ...prev, 
-                        newPassword: e.target.value
-                      }))}
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2">Confirm New Password</label>
-                    <Input 
-                      type="password"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData(prev => ({
-                        ...prev, 
-                        confirmPassword: e.target.value
-                      }))}
-                    />
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setCurrentView('overview')}
-                    >
-                      <X className="mr-2 h-4 w-4" /> Cancel
-                    </Button>
-                    <Button onClick={handlePasswordChange}>
-                      <Save className="mr-2 h-4 w-4" /> Change Password
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+         <ChangePassword
+         setCurrentView={setCurrentView}/>
           )}
 
           {/* Saved Services */}

@@ -20,4 +20,8 @@ export interface IProfileService{
         success:boolean,
         message:string,
     }>
+    changePassword(userId:string,oldPassword:string,newPassword:string):Promise<{
+        success:boolean,
+        message:string
+    }>
 }

@@ -105,6 +105,21 @@ export class ProfileController implements IProfileController {
         this.sendResponse(res,error.message||'internl server error' ,HttpStatus.INTERNAL_SERVER_ERROR)
       }
     }
+    async changePassword(req:AuthRequest,res:Response):Promise<void>{
+      try {
+        const userId= req.user.userId
+        const {currentPassword,newPassword}= req.body
+        if(!currentPassword || !newPassword){
+          this.sendResponse(res,{success:false,message:'Missing password'},HttpStatus.BAD_REQUEST)
+          return;
+        }
+        const response= await this.profileService.changePassword(userId,currentPassword,newPassword)
+        this.sendResponse(res,response,response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+      } catch (error:any) {
+        this.sendResponse(res,error.message|| "Internal server error",HttpStatus.INTERNAL_SERVER_ERROR)
+      }
+
+    }
   private sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }
