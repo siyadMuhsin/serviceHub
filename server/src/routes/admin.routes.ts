@@ -62,4 +62,6 @@ router.get('/expert/:id',expertController.getExpertData.bind(expertController))
 const plansController=container.get<IPlansController>(TYPES.PlansController)
 router.post('/plan',plansController.createPlan.bind(plansController))
 router.patch('/plan/:planId',plansController.listAndUnlist.bind(plansController))
-export default router
+router.put('/plan/:planId',plansController.updatePlan.bind(plansController))
+router.get('/plans',plansController.getAllPlans.bind(plansController))
+export default router 

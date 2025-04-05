@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/Admin/Header";
 import Sidebar from "@/components/Admin/Sidebar";
 import { Button } from "@/components/ui/button";
@@ -13,68 +13,77 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "react-toastify";
+import { actionChange, createPlan, getAllPlans, updatePlan } from "@/services/Admin/subscription.service";
+import { coreModule } from "@reduxjs/toolkit/dist/query";
 
 interface Plan {
-  id: string;
-  duration: string;
-  price: string;
-  active: boolean;
-  durationInDays: number;
+  _id: string;
+  name: string;
+  durationMonths: number;
+  price: number;
+  isActive: boolean;
+  durationDisplay: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const SubscriptionManagement = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<Plan | null>(null);
+  const [plans, setPlans] = useState<Plan[]>([]);
 
-  // Enhanced plans data with IDs and status
-  const [plans, setPlans] = useState<Plan[]>([
-    {
-      id: "1",
-      duration: "1 Month",
-      price: "₹199",
-      active: true,
-      durationInDays: 30,
-    },
-    {
-      id: "2",
-      duration: "3 Months",
-      price: "₹399",
-      active: true,
-      durationInDays: 90,
-    },
-    {
-      id: "3",
-      duration: "6 Months",
-      price: "₹699",
-      active: true,
-      durationInDays: 180,
-    },
-  ]);
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await getAllPlans();
+        console.log(response.plans);
+        setPlans(response.plans);
+      } catch (error) {
+        toast.error("Failed to fetch plans");
+      }
+    };
+    fetchPlans();
+  }, []);
 
   const [newPlan, setNewPlan] = useState({
+    name: "",
     duration: "",
     price: "",
-    durationInDays: 0,
   });
 
-  const handleAddPlan = () => {
-    if (!newPlan.duration || !newPlan.price || !newPlan.durationInDays) {
-      toast.error("Please fill all fields!");
-      return;
+  const handleAddPlan = async () => {
+    try {
+      const { name, duration, price } = newPlan;
+
+      if (!name || !duration || !price) {
+        toast.error("Please fill all fields!");
+        return;
+      }
+
+      const durationMonths = parseInt(duration);
+      const priceValue = parseFloat(price) ;
+
+      if (!durationMonths || isNaN(durationMonths)) {
+        toast.error("Invalid duration format (must be a number)");
+        return;
+      }
+
+      if (!priceValue || isNaN(priceValue)) {
+        toast.error("Invalid price format (must be a number)");
+        return;
+      }
+
+      const response = await createPlan({ name, durationMonths, price: priceValue });
+      console.log(response)
+      if (response.success) {
+        setPlans([...plans, response.plan]);
+        setNewPlan({ name: "", duration: "", price: "" });
+        toast.success("Plan added successfully!");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong");
     }
-
-    const plan: Plan = {
-      id: Date.now().toString(),
-      duration: newPlan.duration,
-      price: newPlan.price,
-      active: true,
-      durationInDays: newPlan.durationInDays,
-    };
-
-    setPlans([...plans, plan]);
-    setNewPlan({ duration: "", price: "", durationInDays: 0 });
-    toast.success("Plan added successfully!");
   };
 
   const handleEditPlan = (plan: Plan) => {
@@ -82,30 +91,43 @@ const SubscriptionManagement = () => {
     setIsEditDialogOpen(true);
   };
 
-  const handleUpdatePlan = () => {
-    if (!currentPlan) return;
+  const handleUpdatePlan = async(id:string) => {
+    try {
+      if (!currentPlan) return;
 
-    setPlans(
-      plans.map((plan) =>
-        plan.id === currentPlan.id ? { ...currentPlan } : plan
-      )
-    );
-    setIsEditDialogOpen(false);
-    toast.success("Plan updated successfully!");
+      const response= await updatePlan(id,currentPlan)
+      if(response.success){
+        setPlans(
+          plans.map((plan) =>
+            plan._id === currentPlan._id ? { ...currentPlan } : plan
+          )
+        );
+        setIsEditDialogOpen(false);
+        toast.success("Plan updated successfully!");
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
   };
 
-  const togglePlanStatus = (id: string) => {
-    setPlans(
-      plans.map((plan) =>
-        plan.id === id ? { ...plan, active: !plan.active } : plan
-      )
-    );
-    toast.info(
-      `Plan ${plans.find((p) => p.id === id)?.active ? "unlisted" : "activated"}`
-    );
+  const togglePlanStatus = async(id: string) => {
+    try {
+      const response= await actionChange(id)
+      if(response.success){
+        setPlans(
+          plans.map((plan) =>
+            plan._id === id ? { ...plan, isActive: !plan.isActive } : plan
+          )
+        );
+        toast.info(
+          `Plan ${plans.find((p) => p._id === id)?.isActive ? "unlisted" : "activated"}`
+        );
+      }
+    } catch (error) {
+      toast.error(error)
+    }
+    
   };
-
-
 
   return (
     <>
@@ -120,60 +142,58 @@ const SubscriptionManagement = () => {
           }`}
         >
           <h2 className="text-3xl font-bold mb-6">Subscription Plans</h2>
-
-     
-
           {/* Existing Plans */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {plans.map((plan) => (
               <Card
-                key={plan.id}
+                key={plan._id}
                 className={`p-6 rounded-lg shadow-md relative ${
-                  plan.active ? "bg-white text-black" : "bg-gray-700 text-white"
+                  plan.isActive ? "bg-white text-black" : "bg-gray-700 text-white"
                 }`}
               >
                 {/* Status Badge */}
                 <span
                   className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold ${
-                    plan.active
+                    plan.isActive
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
                   }`}
                 >
-                  {plan.active ? "Active" : "Inactive"}
+                  {plan.isActive ? "Active" : "Inactive"}
                 </span>
 
-                <h3 className="text-lg font-bold text-center">{plan.duration}</h3>
+                <h3 className="text-lg font-bold text-center">{plan.name}</h3>
+                <p className="text-sm text-center text-gray-500">{plan.durationDisplay}</p>
                 <p
                   className={`text-xl font-semibold text-center ${
-                    plan.active ? "text-blue-600" : "text-gray-400"
+                    plan.isActive ? "text-blue-600" : "text-gray-400"
                   }`}
                 >
-                  {plan.price}
+                  ₹{plan.price}
                 </p>
                 <p
                   className={`text-sm text-center mt-2 ${
-                    plan.active ? "text-gray-600" : "text-gray-300"
+                    plan.isActive ? "text-gray-600" : "text-gray-300"
                   }`}
                 >
-                  {plan.durationInDays} days visibility
+                  Created: {new Date(plan.createdAt).toLocaleDateString()}
                 </p>
 
                 {/* Action Buttons */}
                 <div className="flex justify-center gap-2 mt-4">
                   <Button
-                    variant="outline"
+                    variant={plan.isActive?'outline':'secondary'}
                     size="sm"
                     onClick={() => handleEditPlan(plan)}
                   >
                     <Edit className="h-4 w-4 mr-1" /> Edit
                   </Button>
                   <Button
-                    variant={plan.active ? "destructive" : "success"}
+                    variant={plan.isActive ? "destructive" : "success"}
                     size="sm"
-                    onClick={() => togglePlanStatus(plan.id)}
+                    onClick={() => togglePlanStatus(plan._id)}
                   >
-                    {plan.active ? (
+                    {plan.isActive ? (
                       <>
                         <EyeOff className="h-4 w-4 mr-1" /> Unlist
                       </>
@@ -183,7 +203,6 @@ const SubscriptionManagement = () => {
                       </>
                     )}
                   </Button>
-                 
                 </div>
               </Card>
             ))}
@@ -195,7 +214,17 @@ const SubscriptionManagement = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Input
                 type="text"
-                placeholder="Duration (e.g., 1 Month)"
+                placeholder="Plan Name (e.g., Basic Plan)"
+                value={newPlan.name}
+                onChange={(e) =>
+                  setNewPlan({ ...newPlan, name: e.target.value })
+                }
+                className="text-black"
+              />
+
+              <Input
+                type="number"
+                placeholder="Duration in Months (e.g., 3)"
                 value={newPlan.duration}
                 onChange={(e) =>
                   setNewPlan({ ...newPlan, duration: e.target.value })
@@ -203,26 +232,15 @@ const SubscriptionManagement = () => {
                 className="text-black"
               />
               <Input
-                type="text"
-                placeholder="Price (e.g., ₹199)"
+                type="number"
+                placeholder="Price (e.g., 199)"
                 value={newPlan.price}
                 onChange={(e) =>
                   setNewPlan({ ...newPlan, price: e.target.value })
                 }
                 className="text-black"
               />
-              <Input
-                type="number"
-                placeholder="Duration in days"
-                value={newPlan.durationInDays || ""}
-                onChange={(e) =>
-                  setNewPlan({
-                    ...newPlan,
-                    durationInDays: parseInt(e.target.value) || 0,
-                  })
-                }
-                className="text-black"
-              />
+            
               <Button
                 onClick={handleAddPlan}
                 className="bg-green-500 hover:bg-green-600"
@@ -244,16 +262,32 @@ const SubscriptionManagement = () => {
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Name
+                      </label>
+                      <Input
+                        type="text"
+                        value={currentPlan.name}
+                        onChange={(e) =>
+                          setCurrentPlan({
+                            ...currentPlan,
+                            name: e.target.value,
+                          })
+                        }
+                        className="text-black"
+                      />
+                    </div>
                     <label className="block text-sm font-medium mb-1">
-                      Duration
+                      Duration (Months)
                     </label>
                     <Input
-                      type="text"
-                      value={currentPlan.duration}
+                      type="number"
+                      value={currentPlan.durationMonths}
                       onChange={(e) =>
                         setCurrentPlan({
                           ...currentPlan,
-                          duration: e.target.value,
+                          durationMonths: parseInt(e.target.value) || 0,
                         })
                       }
                       className="text-black"
@@ -264,46 +298,16 @@ const SubscriptionManagement = () => {
                       Price
                     </label>
                     <Input
-                      type="text"
+                      type="number"
                       value={currentPlan.price}
                       onChange={(e) =>
                         setCurrentPlan({
                           ...currentPlan,
-                          price: e.target.value,
+                          price: parseFloat(e.target.value) || 0,
                         })
                       }
                       className="text-black"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Duration in Days
-                    </label>
-                    <Input
-                      type="number"
-                      value={currentPlan.durationInDays}
-                      onChange={(e) =>
-                        setCurrentPlan({
-                          ...currentPlan,
-                          durationInDays: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="text-black"
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="activeStatus"
-                      checked={currentPlan.active}
-                      onChange={(e) =>
-                        setCurrentPlan({
-                          ...currentPlan,
-                          active: e.target.checked,
-                        })
-                      }
-                    />
-                    <label htmlFor="activeStatus">Active Plan</label>
                   </div>
                 </div>
                 <div className="flex justify-end gap-2">
@@ -313,7 +317,7 @@ const SubscriptionManagement = () => {
                   >
                     Cancel
                   </Button>
-                  <Button onClick={handleUpdatePlan}>Save Changes</Button>
+                  <Button onClick={()=>handleUpdatePlan(currentPlan._id)}>Save Changes</Button>
                 </div>
               </DialogContent>
             )}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { adminAuthCheck } from "../services/Admin/adminAuthService";
+import { adminAuthCheck } from "../services/Admin/adminAuth.service";
 import { useDispatch } from "react-redux";
 import { adminLogin, adminLogout} from "../Slice/adminAuthSlice";
 import { AppDispatch } from "../store"; // Ensure you have a typed Redux store

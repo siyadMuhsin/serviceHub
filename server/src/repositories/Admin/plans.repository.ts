@@ -13,4 +13,10 @@ export class PlanRepository implements IPlanRespository {
    async findByIdAndUpdate(id: string,update:Partial<IPlan>): Promise<IPlan |null> {
        return await Plans.findByIdAndUpdate(id,update,{new:true})
    }
+   async getAllPlans(): Promise<IPlan[]> {
+       return await Plans.find()
+   }
+   async findOneByName(name: string): Promise<IPlan | null> {
+    return await Plans.findOne({name});
+}
 }

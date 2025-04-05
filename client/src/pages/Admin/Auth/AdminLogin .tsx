@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { adminLoginService } from "../../../services/Admin/adminAuthService";
+import { adminLoginService } from "../../../services/Admin/adminAuth.service";
 import { useDispatch } from "react-redux";
 import { adminLogin} from "../../../Slice/adminAuthSlice";
 import { toast } from "react-toastify";

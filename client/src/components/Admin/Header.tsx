@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { adminLogout } from "../../Slice/adminAuthSlice";
-import { adminLogoutService } from "../../services/Admin/adminAuthService";
+import { adminLogoutService } from "../../services/Admin/adminAuth.service";
 import ConfirmModal from "../../Utils/Confirmation";
 
 
