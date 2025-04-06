@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import ExpertSidebar from '@/components/Expert/Sidebar';
 import Dashboard from '@/pages/Expert/Dashboard';
 import ProtectedExpertRoute from './ProtectRoute';
+import SubscriptionPage from '@/pages/Expert/SubscriptionPage';
 
 const ExpertRoutes = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -18,6 +19,7 @@ const ExpertRoutes = () => {
         <div className={`flex-1 transition-all duration-300 ${isSidebarExpanded ? 'ml-64' : 'ml-16'}`}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path='/subscription' element={<SubscriptionPage/>} />
             {/* Add more routes here as needed */}
           </Routes>
         </div>

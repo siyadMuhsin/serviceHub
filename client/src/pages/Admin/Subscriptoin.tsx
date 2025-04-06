@@ -142,8 +142,50 @@ const SubscriptionManagement = () => {
           }`}
         >
           <h2 className="text-3xl font-bold mb-6">Subscription Plans</h2>
+                    {/* Add New Plan */}
+           <Card className="p-6 rounded-lg mb-5">
+            <h3 className="text-xl font-semibold mb-4">Create New Plan</h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Input
+                type="text"
+                placeholder="Plan Name (e.g., Basic Plan)"
+                value={newPlan.name}
+                onChange={(e) =>
+                  setNewPlan({ ...newPlan, name: e.target.value })
+                }
+                className="text-black"
+              />
+
+              <Input
+                type="number"
+                placeholder="Duration in Months (e.g., 3)"
+                value={newPlan.duration}
+                onChange={(e) =>
+                  setNewPlan({ ...newPlan, duration: e.target.value })
+                }
+                className="text-black"
+              />
+              <Input
+                type="number"
+                placeholder="Price (e.g., 199)"
+                value={newPlan.price}
+                onChange={(e) =>
+                  setNewPlan({ ...newPlan, price: e.target.value })
+                }
+                className="text-black"
+              />
+            
+              <Button
+                onClick={handleAddPlan}
+                className="bg-green-500 hover:bg-green-600"
+              >
+                Add Plan
+              </Button>
+            </div>
+          </Card>
+
           {/* Existing Plans */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 ">
             {plans.map((plan) => (
               <Card
                 key={plan._id}
@@ -208,47 +250,6 @@ const SubscriptionManagement = () => {
             ))}
           </div>
 
-          {/* Add New Plan */}
-          <Card className="p-6 rounded-lg">
-            <h3 className="text-xl font-semibold mb-4">Create New Plan</h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Input
-                type="text"
-                placeholder="Plan Name (e.g., Basic Plan)"
-                value={newPlan.name}
-                onChange={(e) =>
-                  setNewPlan({ ...newPlan, name: e.target.value })
-                }
-                className="text-black"
-              />
-
-              <Input
-                type="number"
-                placeholder="Duration in Months (e.g., 3)"
-                value={newPlan.duration}
-                onChange={(e) =>
-                  setNewPlan({ ...newPlan, duration: e.target.value })
-                }
-                className="text-black"
-              />
-              <Input
-                type="number"
-                placeholder="Price (e.g., 199)"
-                value={newPlan.price}
-                onChange={(e) =>
-                  setNewPlan({ ...newPlan, price: e.target.value })
-                }
-                className="text-black"
-              />
-            
-              <Button
-                onClick={handleAddPlan}
-                className="bg-green-500 hover:bg-green-600"
-              >
-                Add Plan
-              </Button>
-            </div>
-          </Card>
 
           {/* Edit Plan Dialog */}
           <Dialog

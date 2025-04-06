@@ -39,6 +39,12 @@ export const TYPES = {
     //subscrioption
     PlansController:Symbol.for('PlansController'),
     PlansService:Symbol.for('PlansService'),
-    PlanRepository:Symbol.for('PlanRepository')
+    PlanRepository:Symbol.for('PlanRepository'),
+
+      //payment
+    PaymentController:Symbol.for('PaymentController'),
+    PaymentRepository:Symbol.for('PaymentRepository'),
+    PaymentService:Symbol.for('PaymentService'),
+
     
   };

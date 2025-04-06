@@ -71,4 +71,15 @@ if(existingPlan){
       throw new Error(error.message)
     }
   }
+  async availablePlans(): Promise<{ success: boolean; plans: IPlan[]; }> {
+    try {
+      const plans= await this.planRepository.findMany({isActive:true})
+      if(plans){
+        return {success:true,plans}
+      }
+      throw new Error("No Plans are available")
+    } catch (error:any) {
+      throw new Error(error.message||"Failed to fetchplans")  
+    }
+  }
 }

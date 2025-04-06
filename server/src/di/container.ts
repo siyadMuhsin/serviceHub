@@ -54,6 +54,12 @@ import { PlansService } from '../services/Admin/plans.service';
 import { constants } from 'buffer';
 import { IPlanRespository } from '../core/interfaces/repositories/IPlansRepository';
 import { PlanRepository } from '../repositories/Admin/plans.repository';
+import { IPaymentController } from '../core/interfaces/controllers/IPaymentController';
+import { PaymentController } from '../controllers/Expert/payment.controller';
+import { IPaymentService } from '../core/interfaces/services/IPaymentService';
+import { PaymentService } from '../services/Expert/payment.service';
+import { IPaymentRepository } from '../core/interfaces/repositories/IPaymentRepositroy';
+import { PaymentRepository } from '../repositories/Expert/payment.respository';
 
 const container = new Container();
 
@@ -100,4 +106,10 @@ container.bind<IExpertDataController>(TYPES.ExpertDataController).to(ExpertDataC
 container.bind<IPlansController>(TYPES.PlansController).to(PlansController)
 container.bind<IPlanService>(TYPES.PlansService).to(PlansService)
 container.bind<IPlanRespository>(TYPES.PlanRepository).to(PlanRepository)
+
+// payment controler
+container.bind<IPaymentController>(TYPES.PaymentController).to(PaymentController)
+container.bind<IPaymentService>(TYPES.PaymentService).to(PaymentService)
+container.bind<IPaymentRepository>(TYPES.PaymentRepository).to(PaymentRepository)
+
 export default container;

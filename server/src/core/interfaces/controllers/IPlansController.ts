@@ -5,4 +5,5 @@ export interface IPlansController {
   listAndUnlist(req: Request, res: Response): Promise<void>;
   updatePlan(req: Request, res: Response): Promise<void>;
   getAllPlans(req: Request, res: Response): Promise<void>;
+  getAvailablePlans(req:Request,res:Response):Promise<void>;
 }

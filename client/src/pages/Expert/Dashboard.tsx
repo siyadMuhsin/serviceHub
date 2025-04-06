@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
 import { get_expert } from "@/services/Expert/expert.service"
 import { toast } from "react-toastify"
+import SubscriptionPage from "./SubscriptionPage"
+import { Link } from "react-router-dom"
 
 const recentRequests = [
   {
@@ -32,6 +34,7 @@ const recentRequests = [
 
 export default function Dashboard() {
   const [loading,setLoading]=useState<boolean>(true)
+  const [isPlan,setPlan]=useState(false)
   const [expert,setExpert]=useState<any>()
   useEffect(()=>{
     
@@ -70,7 +73,7 @@ export default function Dashboard() {
                 <Button variant="link" size="icon">
                   <User className="h-5 w-5" />
                 </Button>
-                <Button className="bg-blue-500 hover:bg-blue-600">Subscription</Button>
+                <Link to={'/expert/subscription'} className="bg-blue-500 hover:bg-blue-600">Subscription</Link>
               </div>
             </div>
 

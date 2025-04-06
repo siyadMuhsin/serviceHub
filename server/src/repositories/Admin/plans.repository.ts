@@ -1,6 +1,6 @@
 // repositories/PlanRepository.ts
 import { IPlanRespository } from "../../core/interfaces/repositories/IPlansRepository";
-import Plans, { IPlan } from "../../models/plans.model";
+import Plans, { IPlan, PlainPlan } from "../../models/plans.model";
 
 export class PlanRepository implements IPlanRespository {
     async createPlan(planData: Omit<Partial<IPlan>, 'durationDisplay'>): Promise<IPlan> {
@@ -17,6 +17,9 @@ export class PlanRepository implements IPlanRespository {
        return await Plans.find()
    }
    async findOneByName(name: string): Promise<IPlan | null> {
-    return await Plans.findOne({name});
-}
+    return await Plans.findOne({name})
+   }
+   async findMany(query:Partial<PlainPlan>): Promise<IPlan[] | null> {
+    return await Plans.find(query) || null;
+  }
 }

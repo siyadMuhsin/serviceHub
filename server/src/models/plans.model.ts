@@ -18,6 +18,17 @@ export interface IPlan extends Document, IPlanMethods {
   updatedAt: Date;
 }
 
+export type PlainPlan={
+  _id: ObjectId;
+  name: string;
+  durationMonths: number;
+  durationDisplay: string;
+  price: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Define schema with methods
 const subscriptionPlanSchema = new mongoose.Schema<IPlan, mongoose.Model<IPlan, {}, IPlanMethods>>({
   name: {

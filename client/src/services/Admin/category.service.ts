@@ -9,14 +9,6 @@ export const getCategories = async (page:number,limit:number ,search:string) => 
     return { categories: [] };
   }
 };
-
-
-
-
-
-
-
-
 export const addCategory = async (formData: FormData) => {
   try {
     const response = await adminAPI.post("/category", formData, {

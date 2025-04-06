@@ -112,6 +112,15 @@ async updatePlan(req: Request, res: Response): Promise<void> {
     
   }
 }
+
+async getAvailablePlans(req: Request, res: Response): Promise<void> {
+  try {
+    const response= await this.planService.availablePlans()
+    this.sendResponse(res,response,response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+  } catch (error:any) {
+    this.sendResponse(res,{message:error.message||"Internal Server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+}
   private sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }

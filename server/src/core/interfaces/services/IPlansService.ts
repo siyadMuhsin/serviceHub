@@ -19,4 +19,7 @@ export interface IPlanService {
     planData?: IPlan;
   }>;
   getAllPlans(): Promise<{plans:IPlan[]}>;
+  availablePlans():Promise<{
+    success:boolean,
+    plans:IPlan[]}>
 } 
