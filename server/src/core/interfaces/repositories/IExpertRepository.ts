@@ -7,4 +7,6 @@ export interface IExpertRepository {
     findById(id: string): Promise<IExpert | null>;
     findByIdAndUpdate(id: string, update: Partial<IExpert>): Promise<IExpert | null>;
     findOne(query: object): Promise<IExpert | null>;
+    pushToField(experId:string,field:keyof IExpert,value:any):Promise<IExpert|null>
+    pullFromField(expert:string,field:keyof IExpert,value:any):Promise<IExpert|null>
 }

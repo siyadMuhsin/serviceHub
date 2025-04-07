@@ -10,7 +10,7 @@ import NotFound from "../pages/User/NotFount";
 import Loading from "@/components/Loading";
 import useAuthCheck from "../CostomHooks/useAuthCheck ";
 import { PublicLayout, PrivateLayout } from "../layout/user.layoute";
-import { LoginRoute } from "./ProtectRoute";
+import { LoginRoute } from "./Protect.routes";
 
 const AppRoutes = () => {
   const loading = useAuthCheck();

@@ -28,6 +28,8 @@ const ExpertSchema = new Schema<IExpert>(
               default: false
             }
         },
+        gallery:[{type:String}],
+        location: {lat:{type:Number},lng:{type:Number}},
         certificateUrl: { type: String, required: true }, 
     },
     { timestamps: true }

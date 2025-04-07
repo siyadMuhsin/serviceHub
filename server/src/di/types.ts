@@ -25,7 +25,7 @@ export const TYPES = {
     ServiceController:Symbol.for('ServiceController'),
    
     
-    ExpertDataController: Symbol.for('ExpertDataController'),
+    ExpertProfileController: Symbol.for('ExpertProfileController'),
     ExpertController:Symbol.for('ExpertController'),
     //middleware
     AuthMiddlewareService:Symbol.for('AuthMiddlewareService'),
@@ -45,6 +45,11 @@ export const TYPES = {
     PaymentController:Symbol.for('PaymentController'),
     PaymentRepository:Symbol.for('PaymentRepository'),
     PaymentService:Symbol.for('PaymentService'),
+
+    //expert 
+    ExpertProfileService:Symbol.for('ExpertProfileService')
+  
+
 
     
   };

@@ -54,3 +54,27 @@ export interface IUser{
 // certificateUrl: string; // Cloudinary URL
 // createdAt?: Date;
 // updatedAt?: Date;
+
+export interface IExpert  {
+  userId: IUser;
+  serviceId: Service;
+  categoryId:Category;
+  accountName: string;
+  dob: Date;
+  status:string;
+  gender: "Male" | "Female" | "Other";
+  contact: string;
+  experience: number;
+  isBlocked:boolean;
+  certificateUrl: string; // Cloudinary URL
+  location:{lat:number,lng:number}
+  subscription:{
+    plan:any
+    startDate:Date,
+    endDate: Date,
+    isActive:boolean
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+}

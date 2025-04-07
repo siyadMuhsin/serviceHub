@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import Expert from "../../models/expert.model";
 import { IExpert } from "../../types/Expert";
 import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRepository";
+import { findPackageJSON } from 'module';
 
 @injectable()
 export class ExpertRepository implements IExpertRepository {
@@ -39,7 +40,7 @@ export class ExpertRepository implements IExpertRepository {
     }
 
     async findById(id: string): Promise<IExpert | null> {
-        return await Expert.findById(id).populate("userId categoryId serviceId");
+        return await Expert.findById(id).populate("userId categoryId serviceId subscription.plan" );
     }
 
     async findByIdAndUpdate(id: string, update: Partial<IExpert>) {
@@ -49,4 +50,23 @@ export class ExpertRepository implements IExpertRepository {
     async findOne(query: object): Promise<IExpert | null> {
         return await Expert.findOne(query).populate("userId serviceId categoryId");
     }
+    async pushToField(expertId: string,field:keyof IExpert, value:any): Promise<IExpert | null> {
+        try {
+           return await Expert.findByIdAndUpdate(
+                expertId,
+                { $push: {[field]:value} },
+                { new: true }
+            );
+        } catch (error: any) {
+            throw new Error(`Error pushing image to gallery: ${error.message}`);
+        }
+    }
+    async pullFromField(expertId: string, field: keyof IExpert, value: any) {
+        return await Expert.findByIdAndUpdate(
+          expertId,
+          { $pull: { [field]: value } },
+          { new: true }
+        );
+      }
+      
 }

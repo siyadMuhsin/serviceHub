@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ExpertSidebar from '@/components/Expert/Sidebar';
 import Dashboard from '@/pages/Expert/Dashboard';
-import ProtectedExpertRoute from './ProtectRoute';
+import ProtectedExpertRoute from './Protect.routes';
 import SubscriptionPage from '@/pages/Expert/SubscriptionPage';
+import ExpertProfile from '@/pages/Expert/ExpertProfile';
 
 const ExpertRoutes = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -20,6 +21,7 @@ const ExpertRoutes = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path='/subscription' element={<SubscriptionPage/>} />
+            <Route path='/profile' element={<ExpertProfile/>} />
             {/* Add more routes here as needed */}
           </Routes>
         </div>

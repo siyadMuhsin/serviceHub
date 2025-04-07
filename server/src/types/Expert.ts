@@ -14,6 +14,8 @@ export interface IExpert extends Document {
     isBlocked:boolean;
     certificateUrl: string; // Cloudinary URL
     subscription:any;
+    location?: {lat:number,lng:number},
+    gallery?: string[];
     createdAt?: Date;
     updatedAt?: Date;
 }

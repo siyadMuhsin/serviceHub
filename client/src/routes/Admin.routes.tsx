@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AdminLogin from "./../pages/Admin/Auth/AdminLogin ";
+import AdminLogin from "../pages/Admin/Auth/AdminLogin ";
 import AdminDashboard from "../pages/Admin/Dashboard/Dashboard";
-import { AdminProtectRoute, AdminLoginRoute } from "./ProtectRoute";
+import { AdminProtectRoute, AdminLoginRoute } from "./Protect.routes";
 import AdminAuthCheck from "../CostomHooks/AdminAuthCheck";
 import Category from "../pages/Admin/Category";
 import Services from "../pages/Admin/Services";

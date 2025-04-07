@@ -13,9 +13,11 @@ const locationSlice = createSlice({
       state.userLocation = action.payload; // { lat, lng, address }
     },
     setExpertLocation: (state, action) => {
+      console.log('from slice',action.payload)
       state.expertLocation = action.payload; // { lat, lng, address }
     },
     resetLocations: (state) => {
+      
       state.userLocation = { lat: null, lng: null, address: null };
       state.expertLocation = { lat: null, lng: null, address: null };
     },

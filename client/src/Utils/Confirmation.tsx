@@ -32,7 +32,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     <div
       className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 transition-opacity duration-300 backdrop-blur-md ${
           isOpen ? "opacity-100" : "opacity-0"
-      }`}
+      } z-[30]`}
     >
       <div
         className={`bg-gradient-to-r from-purple-500 to-indigo-600 p-6 rounded-lg shadow-2xl w-96 max-w-full transform transition-transform duration-300 ${

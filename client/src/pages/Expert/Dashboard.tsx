@@ -10,6 +10,7 @@ import { get_expert } from "@/services/Expert/expert.service"
 import { toast } from "react-toastify"
 import SubscriptionPage from "./SubscriptionPage"
 import { Link } from "react-router-dom"
+import Loading from "@/components/Loading"
 
 const recentRequests = [
   {
@@ -53,6 +54,9 @@ export default function Dashboard() {
     }
     fetchData()
   },[])
+  if(!expert){
+    return(<Loading/>)
+  }
 
   return (
   
@@ -73,7 +77,28 @@ export default function Dashboard() {
                 <Button variant="link" size="icon">
                   <User className="h-5 w-5" />
                 </Button>
-                <Link to={'/expert/subscription'} className="bg-blue-500 hover:bg-blue-600">Subscription</Link>
+                {!expert.subscription.isActive ? (
+  <div className="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 animate-pulse rounded-md flex items-center justify-between">
+    <div>
+      <p className="font-semibold">Your subscription is inactive.</p>
+
+    </div>
+    <Link
+      to="/expert/subscription"
+      state={{ expert }}
+      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+    >
+      Purchase Subscription
+    </Link>
+  </div>
+) : (
+  <div className="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-md flex items-center justify-between">
+    <span className="text-sm font-medium">
+      Subscription Active:{" "}
+      <span className="font-bold">{expert.subscription.plan.durationMonths * 30} days remaining</span>
+    </span>
+  </div>
+)}
               </div>
             </div>
 

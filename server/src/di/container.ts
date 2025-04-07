@@ -41,8 +41,7 @@ import { IExpertService } from '../core/interfaces/services/IExpertService';
 import { ExpertService } from '../services/Expert/expert.service';
 import { ExpertRepository } from '../repositories/Expert/Expert.respository';
 import { IExpertRepository } from '../core/interfaces/repositories/IExpertRepository';
-import { IExpertDataController } from '../core/interfaces/controllers/IExpertDataController';
-import { ExpertDataController } from '../controllers/Expert/expert.data.controller';
+import { ExpertProfileController } from '../controllers/Expert/expert.profile.controller';
 import { IProfileController } from '../core/interfaces/controllers/IProfileController';
 import { ProfileController } from '../controllers/User/user.controller';
 import { IProfileService } from '../core/interfaces/services/IProfileService';
@@ -60,6 +59,9 @@ import { IPaymentService } from '../core/interfaces/services/IPaymentService';
 import { PaymentService } from '../services/Expert/payment.service';
 import { IPaymentRepository } from '../core/interfaces/repositories/IPaymentRepositroy';
 import { PaymentRepository } from '../repositories/Expert/payment.respository';
+import { IExpertProfileController } from '../core/interfaces/controllers/IExpertProfileController';
+import { IExpertProfileService } from '../core/interfaces/services/IExpertProfileService';
+import { ExpertProfileService } from '../services/Expert/expertProfile.service';
 
 const container = new Container();
 
@@ -101,7 +103,7 @@ container.bind<IServiceController>(TYPES.ServiceController).to(ServiceController
 container.bind<IExpertController>(TYPES.ExpertController).to(ExpertController)
 container.bind<IExpertService>(TYPES.ExpertService).to(ExpertService)
 container.bind<IExpertRepository>(TYPES.ExpertRepository).to(ExpertRepository)
-container.bind<IExpertDataController>(TYPES.ExpertDataController).to(ExpertDataController)
+container.bind<IExpertProfileController>(TYPES.ExpertProfileController).to(ExpertProfileController)
 // subscription management
 container.bind<IPlansController>(TYPES.PlansController).to(PlansController)
 container.bind<IPlanService>(TYPES.PlansService).to(PlansService)
@@ -111,5 +113,7 @@ container.bind<IPlanRespository>(TYPES.PlanRepository).to(PlanRepository)
 container.bind<IPaymentController>(TYPES.PaymentController).to(PaymentController)
 container.bind<IPaymentService>(TYPES.PaymentService).to(PaymentService)
 container.bind<IPaymentRepository>(TYPES.PaymentRepository).to(PaymentRepository)
+
+container.bind<IExpertProfileService>(TYPES.ExpertProfileService).to(ExpertProfileService)
 
 export default container;
