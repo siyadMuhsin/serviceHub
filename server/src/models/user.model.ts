@@ -15,7 +15,7 @@ export interface IUser extends Document {
     resetPasswordToken: string |undefined; // Changed to string
     resetPasswordExpires: Date |undefined; // Changed to Date
     isVerified: boolean;
-    location?:{lat:number,lng:number} | null
+    location?:{type:string,coordinates:number[]}
   }
 
 const userSchema = new Schema<IUser>(
@@ -34,8 +34,20 @@ const userSchema = new Schema<IUser>(
     resetPasswordToken: { type: String }, 
     resetPasswordExpires: { type: Date },
     isVerified: { type: Boolean, default: false },
-    location: {lat:{type:Number},lng:{type:Number}}
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+      },
+      coordinates: {
+        type: [Number], // [lng, lat]
+        default: undefined,
+      },
+    }
   },
   { timestamps: true }
 );
+
+userSchema.index({ location: "2dsphere" });    
 export default mongoose.model<IUser>('User',userSchema)

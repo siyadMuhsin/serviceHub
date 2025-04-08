@@ -16,7 +16,7 @@ export interface IProfileService{
         message:string,
         profileImageUrl?:string
     }>
-    profileUpdate(userId:string,data:Partial<IUser>):Promise<{
+    profileUpdate(userId:string,data: Partial<Omit<IUser, "location">> & { location?: { lat: number; lng: number }}):Promise<{
         success:boolean,
         message:string,
     }>

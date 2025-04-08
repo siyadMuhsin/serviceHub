@@ -10,12 +10,7 @@ export const createExpertAccount = async(formDate:FormData)=>{
         })
         return response.data
     } catch (error) {
-       
-        // throw new Error(error)
-        return {success:false,message:error.response?.data?.error}
-
-
-        
+        throw new Error(error.response.data.message)
     }
 }
 export const switchExpert=async()=>{

@@ -50,7 +50,6 @@ import { IPlansController } from '../core/interfaces/controllers/IPlansControlle
 import { PlansController } from '../controllers/Admin/plans.controller';
 import { IPlanService } from '../core/interfaces/services/IPlansService';
 import { PlansService } from '../services/Admin/plans.service';
-import { constants } from 'buffer';
 import { IPlanRespository } from '../core/interfaces/repositories/IPlansRepository';
 import { PlanRepository } from '../repositories/Admin/plans.repository';
 import { IPaymentController } from '../core/interfaces/controllers/IPaymentController';
@@ -62,6 +61,10 @@ import { PaymentRepository } from '../repositories/Expert/payment.respository';
 import { IExpertProfileController } from '../core/interfaces/controllers/IExpertProfileController';
 import { IExpertProfileService } from '../core/interfaces/services/IExpertProfileService';
 import { ExpertProfileService } from '../services/Expert/expertProfile.service';
+import { IUserExpertController } from '../core/interfaces/controllers/IUserExpertController';
+import { UserExpertController } from '../controllers/User/user.expert.controller';
+import { IUserExpertService } from '../core/interfaces/services/IUserExpertService';
+import { UserExpertService } from '../services/User/user.expert.service';
 
 const container = new Container();
 
@@ -80,18 +83,13 @@ container.bind<ITokenController>(TYPES.TokenController).to(TokenController);
 container.bind<IUsersController>(TYPES.UsersController).to(UsersController);
 container.bind<IAdminAuthController>(TYPES.AdminAuthController).to(AdminAuthController);
 container.bind<IProfileController>(TYPES.ProfileController).to(ProfileController)
-
-
 //middleware
 container.bind<AuthMiddlewareService>(TYPES.AuthMiddlewareService)
     .toDynamicValue(() => new AuthMiddlewareService(
         container.get<IUserService>(TYPES.UserService),
         process.env.ACCESS_SECRET as string
     ));
-
 container.bind<IAuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware);
-
-
 container.bind<ICategoryController>(TYPES.CategoryController).to(CategoryController)
 container.bind<ICategoryRepository>(TYPES.CategoryRepository).to(CategoryRepository)
 container.bind<ICategoryService>(TYPES.CategoryService).to(CategoryService)
@@ -116,4 +114,8 @@ container.bind<IPaymentRepository>(TYPES.PaymentRepository).to(PaymentRepository
 
 container.bind<IExpertProfileService>(TYPES.ExpertProfileService).to(ExpertProfileService)
 
+
+//user
+container.bind<IUserExpertController>(TYPES.UserExpertController).to(UserExpertController)
+container.bind<IUserExpertService>(TYPES.UserExpertService).to(UserExpertService)
 export default container;

@@ -67,8 +67,8 @@ export const ProfilePage: React.FC = () => {
           setUser(response.user);
 
 
-    if (response.user?.location?.lat && response.user?.location?.lng) {
-     await fetchLocationFromCoordinates(response.user.location.lat, response.user.location.lng).then(setLocationData);
+    if (response.user?.location?.coordinates[1] && response.user?.location?.coordinates[0]) {
+     await fetchLocationFromCoordinates(response.user.location.coordinates[1], response.user.location.coordinates[0]).then(setLocationData);
     }
   
 

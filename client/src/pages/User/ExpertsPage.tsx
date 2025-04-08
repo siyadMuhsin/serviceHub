@@ -1,0 +1,140 @@
+import React, { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Lock, Star } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { getExpertsSpecificService } from "@/services/User/expert.service";
+import { toast } from "react-toastify";
+import { IExpert } from "@/Interfaces/interfaces";
+
+const ExpertsPage = () => {
+  const [experts, setExperts] = useState<IExpert[]>([]);
+  const { id: serviceId } = useParams();
+  const navigate = useNavigate(); // Fixed typo from 'navigete' to 'navigate'
+
+  // Remove the first useEffect as it was setting the same empty array
+  useEffect(() => {
+    const fetchExperts = async () => {
+      try {
+        const response = await getExpertsSpecificService(serviceId);
+        if (response.success) {
+          setExperts(response.experts);
+        }
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+    fetchExperts();
+  }, [serviceId]); // Added serviceId as dependency
+  const handleViewProfile = (expertId: string) => {
+    navigate(`/user/expert/${expertId}`); // Fixed typo and moved navigate inside the function
+  };
+
+  
+  return (
+    <div className="min-h-screen bg-gray-50 px-4 py-8 md:px-8 md:py-12">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-8">
+          Find Trusted Home Service Experts
+        </h1>
+
+        {experts.length === 0 && (
+  <div className="flex justify-center items-center h-60 bg-white border border-dashed border-gray-300 rounded-lg shadow-sm mb-8">
+    <div className="text-center">
+      <h3 className="text-xl font-semibold text-gray-700 mb-2">No Experts Found</h3>
+      <p className="text-gray-500 text-sm">
+        Try adjusting your search or check back later.
+      </p>
+    </div>
+  </div>
+)}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {experts.map((expert) => (
+            <ExpertCard 
+              key={expert._id} // Changed from expert.id to expert._id assuming MongoDB-style IDs
+              expert={expert} 
+              onViewProfile={handleViewProfile} // Pass the handler as prop
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const StarRating = ({ rating }: { rating: number }) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+
+  return (
+    <div className="flex items-center">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star
+          key={i}
+          size={16}
+          className={`${
+            i < fullStars ? "fill-yellow-400 text-yellow-400" : ""
+          } ${
+            i === fullStars && hasHalfStar
+              ? "fill-yellow-400 text-yellow-400"
+              : "text-gray-300"
+          }`}
+        />
+      ))}
+      <span className="text-sm text-gray-600 ml-1">{rating}</span> {/* Updated to show actual rating */}
+    </div>
+  );
+};
+
+const ExpertCard = ({ 
+  expert, 
+  onViewProfile 
+}: { 
+  expert: any; 
+  onViewProfile: (expertId: string) => void; 
+}) => {
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start">
+          <div className="flex gap-4">
+            <img
+              src={expert.profile}
+              alt={expert.name}
+              className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
+            />
+            <div>
+              <div>
+                <h3 className="font-bold text-lg">{expert.name}</h3>
+                <p className="text-sm text-gray-600">
+                  {expert.service} Specialist
+                </p>
+              </div>
+
+              <div className="mt-2">
+                <StarRating rating={5} />
+                <div className="flex items-center text-sm text-gray-500 mt-1">
+                  <Lock className="w-3 h-3 mr-1" />
+                  <span>
+                    {expert.experience} experience • {19} jobs
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <Button 
+              variant="default" 
+              onClick={() => onViewProfile(expert._id)} // Call the prop function
+            >
+              View Profile
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default ExpertsPage;

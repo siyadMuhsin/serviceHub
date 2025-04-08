@@ -16,29 +16,34 @@ export class ProfileService implements IProfileService {
    
      async addLocation(userId: string, lat: number, lng: number) {
         try {
-            const location:any = {} ;
-            location.lat=lat
-            location.lng=lng
-    
-            const user = await this.userRepositry.findByIdAndUpdate(userId,{ location },);
+            const location = {
+                type: "Point",
+                coordinates: [lng, lat]  // GeoJSON requires [longitude, latitude]
+            };
+            console.log(location)
+            const user = await this.userRepositry.findByIdAndUpdate(
+                userId,
+                { location },
+            );
             if (!user) {
-                return { 
-                    success: false, 
-                    message: "User not found" 
+                return {
+                    success: false,
+                    message: "User not found"
                 };
             }
-            return { 
-                success: true, 
-                message: "Location updated successfully",  
+            return {
+                success: true,
+                message: "Location updated successfully",
             };
         } catch (error) {
             console.error("Error in addLocation:", error);
-            return { 
-                success: false, 
-                message: "Failed to update location" 
+            return {
+                success: false,
+                message: "Failed to update location"
             };
         }
     }
+    
 
     async getExpertData(id:string){
         try {
@@ -68,16 +73,32 @@ export class ProfileService implements IProfileService {
             return {success:false,message:error.message|| 'failed to upload profile'}
         }
     }
-    async profileUpdate(userId:string,data:Partial<IUser>){
+    async profileUpdate(
+        userId: string,
+        data: Partial<Omit<IUser, "location">> & { location?: { lat: number; lng: number } }
+      ) {
         try {
-            await this.userRepositry.findByIdAndUpdate(userId,data)
-            return {success:true,message:'Profile updated Successfully'}
-
-        } catch (error:any) {
-            return {success:false,message:error.message || 'Failed to update profile'}
+          let updateData: any = { ...data };
+      
+          if (data.location && data.location.lat && data.location.lng) {
+            updateData.location = {
+              type: 'Point',
+              coordinates: [data.location.lng, data.location.lat], // GeoJSON format
+            };
+          }
+          await this.userRepositry.findByIdAndUpdate(userId, updateData);
+          return {
+            success: true,
+            message: 'Profile updated successfully',
+          };
+        } catch (error: any) {
+          return {
+            success: false,
+            message: error.message || 'Failed to update profile',
+          };
         }
-
-    }
+      }
+      
     async changePassword(userId: string, oldPassword: string, newPassword: string) {
         try {
           const user = await this.userRepositry.findUserById(userId);

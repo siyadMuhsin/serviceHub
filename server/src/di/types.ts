@@ -47,9 +47,12 @@ export const TYPES = {
     PaymentService:Symbol.for('PaymentService'),
 
     //expert 
-    ExpertProfileService:Symbol.for('ExpertProfileService')
+    ExpertProfileService:Symbol.for('ExpertProfileService'),
   
 
+      //user
+    UserExpertController:Symbol.for('UserExpertController'),
+    UserExpertService:Symbol.for('UserExpertService')
 
     
   };

@@ -9,18 +9,30 @@ export class ExpertProfileService implements IExpertProfileService{
     constructor(
         @inject(TYPES.ExpertRepository) private expertRepository:IExpertRepository
     ){}
-    async updateExpertLocation(location: { lat: number; lng: number; }, expertId: string){
-        try {
-            const updateExpert= await this.expertRepository.findByIdAndUpdate(expertId,{location:location})
-            if(!updateExpert){
-                return {success:false,message:"Location updation failed"}
-            }
-            return {success:true ,message:"Location Updated SuccessFully"}
-        } catch (error:any) {
-            throw new Error (error.message || "Error in updateLocation")
-            
-        }
+async updateExpertLocation(
+  location: { lat: number; lng: number },
+  expertId: string
+) {
+  try {
+    const geoLocation = {
+      type: "Point",
+      coordinates: [location.lng, location.lat], // Note: [lng, lat]
+    };
+
+    const updateExpert = await this.expertRepository.findByIdAndUpdate(
+      expertId,
+      { location: geoLocation }
+    );
+
+    if (!updateExpert) {
+      return { success: false, message: "Location updation failed" };
     }
+
+    return { success: true, message: "Location updated successfully" };
+  } catch (error: any) {
+    throw new Error(error.message || "Error in updateLocation");
+  }
+}
     async uploadImage(experId: string, file: Express.Multer.File) {
         try {
             const existingExpert= await this.expertRepository.findById(experId)

@@ -20,6 +20,7 @@ import LocationFetcher from "../Location/GeoLocation";
 
 import { fetchLocationFromCoordinates } from "@/Utils/locationUtils";
 import { number } from "yup";
+import { setUserLocation } from "@/Slice/locationSlice";
 
 const Navbar: React.FC = () => {
   // const { categories, services } = useSelector((state: any) => state.categoryService);
@@ -34,13 +35,20 @@ const [userr,setUser]=useState()
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [locationData, setLocationData] = useState<string | null>(null);
-
+const {userLocation}=useSelector((state:any)=>state.location)
   useEffect(() => {
-    if (user?.location?.lat && user?.location?.lng) {
-      fetchLocationFromCoordinates(user.location.lat, user.location.lng).then(setLocationData);
-    }
-  }, [user]);
+    const fn=async()=>{
+      if (user?.location?.coordinates[1] && user?.location?.coordinates[0]) {
+      
+      const address= await fetchLocationFromCoordinates(user.location.coordinates[1], user.location.coordinates[0])
+      setLocationData(address)
+     
+        dispatch(setUserLocation({lat:user.location.coordinates[1],lng:user.location.coordinates[0],address:address}))
 
+      }
+    }
+   fn()
+  }, [user]);
   const handleLogout = async () => {
     try{
       setIsLoading(true)
@@ -64,9 +72,10 @@ const [userr,setUser]=useState()
     setShowLogoutModal(false);
   };
 
- 
+
   const updateUserLocation = (newLocation: { location: string; latitude: number; longitude: number }) => {
     setUser({ ...user, ...newLocation });
+    dispatch(setUserLocation({lat:newLocation.latitude,lng:newLocation.longitude,address:newLocation.location}))
   };
   
   return (
@@ -114,7 +123,10 @@ const [userr,setUser]=useState()
           </div>
           {user ? (
   <div className="flex items-center">
-    {user && (
+    {}
+    {user && userLocation.address?(
+      <p>{userLocation.address.split(',')[0]+userLocation.address.split(',')[1]}</p>
+    ):(
     <LocationFetcher user={user} updateUserLocation={updateUserLocation} />
   )}
   </div>

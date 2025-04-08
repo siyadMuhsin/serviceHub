@@ -8,7 +8,10 @@ import { findPackageJSON } from 'module';
 export class ExpertRepository implements IExpertRepository {
     async createExpert(data: Partial<IExpert>, userId: string): Promise<IExpert> {
         try {
-            const newData = { ...data, userId };
+            const newData = { ...data, userId , location: {
+                type: "Point",
+                coordinates: [0, 0] 
+              }};
             const expert = new Expert(newData);
             return await expert.save();
         } catch (error: any) {
@@ -68,5 +71,43 @@ export class ExpertRepository implements IExpertRepository {
           { new: true }
         );
       }
-      
+
+      async findNearbyExperts(userLat: number, userLng: number, distanceInKm = 25,serviceId:string):Promise<IExpert[] |null> {
+        try {
+          const maxDistanceInMeters = distanceInKm * 1000;
+          return await Expert.find({
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [userLng, userLat],
+                },
+                $maxDistance: maxDistanceInMeters,
+              },
+            },
+            isBlocked:false,
+            serviceId:serviceId
+          }).populate("userId").populate('serviceId' ,'name');
+        } catch (error: any) {
+            throw new Error(error.message||"Failed to fetch nearby experts" )
+        }
+      }
+
+    async getExpertDataToUser(userLat:number,userLng:number,distanceInKm=25,expertId:string):Promise<IExpert|null>{
+        const maxDistanceInMeters = distanceInKm * 1000;
+        return await Expert.findOne({
+            _id:expertId,
+            location: {
+              $near: {
+                $geometry: {
+                  type: "Point",
+                  coordinates: [userLng, userLat],
+                },
+                $maxDistance: maxDistanceInMeters,
+              },
+            },
+            isBlocked:false,
+          }).populate("userId serviceId categoryId");
+
+    }
 }

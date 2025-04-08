@@ -23,15 +23,16 @@ const dispatch=useDispatch()
     const fetchExpertData = async () => {
       try {
         const response = await get_expert()
-        
         if (response.success) {
           setExpertData(response.expert)
-          if(response.expert.location){
-            const location=response.expert.location
-            const locationData= await fetchLocationFromCoordinates(location.lat,location.lng)
-
-      dispatch(setExpertLocation({lat:location.lat,lng:location.lng,address:locationData}))
+          if(!expertLocation.lat){
+            if(response.expert.location){
+              const location=response.expert.location
+              const locationData= await fetchLocationFromCoordinates(location.coordinates[1],location.coordinates[0])
+        dispatch(setExpertLocation({lat:location.coordinates[1],lng:location.coordinates[0],address:locationData}))
+            }
           }
+          
          
           
         }

@@ -56,6 +56,7 @@ export interface IUser{
 // updatedAt?: Date;
 
 export interface IExpert  {
+  _id:string
   userId: IUser;
   serviceId: Service;
   categoryId:Category;
@@ -67,7 +68,8 @@ export interface IExpert  {
   experience: number;
   isBlocked:boolean;
   certificateUrl: string; // Cloudinary URL
-  location:{lat:number,lng:number}
+  location?: {type:string,coordinates:number[]},
+  gallery:string[]
   subscription:{
     plan:any
     startDate:Date,

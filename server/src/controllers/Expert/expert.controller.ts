@@ -111,6 +111,7 @@ export class ExpertController implements IExpertController {
 
     async getExpertData(req: Request, res: Response): Promise<void> {
         try {
+            console.log('test')
             const { id } = req.params;
             const response = await this.expertService.getExpertData(id);
             this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);

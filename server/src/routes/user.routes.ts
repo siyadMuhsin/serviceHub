@@ -8,12 +8,14 @@ import { IExpertController } from "../core/interfaces/controllers/IExpertControl
 import { IUsersController } from "../core/interfaces/controllers/IUsersController";
 import { IProfileController } from "../core/interfaces/controllers/IProfileController";
 import upload from "../config/multer";
+import { IUserExpertController } from "../core/interfaces/controllers/IUserExpertController";
 const router= Router()
 
 const authMiddleware= container.get<IAuthMiddleware>(TYPES.AuthMiddleware)
 const categoryController = container.get<ICategoryController>(TYPES.CategoryController);
 const servicesController= container.get<IServiceController>(TYPES.ServiceController)
 const profileController= container.get<IProfileController>(TYPES.ProfileController)
+const userExpertController= container.get<IUserExpertController>(TYPES.UserExpertController)
 const verifyUser=authMiddleware.verifyToken.bind(authMiddleware)
 
 router.get('/categories',categoryController.categoriesByLimit.bind(categoryController))
@@ -31,4 +33,7 @@ router.get('/expert',authMiddleware.verifyToken.bind(authMiddleware),profileCont
 router.post('/profile/image',upload.single("image"),authMiddleware.verifyToken.bind(authMiddleware),profileController.profileImageUpload.bind(profileController))
 router.put('/profile',authMiddleware.verifyToken.bind(authMiddleware),profileController.profileUpdate.bind(profileController))
 router.patch('/profile/changePassword',verifyUser,profileController.changePassword.bind(profileController))
+
+router.get('/user/expert/service/:serviceId',verifyUser,userExpertController.getExpertSpecificService.bind(userExpertController))
+router.get('/user/expert/:expertId',verifyUser,userExpertController.getExpertDetails.bind(userExpertController))
 export default router

@@ -11,6 +11,8 @@ import Loading from "@/components/Loading";
 import useAuthCheck from "../CostomHooks/useAuthCheck ";
 import { PublicLayout, PrivateLayout } from "../layout/user.layoute";
 import { LoginRoute } from "./Protect.routes";
+import ExpertsPage from "@/pages/User/ExpertsPage";
+import ExpertViewProfile from "@/pages/User/ExpertViewProfile";
 
 const AppRoutes = () => {
   const loading = useAuthCheck();
@@ -34,6 +36,8 @@ const AppRoutes = () => {
         <Route path="/categories" element={<Category />} />
         <Route path="/categories/:id" element={<Service />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/services/:id" element={<ExpertsPage/>}/>
+        <Route path="/user/expert/:expertId" element={<ExpertViewProfile/>}/>
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

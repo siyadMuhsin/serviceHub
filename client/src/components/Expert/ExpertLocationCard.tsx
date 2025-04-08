@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setExpertLocation } from "@/Slice/locationSlice";
 import opencage from "opencage-api-client";
 import { fetchLocationFromCoordinates } from "@/Utils/locationUtils";
@@ -11,7 +11,7 @@ const API_KEY = "173c9408b3a6422b810bccbc0d6f9d5c";
 
 const ExpertLocationCard = ({ expertData }) => {
   const dispatch = useDispatch();
-
+const {expertLocation}=useSelector((state:any)=>state.location)
   const [isEditing, setIsEditing] = useState(false);
   const [location, setLocation] = useState<string | null>(null);
   const [latitude, setLatitude] = useState<number | null>(null);
@@ -20,15 +20,28 @@ const ExpertLocationCard = ({ expertData }) => {
   const [manualLocation, setManualLocation] = useState<string>("");
 
   useEffect(() => {
-    if (expertData?.location?.lat && expertData?.location?.lng) {
-      setLatitude(expertData.location.lat);
-      setLongitude(expertData.location.lng);
+    if (expertLocation?.lat && expertLocation?.lng && expertLocation?.address) {
+      // If location already exists in Redux
+      setLatitude(expertLocation.lat);
+      setLongitude(expertLocation.lng);
+      setLocation(expertLocation.address);
+    } else if (
+      expertData?.location?.coordinates?.length === 2 &&
+      expertData?.location?.coordinates[0] !== undefined &&
+      expertData?.location?.coordinates[1] !== undefined
+    ) {
+      const lat = expertData.location.coordinates[1];
+      const lng = expertData.location.coordinates[0];
+      setLatitude(lat);
+      setLongitude(lng);
       setLoading(true);
-      fetchLocationFromCoordinates(expertData.location.lat, expertData.location.lng)
+  
+      fetchLocationFromCoordinates(lat, lng)
         .then((loc) => setLocation(loc))
+        .catch((e) => console.error("Fetch location failed:", e))
         .finally(() => setLoading(false));
     }
-  }, [expertData]);
+  }, [expertData, expertLocation]);
 
   const fetchCurrentLocation = async () => {
     setLoading(true);

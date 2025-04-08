@@ -24,8 +24,8 @@ interface Expert {
   categoryId: { name: string };
   serviceId?: { name: string };
   userId: { name: string; email: string };
-  experience?: number;
-  subscription: string;
+  experience?: string;
+  subscription: any;
   contact: string;
   isBlocked: boolean;
   status?: string;
@@ -263,7 +263,7 @@ function ExpertManagement() {
                         }`}
                       >
                         {expert.status === "approved"
-                          ? `${expert.subscription || "No subscription"}`
+                          ? `${expert.subscription.isActive ? "subscribed":'No subcription'}`
                           : expert.status}
                         {expert.isBlocked && " (Blocked)"}
                       </span>

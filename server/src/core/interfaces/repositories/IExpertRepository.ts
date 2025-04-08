@@ -8,5 +8,7 @@ export interface IExpertRepository {
     findByIdAndUpdate(id: string, update: Partial<IExpert>): Promise<IExpert | null>;
     findOne(query: object): Promise<IExpert | null>;
     pushToField(experId:string,field:keyof IExpert,value:any):Promise<IExpert|null>
-    pullFromField(expert:string,field:keyof IExpert,value:any):Promise<IExpert|null>
+    pullFromField(expert:string,field:keyof IExpert,value:any):Promise<IExpert|null>;
+    findNearbyExperts(lat:number,lng:number,distanceInKm:number,serviceId:string):Promise<IExpert[] |null>
+    getExpertDataToUser(userlat:number,userlng:number,distanceInKm:number,experId:string):Promise<IExpert|null>
 }
