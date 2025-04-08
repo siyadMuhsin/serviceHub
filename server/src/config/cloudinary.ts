@@ -29,7 +29,7 @@ export class CloudinaryService {
     }
     static deleteImage(publicId: string): Promise<any> {
       return new Promise((resolve, reject) => {
-        cloudinary.uploader.destroy(publicId, (error, result) => {
+        cloudinary.uploader.destroy(publicId, { invalidate: true },(error, result) => {
           if (error) return reject(error);
           resolve(result);
         });

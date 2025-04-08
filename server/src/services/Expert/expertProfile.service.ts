@@ -55,7 +55,9 @@ export class ExpertProfileService implements IExpertProfileService{
         }
         await this.expertRepository.pullFromField(expertId, "gallery", imageUrl);
       const public_Id=extractPublicId(imageUrl)
+
         await CloudinaryService.deleteImage(public_Id)
+
         return { success: true, message: "Image deleted from gallery" };
     } catch (error:any) {
      throw new Error(error.message)       
