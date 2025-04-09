@@ -229,9 +229,7 @@ export class AuthService implements IAuthService {
 
   async resetPassword(token: string, newPassword: string): Promise<AuthResult> {
     try {
-      console.log(token)
       const user = await this.userRepository.findOneBYToken(token);
-      console.log(user)
       if (!user) {
         return { success: false, message: "Invalid or expired token" };
       }
@@ -239,14 +237,14 @@ export class AuthService implements IAuthService {
     await this .userRepository.findByIdClearToken(user._id, hashedPassword)
       return { success: true, message: "Password reset successful" };
     } catch (error) {
-      console.error("Error in resetPassword:", error);
+      // console.error("Error in resetPassword:", error);
       throw new Error("Failed to reset password");
     }
   }
 
   private async generateAndSendOtp(email: string): Promise<AuthResult> {
     const otp = generateOTP();
-    const otpExpires = new Date(Date.now() + 1 * 60 * 1000); // 1 minute
+    const otpExpires = new Date(Date.now() + 5 * 60 * 1000); 
     await this.otpRepository.saveOTP(email, otp, otpExpires);
     await sendMailer(email, otp);
     return { success: true, message: "OTP sent to email. Please verify." };
