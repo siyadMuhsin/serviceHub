@@ -20,7 +20,7 @@ export class ProfileService implements IProfileService {
                 type: "Point",
                 coordinates: [lng, lat]  // GeoJSON requires [longitude, latitude]
             };
-            console.log(location)
+ 
             const user = await this.userRepositry.findByIdAndUpdate(
                 userId,
                 { location },
@@ -80,12 +80,14 @@ export class ProfileService implements IProfileService {
         try {
           let updateData: any = { ...data };
       
+          
           if (data.location && data.location.lat && data.location.lng) {
             updateData.location = {
               type: 'Point',
               coordinates: [data.location.lng, data.location.lat], // GeoJSON format
             };
           }
+          console.log(updateData)
           await this.userRepositry.findByIdAndUpdate(userId, updateData);
           return {
             success: true,

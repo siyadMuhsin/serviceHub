@@ -62,7 +62,6 @@ const authSlice = createSlice({
       state.otpVerified = false;
     },
     changeRole(state, action) {
-      console.log(action.payload)
     state.role=action.payload
   },
     setUser:(state,action)=>{

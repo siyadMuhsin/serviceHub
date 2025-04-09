@@ -95,6 +95,8 @@ export class ProfileController implements IProfileController {
             return this.sendResponse(res, { success: false, message: `${key} cannot be empty` }, HttpStatus.BAD_REQUEST);
           }
         }
+        const {location}=req.body
+        console.log(location)
         const response= await this.profileService.profileUpdate(userId,req.body)
         if(response.success){
           this.sendResponse(res,response,HttpStatus.OK)

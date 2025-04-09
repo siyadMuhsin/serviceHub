@@ -38,14 +38,14 @@ const [userr,setUser]=useState()
 const {userLocation}=useSelector((state:any)=>state.location)
   useEffect(() => {
     const fn=async()=>{
-      if (user?.location?.coordinates[1] && user?.location?.coordinates[0]) {
-      
-      const address= await fetchLocationFromCoordinates(user.location.coordinates[1], user.location.coordinates[0])
-      setLocationData(address)
-     
-        dispatch(setUserLocation({lat:user.location.coordinates[1],lng:user.location.coordinates[0],address:address}))
-
+      if(user.location?.coordinates){
+        if (user?.location?.coordinates[1] && user?.location?.coordinates[0]) {
+          const address= await fetchLocationFromCoordinates(user.location.coordinates[1], user.location.coordinates[0])
+          setLocationData(address)
+            dispatch(setUserLocation({lat:user.location.coordinates[1],lng:user.location.coordinates[0],address:address}))
+          }
       }
+     
     }
    fn()
   }, [user]);

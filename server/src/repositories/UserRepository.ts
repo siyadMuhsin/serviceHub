@@ -17,7 +17,11 @@ export class UserRepository implements IUserRepository {
 
     async createUser(userData: Partial<IUser>): Promise<IUser> {
         try {
-            const user = new User(userData);
+            const newData={...userData,location:{
+                type:'Point',
+                coordinates:[0,0]
+            }}
+            const user = new User(newData);
             return await user.save();
         } catch (error) {
             console.error("Error creating user:", error);

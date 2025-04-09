@@ -18,7 +18,8 @@ const LocationFetcher = ({ user, updateUserLocation }: { user: any; updateUserLo
 
   useEffect(() => {
     // Blinking effect for the "Add Location" button
-    if (!user?.location?.coordinates[1] && !user?.location?.coordinates[0]) {
+
+    if (!user?.location.coordinates&&!user?.location?.coordinates[1] && !user?.location?.coordinates[0]) {
       const blinkInterval = setInterval(() => {
         setIsBlinking(prev => !prev);
       }, 800);

@@ -28,7 +28,7 @@ export class AuthService implements IAuthService {
         return { success: false, message: "User with this email already exists" };
       }
 
-      if (exitingUser && exitingUser.password) {
+      if (exitingUser && exitingUser.password &&exitingUser.isVerified) {
         return { success: false, message: "User with this email already exists" };
       }
 

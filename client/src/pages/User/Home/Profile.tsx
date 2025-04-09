@@ -55,24 +55,19 @@ export const ProfilePage: React.FC = () => {
     certificate:''
    })
 
-
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
         setIsLoading(true);
         const response = await get_userData();
-
         if (response.success) {
+          console.log(response.user)
           setUser(response.user);
-
 
     if (response.user?.location?.coordinates[1] && response.user?.location?.coordinates[0]) {
      await fetchLocationFromCoordinates(response.user.location.coordinates[1], response.user.location.coordinates[0]).then(setLocationData);
     }
   
-
-
         } else {
           toast.error(response.message);
         }
