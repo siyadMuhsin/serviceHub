@@ -144,11 +144,21 @@ export const ProfilePage: React.FC = () => {
       setIsLoading(true);
       delete updateProfileData.email
       const response = await updateUserProfile(updateProfileData);
+      console.log('egvs')
       if (response.success) {
-     const locationData= await fetchLocationFromCoordinates(updateProfileData.location.lat,updateProfileData.location.lng)
-     setLocationData(locationData)
+        console.log(updateProfileData);
+        
+        if(updateProfileData.location){
+          if(updateProfileData.location.lat!==0 && updateProfileData.location.lng!==0){
+            const locationData= await fetchLocationFromCoordinates(updateProfileData.location.lat,updateProfileData.location.lng)
+            setLocationData(locationData)
+            dispatch(setUserLocation({...updateProfileData.location,address:locationData}))
+  
+          }
+        }
+      
 
-       dispatch(setUserLocation({...updateProfileData.location,address:locationData}))
+
         setUser((prev) => ({
           ...prev,
           ...updateProfileData, 
@@ -162,6 +172,7 @@ export const ProfilePage: React.FC = () => {
       // toast.success("Profile updated successfully (demo)");
       // setCurrentView('overview');
     } catch (error: any) {
+      console.log(error)
       toast.error(error?.message || "Profile update failed");
     } finally {
       setIsLoading(false);

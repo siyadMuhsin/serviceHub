@@ -14,10 +14,14 @@ const uploadProfileImage=async(formData:FormData)=>{
 }
 const updateUserProfile=async(profileData:any)=>{
     try {
+        if(!profileData?.location?.lat || !profileData?.location?.lng){
+            delete profileData.location
+        }
         console.log(profileData)
         const response= await userAPI.put('profile',profileData)
         return response.data
     } catch (error) {
+        console.log(error)
         throw new Error (error.response.data.message)  
     }
 }

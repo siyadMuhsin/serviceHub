@@ -342,16 +342,22 @@ const Login: React.FC = () => {
               </form>
             ) : (
               <form className={`${styles.form} ${styles.signUp}`} onSubmit={handleOtpSubmit}>
-                <div className={styles.inputGroup}>
-                  <i className="bx bxs-lock-alt"></i>
-                  <input
-                    type="text"
-                    placeholder="Enter OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                  />
-                </div>
+               <div className={styles.inputGroup}>
+  <i className="bx bxs-lock-alt"></i>
+  <input
+    type="text"
+    placeholder="Enter OTP"
+    value={otp}
+    onChange={(e) => {
+      const value = e.target.value;
+      if (/^\d{0,4}$/.test(value)) {
+        setOtp(value);
+      }
+    }}
+    maxLength={4}
+    required
+  />
+</div>
                 <button className={styles.action} type="submit" disabled={loading}>
                   {loading ? "Loading..." : "Verify OTP"}
                 </button>

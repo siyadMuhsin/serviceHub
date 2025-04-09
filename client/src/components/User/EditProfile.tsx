@@ -150,22 +150,21 @@ const EditProfile: React.FC<EditProfileProps> = ({
     
     const file = e.target.files?.[0];
     if (!file) return;
-
+    if (!file.type.startsWith('image/')) {
+      toast.warn("Only image files are allowed");
+      setIsLoading(false);
+      return;
+    }
     // Validate file size (2MB max)
     if (file.size > 2 * 1024 * 1024) {
       alert("File size exceeds 2MB limit");
       setIsLoading(false)
-      return;
-      
+      return; 
     }
-
     try {
       setLoading(prev => ({ ...prev, image: true }));
       const formData = new FormData();
-    formData.append('image', file);
-    
-    //   const imageUrl = await onUploadImage(file);
-    
+    formData.append('image', file);  
       const response = await uploadProfileImage(formData) ;
       if(response.success){
         setEditedProfile(prev => ({
@@ -283,19 +282,23 @@ const EditProfile: React.FC<EditProfileProps> = ({
           />
         </div>
         <div>
-          <label className="block mb-2 text-sm font-medium">Phone</label>
-          <Input
-            value={editedProfile.phone}
-            onChange={(e) =>
-              setEditedProfile((prev) => ({
-                ...prev,
-                phone: e.target.value,
-              }))
-            }
-            type="tel"
-            disabled={loading.profile}
-          />
-        </div>
+  <label className="block mb-2 text-sm font-medium">Phone</label>
+  <Input
+    value={editedProfile.phone}
+    onChange={(e) => {
+      const value = e.target.value;
+      if (/^\d{0,10}$/.test(value)) {
+        setEditedProfile((prev) => ({
+          ...prev,
+          phone: value,
+        }));
+      }
+    }}
+    type="tel"
+    maxLength={10}
+    disabled={loading.profile}
+  />
+</div>
 
         <div>
           <label className="block mb-2 text-sm font-medium">Location</label>

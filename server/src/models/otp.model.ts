@@ -13,6 +13,7 @@ const otpSchema = new Schema<IOtp>({
     expiresAt: { type: Date, required: true }
 }, { timestamps: true });
 
+// otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 const OTP: Model<IOtp> = mongoose.models.OTP || mongoose.model<IOtp>('OTP', otpSchema);
 
 export default OTP;

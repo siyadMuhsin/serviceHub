@@ -94,9 +94,21 @@ export class ProfileController implements IProfileController {
           if (typeof value === 'string' && !value.trim()) {
             return this.sendResponse(res, { success: false, message: `${key} cannot be empty` }, HttpStatus.BAD_REQUEST);
           }
+          if (key === 'phone' && typeof value==='string') {
+            if (!/^\d{10}$/.test(value)) {
+              return this.sendResponse(
+                res,
+                { success: false, message: `Phone number must be exactly 10 digits` },
+                HttpStatus.BAD_REQUEST
+              );
+            }
+          }
+      
         }
-        const {location}=req.body
-        console.log(location)
+        // if(!location.lat || !location.lng){ 
+        //   this.sendResponse(res,{message:"Add Location"},HttpStatus.BAD_REQUEST)
+        //   return
+        // }
         const response= await this.profileService.profileUpdate(userId,req.body)
         if(response.success){
           this.sendResponse(res,response,HttpStatus.OK)

@@ -4,6 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { expertSchemaValidation } from "../../../validations/expertValidation";
 import { Category, Service, ExpertData } from "../../../Interfaces/interfaces";
 import { getAll_categories, getAll_services } from "@/services/category.service";
+import { toast } from "react-toastify";
 
 interface CreateExpertModalProps {
   isOpen: boolean;
@@ -63,17 +64,21 @@ const CreateExpertModal: React.FC<CreateExpertModalProps> = ({
   const categoryValue = watch("category");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setCertificateFile(e.target.files[0]);
-      setValue("certificate", e.target.files[0]); // Set file in form data
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.warn("Only image files are allowed");
+      return;
     }
+    setCertificateFile(file);
+    setValue("certificate", file); // Set file in form data
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-lg">
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center overflow-auto">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-lg max-h-[90vh] overflow-y-auto">
         <h2 className="text-lg font-semibold mb-4">
           {existingData ? "Edit Expert Account" : "Create Expert Account"}
         </h2>
@@ -160,7 +165,7 @@ const CreateExpertModal: React.FC<CreateExpertModalProps> = ({
           </label>
           <input
             type="file"
-            accept=".pdf,.jpg,.png"
+            accept=".jpg,.jpeg,.png"
             onChange={handleFileChange}
             className="w-full p-2 border border-gray-300 rounded"
           />
