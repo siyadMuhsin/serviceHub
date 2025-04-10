@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, Star } from "lucide-react";
+import { Lock, MapPin, Star } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getExpertsSpecificService } from "@/services/User/expert.service";
 import { toast } from "react-toastify";
@@ -94,46 +94,54 @@ const ExpertCard = ({
   onViewProfile: (expertId: string) => void; 
 }) => {
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start">
-          <div className="flex gap-4">
-            <img
-              src={expert.profile}
-              alt={expert.name}
-              className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
-            />
-            <div>
-              <div>
-                <h3 className="font-bold text-lg">{expert.name}</h3>
-                <p className="text-sm text-gray-600">
-                  {expert.service} Specialist
-                </p>
-              </div>
+<Card className="hover:shadow-md transition-shadow">
+  <CardContent className="p-4">
+    <div className="flex justify-between items-start gap-4">
+      {/* Left: Profile Image + Info */}
+      <div className="flex gap-4">
+        <img
+          src={expert.profile}
+          alt={expert.name}
+          className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
+        />
+        <div className="flex flex-col justify-between">
+          {/* Name & Service */}
+          <div>
+            <h3 className="font-bold text-lg">{expert.name}</h3>
+            <p className="text-sm text-gray-600">{expert.service} Specialist</p>
+          </div>
 
-              <div className="mt-2">
-                <StarRating rating={5} />
-                <div className="flex items-center text-sm text-gray-500 mt-1">
-                  <Lock className="w-3 h-3 mr-1" />
-                  <span>
-                    {expert.experience} experience • {19} jobs
-                  </span>
-                </div>
-              </div>
+          {/* Distance */}
+          <div className="flex items-center mt-1 text-sm text-blue-600 font-medium">
+            <MapPin className="w-4 h-4 mr-1 text-blue-500" />
+            <span>{expert.distanceInKm.toFixed(2)} km away</span>
+          </div>
+
+          {/* Rating & Experience */}
+          <div className="mt-2">
+            <StarRating rating={5} />
+            <div className="flex items-center text-sm text-gray-500 mt-1">
+              <Lock className="w-3 h-3 mr-1" />
+              <span>{expert.experience} experience • 19 jobs</span>
             </div>
           </div>
-
-          <div className="mt-4">
-            <Button 
-              variant="default" 
-              onClick={() => onViewProfile(expert._id)} // Call the prop function
-            >
-              View Profile
-            </Button>
-          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Right: Button */}
+      <div>
+        <Button
+          variant="default"
+          className="mt-1"
+          onClick={() => onViewProfile(expert._id)}
+        >
+          View Profile
+        </Button>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+
   );
 };
 

@@ -25,12 +25,15 @@ export class UserExpertService implements IUserExpertService{
             if(user.location?.coordinates){
                 const [userLng ,userLat]= user.location?.coordinates
                 const experts= await this.expertResposity.findNearbyExperts(userLat,userLng,25,serviceId)
+                // const res= await this.expertResposity.findDistanceLocation(userLng,userLat)
+                console.log(experts)
                 const result:any=experts?.map((item)=>{
                     return{_id:item._id,
                         name:item.userId.name,
                         profile:item.userId.profile_image,
                         service:item.serviceId.name,
-                        experience:item.experience
+                        experience:item.experience,
+                        distanceInKm:item.distanceInKm
                     }
                 })
                 return {success:true,message:"Fetch experts successFully",experts:result}

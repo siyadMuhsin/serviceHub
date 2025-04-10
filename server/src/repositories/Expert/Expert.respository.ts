@@ -3,6 +3,7 @@ import Expert from "../../models/expert.model";
 import { IExpert } from "../../types/Expert";
 import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRepository";
 import { findPackageJSON } from 'module';
+import mongoose from 'mongoose';
 
 @injectable()
 export class ExpertRepository implements IExpertRepository {
@@ -72,27 +73,70 @@ export class ExpertRepository implements IExpertRepository {
         );
       }
 
-      async findNearbyExperts(userLat: number, userLng: number, distanceInKm = 25,serviceId:string):Promise<IExpert[] |null> {
+      async findNearbyExperts(
+        userLat: number,
+        userLng: number,
+        distanceInKm = 25,
+        serviceId: string
+      ): Promise<any[] | null> {
         try {
           const maxDistanceInMeters = distanceInKm * 1000;
-          return await Expert.find({
-            location: {
-              $near: {
-                $geometry: {
+      
+          const results = await Expert.aggregate([
+            {
+              $geoNear: {
+                near: {
                   type: "Point",
                   coordinates: [userLng, userLat],
                 },
-                $maxDistance: maxDistanceInMeters,
+                distanceField: "distanceInKm",
+                maxDistance: maxDistanceInMeters,
+                spherical: true,
+                distanceMultiplier: 0.001, // convert to km
+                query: {
+                  isBlocked: false,
+                  serviceId: new mongoose.Types.ObjectId(serviceId),
+                },
               },
             },
-            isBlocked:false,
-            serviceId:serviceId
-          }).populate("userId").populate('serviceId' ,'name');
+            {
+              $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "userId",
+              },
+            },
+            {
+              $unwind: "$userId",
+            },
+            {
+              $lookup: {
+                from: "services",
+                localField: "serviceId",
+                foreignField: "_id",
+                as: "serviceId",
+              },
+            },
+            {
+              $unwind: "$serviceId",
+            },
+            {
+              $project: {
+                userId: 1,
+                serviceId: { name: 1 },
+                distanceInKm: 1,
+                location: 1,
+              },
+            },
+          ]);
+      
+          return results;
         } catch (error: any) {
-            throw new Error(error.message||"Failed to fetch nearby experts" )
+          throw new Error(error.message || "Failed to fetch nearby experts");
         }
       }
-
+      
     async getExpertDataToUser(userLat:number,userLng:number,distanceInKm=25,expertId:string):Promise<IExpert|null>{
         const maxDistanceInMeters = distanceInKm * 1000;
         return await Expert.findOne({
@@ -109,5 +153,20 @@ export class ExpertRepository implements IExpertRepository {
             isBlocked:false,
           }).populate("userId serviceId categoryId");
 
+    }
+    async findDistanceLocation(userLng: number, userLat: number): Promise<any> {
+      return await Expert.aggregate([
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [userLng, userLat], // must be in [lng, lat] order
+            },
+            distanceField: "distanceInMeters",
+            spherical: true,
+            distanceMultiplier: 0.001, // to get distance in kilometers
+          }
+        }
+      ])
     }
 }
