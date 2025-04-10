@@ -16,7 +16,6 @@ export class AdminAuthController implements IAdminAuthController {
         try {
             const { email, password } = req.body;
             const response = await this.adminService.loginAdmin(email, password);
-            
             if (response.success && response.accessToken && response.refreshToken) {
                 this.setAuthCookies(res, response.accessToken, response.refreshToken);
                 res.status(HttpStatus.OK).json({ 

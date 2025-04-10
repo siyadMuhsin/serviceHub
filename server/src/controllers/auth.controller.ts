@@ -73,7 +73,6 @@ export class AuthController implements IAuthController {
       });
     }
   }
-
   async getCurrentUser(req: AuthRequest, res: Response): Promise<void> {
     const userId = req?.user?.userId;
     if (!userId) {
@@ -83,7 +82,6 @@ export class AuthController implements IAuthController {
       });
       return;
     }
-
     try {
       const response = await this.authService.findUser(userId);
       console.log(response)

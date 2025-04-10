@@ -1,5 +1,5 @@
 import { Bell, User, FileText, CheckCircle, Clock, Users } from "lucide-react"
-
+import { differenceInDays, differenceInMonths } from 'date-fns';
 import { Footer } from "@/components/Expert/Footer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -54,8 +54,17 @@ export default function Dashboard() {
     }
     fetchData()
   },[])
+
+//   const 
+// const monthsRemaining = differenceInMonths(endDate, new Date());
   if(!expert){
     return(<Loading/>)
+  }
+  let daysRemaining: number | null = null;
+
+  if (expert.subscription.plan&&expert.subscription.plan.isActive) {
+    const endDate = new Date(expert.subscription.endDate);
+    daysRemaining = differenceInDays(endDate, new Date());
   }
 
   return (
@@ -95,7 +104,7 @@ export default function Dashboard() {
   <div className="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-md flex items-center justify-between">
     <span className="text-sm font-medium">
       Subscription Active:{" "}
-      <span className="font-bold">{expert.subscription.plan.durationMonths * 30} days remaining</span>
+      <span className="font-bold">{daysRemaining} days remaining</span>
     </span>
   </div>
 )}

@@ -20,7 +20,6 @@ export class ProfileService implements IProfileService {
                 type: "Point",
                 coordinates: [lng, lat]  // GeoJSON requires [longitude, latitude]
             };
- 
             const user = await this.userRepositry.findByIdAndUpdate(
                 userId,
                 { location },
@@ -62,7 +61,6 @@ export class ProfileService implements IProfileService {
     }
     async profileImageUpload(userId:string,file:Express.Multer.File){
         try {
-
             const profileImageUrl= await CloudinaryService.uploadImage(file)
             if(profileImageUrl){
                 await this.userRepositry.findByIdAndUpdate(userId,{profile_image:profileImageUrl})
@@ -79,8 +77,6 @@ export class ProfileService implements IProfileService {
       ) {
         try {
           let updateData: any = { ...data };
-      
-          
           if (data.location && data.location.lat && data.location.lng) {
             updateData.location = {
               type: 'Point',
