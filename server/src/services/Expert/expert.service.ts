@@ -123,7 +123,8 @@ export class ExpertService implements IExpertService {
             const userId: string = updatedExpert.userId.toString();
             await this.userRepository.findByIdAndUpdate(userId, {
                 role: action === 'approved' ? 'expert' : 'user',
-                expertStatus: action === "approved" ? "approved" : "rejected"
+                expertStatus: action === "approved" ? "approved" : "rejected",
+                rejectReason:action==='rejected'?reason:undefined
             });
 
             await sendExpertStatusUpdate(existingExpert.userId.email, action,reason);

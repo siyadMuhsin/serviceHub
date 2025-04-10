@@ -5,46 +5,54 @@ const ExpertSchema = new Schema<IExpert>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     serviceId: { type: Schema.Types.ObjectId, ref: "Service", required: true },
-    categoryId: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
     accountName: { type: String, required: true },
     dob: { type: Date, required: true },
     gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
     contact: { type: String, required: true },
     isBlocked: { type: Boolean, default: false },
-    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+    
     experience: { type: Number, required: true },
     subscription: {
       plan: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Plans'
+        ref: "Plans",
       },
       startDate: {
         type: Date,
-        default: Date.now
+        default: Date.now,
       },
       endDate: Date,
       isActive: {
         type: Boolean,
-        default: false
-      }
+        default: false,
+      },
     },
     gallery: [{ type: String }],
     location: {
       type: {
         type: String,
-        enum: ['Point'],
-        default: 'Point'
+        enum: ["Point"],
+        default: "Point",
       },
       coordinates: {
         type: [Number], // [lng, lat]
-        required: false
-      }
+        required: false,
+      },
     },
     certificateUrl: { type: String, required: true },
   },
   { timestamps: true }
 );
-
 
 ExpertSchema.index({ location: "2dsphere" });
 

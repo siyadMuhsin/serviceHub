@@ -15,6 +15,7 @@ export interface IUser extends Document {
     resetPasswordToken: string |undefined; // Changed to string
     resetPasswordExpires: Date |undefined; // Changed to Date
     isVerified: boolean;
+    rejectReason?:string
     location?:{type:string,coordinates:number[]}
   }
 
@@ -34,6 +35,7 @@ const userSchema = new Schema<IUser>(
     resetPasswordToken: { type: String }, 
     resetPasswordExpires: { type: Date },
     isVerified: { type: Boolean, default: false },
+    rejectReason:{type:String,required:false},
     location: {
       type: {
         type: String,
@@ -46,6 +48,7 @@ const userSchema = new Schema<IUser>(
       },
     }
   },
+  
   { timestamps: true }
 );
 

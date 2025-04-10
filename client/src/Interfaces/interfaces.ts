@@ -35,6 +35,7 @@ export interface IUser{
     profile_image: string;
     location:{lat:number,lng:number};
     expertStatus:string
+    rejectReason?:string
     resetPasswordToken: string |undefined; // Changed to string
     resetPasswordExpires: Date |undefined; // Changed to Date
     isVerified: boolean;

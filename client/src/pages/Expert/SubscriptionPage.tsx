@@ -27,7 +27,7 @@ interface Plan {
   _id: string;
   name: string;
   price: number;
-  duration: number;
+  durationMonths: number;
   durationDisplay:string
   features?: string[];
 }
@@ -159,7 +159,7 @@ const {expert}=location.state
             <h3 className="text-xl font-semibold text-gray-800 mb-1">{selectedPlan.name}</h3>
             <p className="text-2xl font-bold text-blue-600 mb-2">₹{selectedPlan.price}</p>
             <p className="text-gray-600">
-              <span className="font-medium">Duration:</span> {selectedPlan.duration} days
+              <span className="font-medium">Duration:</span> {selectedPlan.durationMonths *30} days
             </p>
           </div>
   

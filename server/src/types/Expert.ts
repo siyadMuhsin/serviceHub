@@ -15,6 +15,7 @@ export interface IExpert extends Document {
     certificateUrl: string; // Cloudinary URL
     subscription:any;
     location?: {type:string,coordinates:number[]},
+    rejectReason?:string
     gallery?: string[];
     createdAt?: Date;
     updatedAt?: Date;

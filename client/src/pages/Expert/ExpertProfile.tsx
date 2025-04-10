@@ -162,10 +162,10 @@ const dispatch=useDispatch()
         {/* Subscription Status */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Subscription</h3>
-          {expertData.subscription ? (
+          {expertData.subscription.isActive ? (
             <div className="space-y-3">
               <p>
-                <span className="font-medium text-gray-700">Plan:</span> {expertData.subscription.plan.name}
+                <span className="font-medium text-gray-700">Plan:</span> {expertData.subscription.plan?.name}
               </p>
               <p>
                 <span className="font-medium text-gray-700">Status:</span> 
