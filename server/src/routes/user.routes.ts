@@ -5,35 +5,41 @@ import container from "../di/container";
 import { TYPES } from "../di/types";
 import { IServiceController } from "../core/interfaces/controllers/IServiceController";
 import { IExpertController } from "../core/interfaces/controllers/IExpertController";
-import { IUsersController } from "../core/interfaces/controllers/IUsersController";
 import { IProfileController } from "../core/interfaces/controllers/IProfileController";
 import upload from "../config/multer";
 import { IUserExpertController } from "../core/interfaces/controllers/IUserExpertController";
-const router= Router()
 
-const authMiddleware= container.get<IAuthMiddleware>(TYPES.AuthMiddleware)
+const router = Router();
+
+const authMiddleware = container.get<IAuthMiddleware>(TYPES.AuthMiddleware);
+const verifyUser = authMiddleware.verifyToken.bind(authMiddleware);
+
 const categoryController = container.get<ICategoryController>(TYPES.CategoryController);
-const servicesController= container.get<IServiceController>(TYPES.ServiceController)
-const profileController= container.get<IProfileController>(TYPES.ProfileController)
-const userExpertController= container.get<IUserExpertController>(TYPES.UserExpertController)
-const verifyUser=authMiddleware.verifyToken.bind(authMiddleware)
+const servicesController = container.get<IServiceController>(TYPES.ServiceController);
+const profileController = container.get<IProfileController>(TYPES.ProfileController);
+const userExpertController = container.get<IUserExpertController>(TYPES.UserExpertController);
+const expertController = container.get<IExpertController>(TYPES.ExpertController);
 
-router.get('/categories',categoryController.categoriesByLimit.bind(categoryController))
-router.get('/categories/all',categoryController.getAllCategories.bind(categoryController))
-router.get('/services/all',servicesController.getAllServices.bind(servicesController))
-router.get('/services/:categoryId',servicesController.getServicesByCategory_limit.bind(servicesController))
+// ✅ Protected Category Routes
+router.get('/categories', verifyUser, categoryController.categoriesByLimit.bind(categoryController));
+router.get('/categories/all', verifyUser, categoryController.getAllCategories.bind(categoryController));
 
+// ✅ Protected Service Routes
+router.get('/services/all', verifyUser, servicesController.getAllServices.bind(servicesController));
+router.get('/services/:categoryId', verifyUser, servicesController.getServicesByCategory_limit.bind(servicesController));
 
-router.patch('/location',authMiddleware.verifyToken.bind(authMiddleware),profileController.add_location.bind(profileController))
-const expertController= container.get<IExpertController>(TYPES.ExpertController)
-router.get('/switch_expert',authMiddleware.verifyToken.bind(authMiddleware),expertController.switch_expert.bind(expertController))
+// ✅ Protected Profile Routes
+router.patch('/location', verifyUser, profileController.add_location.bind(profileController));
+router.post('/profile/image', upload.single("image"), verifyUser, profileController.profileImageUpload.bind(profileController));
+router.put('/profile', verifyUser, profileController.profileUpdate.bind(profileController));
+router.patch('/profile/changePassword', verifyUser, profileController.changePassword.bind(profileController));
 
-router.get('/expert',authMiddleware.verifyToken.bind(authMiddleware),profileController.getExistingExpert.bind(profileController))
+// ✅ Expert Routes
+router.get('/switch_expert', verifyUser, expertController.switch_expert.bind(expertController));
+router.get('/expert', verifyUser, profileController.getExistingExpert.bind(profileController));
 
-router.post('/profile/image',upload.single("image"),authMiddleware.verifyToken.bind(authMiddleware),profileController.profileImageUpload.bind(profileController))
-router.put('/profile',authMiddleware.verifyToken.bind(authMiddleware),profileController.profileUpdate.bind(profileController))
-router.patch('/profile/changePassword',verifyUser,profileController.changePassword.bind(profileController))
+// ✅ User-Expert Routes
+router.get('/user/expert/service/:serviceId', verifyUser, userExpertController.getExpertSpecificService.bind(userExpertController));
+router.get('/user/expert/:expertId', verifyUser, userExpertController.getExpertDetails.bind(userExpertController));
 
-router.get('/user/expert/service/:serviceId',verifyUser,userExpertController.getExpertSpecificService.bind(userExpertController))
-router.get('/user/expert/:expertId',verifyUser,userExpertController.getExpertDetails.bind(userExpertController))
-export default router
+export default router;

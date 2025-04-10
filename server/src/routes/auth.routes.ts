@@ -22,6 +22,6 @@ router.post('/forgot-password', authController.forgetPassword.bind(authControlle
 router.post('/reset-password', authController.resetPassword.bind(authController));
 router.post('/google-signin', authController.googleSignIn.bind(authController));
 router.get('/me', authMiddleware.verifyToken.bind(authMiddleware), authController.getCurrentUser.bind(authController));
-router.post('/refresh', tokenController.userRefreshToken.bind(tokenController));
+router.post('/refresh', tokenController.refreshToken.bind(tokenController));
 
 export default router;

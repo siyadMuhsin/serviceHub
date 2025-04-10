@@ -12,7 +12,6 @@ export class AuthMiddleware implements IAuthMiddleware {
     constructor(
         @inject(TYPES.AuthMiddlewareService) private authMiddlewareService: AuthMiddlewareService
     ) {}
-
     async verifyToken(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const token = this.getTokenFromRequest(req);
@@ -22,15 +21,20 @@ export class AuthMiddleware implements IAuthMiddleware {
             }
 
             const decoded = await this.authMiddlewareService.verifyToken(token);
+            if(decoded.role!=='user'){
+                this.sendErrorResponse(res,HttpStatus.FORBIDDEN,"Unauthorized")
+                return
+            }
             const isBlocked = await this.authMiddlewareService.checkUserBlocked(decoded.userId);
-            
+          
             if (isBlocked) {
               res.clearCookie('accessToken')
               res.clearCookie('refreshToken')
                 this.sendErrorResponse(res, HttpStatus.FORBIDDEN, "Your account has been blocked by the admin.");
                 return;
             }
-
+            console.log(decoded)
+            
             req.user = decoded;
             next();
         } catch (err) {

@@ -34,8 +34,8 @@ export class AdminAuthController implements IAdminAuthController {
     }
 
     async logout(req: Request, res: Response): Promise<void> {
-        res.clearCookie("adminAccessToken");
-        res.clearCookie("adminRefreshToken");
+        res.clearCookie("accessToken");
+        res.clearCookie("refreshToken");
         res.json({ success: true, message: "Logged out successfully" });
     }
     
@@ -56,11 +56,11 @@ export class AdminAuthController implements IAdminAuthController {
     }
 
     private setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
-        res.cookie("adminAccessToken", accessToken, { 
+        res.cookie("accessToken", accessToken, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === "production" 
         });
-        res.cookie("adminRefreshToken", refreshToken, { 
+        res.cookie("refreshToken", refreshToken, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === "production" 
         });

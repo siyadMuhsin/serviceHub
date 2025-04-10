@@ -7,6 +7,8 @@ import { IExpertProfileController } from "../core/interfaces/controllers/IExpert
 import { IAuthMiddleware } from "../core/interfaces/middleware/IAuthMiddleware";
 import { IPlansController } from "../core/interfaces/controllers/IPlansController";
 import { IPaymentController } from "../core/interfaces/controllers/IPaymentController";
+import { verify } from "crypto";
+import { ITokenController } from "../core/interfaces/controllers/ITokenController";
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -14,6 +16,7 @@ const upload = multer({ storage });
 const expertController = container.get<IExpertController>(TYPES.ExpertController)
 const expertProfileController= container.get<IExpertProfileController>(TYPES.ExpertProfileController)
 const plansController= container.get<IPlansController>(TYPES.PlansController)
+const tokenController = container.get<ITokenController>(TYPES.TokenController);
 const paymentController=container.get<IPaymentController>(TYPES.PaymentController)
 const authMiddleware= container.get<IAuthMiddleware>(TYPES.AuthMiddleware)
 
@@ -31,10 +34,11 @@ router.post('/profile/location',verifyExpert,expertProfileController.updateLocat
     
 router.post('/profile/image',verifyExpert,upload.single('image'),expertProfileController.imagesUpload.bind(expertProfileController))
 router.delete('/profile/image',verifyExpert,expertProfileController.deleteImage.bind(expertProfileController))
+router.post('/auth/refresh',tokenController.refreshToken.bind(tokenController))
 export default router;
 
 function test(req:Request,res:Response){
-    console.log(req.file)
+
     console.log('working')
 
 }
