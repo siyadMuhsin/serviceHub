@@ -54,7 +54,7 @@ adminAPI.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       try {
         console.log("Refreshing token...");
-        const response = await adminAPI.post<ApiResponse>("refresh");
+        const response = await adminAPI.post<ApiResponse>("/refresh");
         if (!response.data.success) {
           store.dispatch(adminLogout());
           return;
@@ -95,6 +95,7 @@ expertAPI.interceptors.response.use(
       } catch (refreshError) {
         console.error("Expert session expired, logging out...");
         store.dispatch(logout()); // Log out the expert
+        window.location.href='/login'
       }
     }
     return Promise.reject(error);

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import AdminLogin from "../pages/Admin/Auth/AdminLogin ";
 import AdminDashboard from "../pages/Admin/Dashboard/Dashboard";
 import { AdminProtectRoute, AdminLoginRoute } from "./Protect.routes";
@@ -11,13 +11,15 @@ import ExpertDetailsPage from "../pages/Admin/ExpertDetailsPage";
 import Subscriptoin from "@/pages/Admin/Subscriptoin";
 
 const AdminRoute = () => {
-  const loading = AdminAuthCheck()
+  const loading = AdminAuthCheck();
 
-  if(loading){
-    return <h2>Loading...</h2>
+  if (loading) {
+    return <h2>Loading...</h2>;
   }
+
   return (
     <Routes>
+      {/* Public login route */}
       <Route
         path="/login"
         element={
@@ -26,15 +28,17 @@ const AdminRoute = () => {
           </AdminLoginRoute>
         }
       />
+
+      {/* Protected routes group */}
       <Route element={<AdminProtectRoute />}>
         <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/categories" element={<Category />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/users" element={<UserManagement />} />
+        <Route path="/experts" element={<ExpertMangement />} />
+        <Route path="/expert/:id" element={<ExpertDetailsPage />} />
+        <Route path="/subscription" element={<Subscriptoin />} />
       </Route>
-      <Route path="/categories" element={<Category/>}></Route>
-      <Route path="/services" element={<Services/>}></Route>
-      <Route path="/users" element={<UserManagement/>}> </Route>
-      <Route path="/experts" element={<ExpertMangement/>} />
-      <Route path="/expert/:id" element={<ExpertDetailsPage/>}/> 
-      <Route path="/subscription" element={<Subscriptoin/>}/>
     </Routes>
   );
 };

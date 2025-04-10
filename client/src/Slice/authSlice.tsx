@@ -1,6 +1,7 @@
 // features/authSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+
 export interface AuthState {
   user: any;
   loading: boolean;
@@ -95,6 +96,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+
     },
 
 
