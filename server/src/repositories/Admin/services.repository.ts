@@ -3,11 +3,15 @@ import { Services } from "../../models/service.model";
 import { IServices } from "../../types/Admin";
 import { ObjectId } from "mongodb";
 import { IServiceRepository } from "../../core/interfaces/repositories/IServiceRepository";
+import { BaseRepository } from '../BaseRepository';
 
 @injectable()
-export class ServiceRepository implements IServiceRepository {
+export class ServiceRepository extends BaseRepository<IServices> implements IServiceRepository {
+    constructor(){
+        super(Services)
+    }
     async createService(data: Partial<IServices>) {
-        return await Services.create(data);
+return this.create(data)
     }
 
     async getServiceByName(name: string) {

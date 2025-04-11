@@ -4,17 +4,27 @@ import { IExpert } from "../../types/Expert";
 import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRepository";
 import { findPackageJSON } from 'module';
 import mongoose from 'mongoose';
+import { BaseRepository } from '../BaseRepository';
+import { IUser } from '../../models/user.model';
 
 @injectable()
-export class ExpertRepository implements IExpertRepository {
+export class ExpertRepository extends BaseRepository<IExpert> implements IExpertRepository {
+  constructor(){
+    super(Expert)
+  }
     async createExpert(data: Partial<IExpert>, userId: string): Promise<IExpert> {
         try {
-            const newData = { ...data, userId , location: {
-                type: "Point",
-                coordinates: [0, 0] 
-              }};
-            const expert = new Expert(newData);
-            return await expert.save();
+          
+            const newData: Partial<IExpert> = {
+            ...data,
+            userId :userId as unknown as IUser,
+            location: {
+                type: "Point", 
+                coordinates: data.location?.coordinates || [0, 0] 
+            }
+        };
+            // const expert = new Expert(newData);
+            return await this.create(newData)
         } catch (error: any) {
             throw new Error(`Error in ExpertRepository: ${error.message}`);
         }
@@ -48,7 +58,9 @@ export class ExpertRepository implements IExpertRepository {
     }
 
     async findByIdAndUpdate(id: string, update: Partial<IExpert>) {
-        return await Expert.findByIdAndUpdate(id, update, { new: true });
+    const leanDoc= await this.updateById(id,update)
+    return this.transformToObject(leanDoc)
+        // return await Expert.findByIdAndUpdate(id, update, { new: true });
     }
 
     async findOne(query: object): Promise<IExpert | null> {

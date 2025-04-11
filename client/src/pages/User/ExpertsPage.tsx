@@ -98,7 +98,7 @@ const ExpertCard = ({
   <CardContent className="p-4">
     <div className="flex justify-between items-start gap-4">
       {/* Left: Profile Image + Info */}
-      <div className="flex gap-4">
+      <div className="flex gap-4  ">
         <img
           src={expert.profile}
           alt={expert.name}

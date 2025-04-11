@@ -1,3 +1,4 @@
+import { LeanDocument } from "mongoose";
 import { IExpert } from "../../../types/Expert";
 
 export interface IExpertRepository {

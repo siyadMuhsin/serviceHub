@@ -2,16 +2,20 @@ import { injectable } from 'inversify';
 import { Category } from "../../models/category.model";
 import { ICategory } from "../../types/Admin";
 import { ICategoryRepository } from "../../core/interfaces/repositories/ICategoryRepository";
+import { BaseRepository } from '../BaseRepository';
 
 @injectable()
-export class CategoryRepository implements ICategoryRepository {
+export class CategoryRepository extends BaseRepository<ICategory> implements ICategoryRepository {
+    constructor(){
+        super(Category)
+    }
     async createCategory(categoryData: Partial<ICategory>): Promise<ICategory> {
-        const category = new Category(categoryData);
-        return await category.save();
+return this.create(categoryData)
     }
 
     async getAllCategories(): Promise<ICategory[]> {
-        return await Category.find({}, { name: 1 });
+        const leanDoc= await this.findAll()
+        return this.transformAllToObjects(leanDoc)
     }
 
     async getCategoryByName(name: string): Promise<ICategory | null> {
@@ -19,11 +23,13 @@ export class CategoryRepository implements ICategoryRepository {
     }
 
     async getCategoryById(id: string): Promise<ICategory | null> {
-        return await Category.findById(id);
+        const leanDoc= await this.findById(id)
+        return this.transformToObject(leanDoc)
     }
 
     async updateCategory(id: string, updateData: Partial<ICategory>): Promise<ICategory | null> {
-        return await Category.findByIdAndUpdate(id, updateData, { new: true });
+        const leanDoc= await this.updateById(id,updateData)
+return this.transformToObject(leanDoc)
     }
 
     async deleteCategory(id: string): Promise<boolean> {

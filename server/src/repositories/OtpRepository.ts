@@ -1,13 +1,17 @@
 import { injectable } from 'inversify';
 import OTP, { IOtp } from '../models/otp.model';
 import { IOtpRepository } from '../core/interfaces/repositories/IOtpRepository';
+import { BaseRepository } from './BaseRepository';
+import { LeanDocument } from 'mongoose';
 
 @injectable()
-export class OtpRepository implements IOtpRepository {
+export class OtpRepository extends BaseRepository<IOtp> implements IOtpRepository {
+    constructor(){
+        super(OTP)
+    }
     async saveOTP(email: string, otp: string, expiresAt: Date): Promise<IOtp> {
         try {
-            const otpRecord = await OTP.create({ email, otp, expiresAt });
-            return otpRecord.toObject();
+         return await this.create({ email, otp, expiresAt });
         } catch (error) {
             console.error(`Error saving OTP for ${email}:`, error);
             throw new Error('Failed to save OTP');
@@ -34,9 +38,9 @@ export class OtpRepository implements IOtpRepository {
         }
     }
 
-    async findByEmail(email: string): Promise<IOtp | null> {
+    async findByEmail(email: string): Promise<LeanDocument<IOtp> | null> {
         try {
-            return await OTP.findOne({ email }).lean();
+            return await this.findOne({ email })
         } catch (error) {
             console.error(`Error finding OTP by email ${email}:`, error);
             throw new Error('Failed to find OTP by email');
