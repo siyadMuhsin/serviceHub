@@ -5,7 +5,7 @@ const get_expert=async()=>{
         const response= await expertAPI.get('/fetch-data')
         return response.data
     } catch (error) {
-        return {success:false,error:error.response.data}
+        throw new Error(error.response.data.message)
         
     }
 }

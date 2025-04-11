@@ -13,4 +13,5 @@ export interface IExpertRepository {
     findNearbyExperts(lat:number,lng:number,distanceInKm:number,serviceId:string):Promise<any[] |null>
     getExpertDataToUser(userlat:number,userlng:number,distanceInKm:number,experId:string):Promise<IExpert|null>
     findDistanceLocation(userLng:number,userLat:number):Promise<any>
+   
 }

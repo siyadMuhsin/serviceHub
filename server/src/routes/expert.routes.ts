@@ -1,4 +1,4 @@
-import express,{Request,Response} from "express";
+import express,{NextFunction, Request,Response} from "express";
 import multer from "multer";
 import container from "../di/container";
 import { IExpertController } from "../core/interfaces/controllers/IExpertController";
@@ -9,6 +9,7 @@ import { IPlansController } from "../core/interfaces/controllers/IPlansControlle
 import { IPaymentController } from "../core/interfaces/controllers/IPaymentController";
 import { verify } from "crypto";
 import { ITokenController } from "../core/interfaces/controllers/ITokenController";
+import { ISlotController } from "../core/interfaces/controllers/ISlotController";
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -18,6 +19,7 @@ const expertProfileController= container.get<IExpertProfileController>(TYPES.Exp
 const plansController= container.get<IPlansController>(TYPES.PlansController)
 const tokenController = container.get<ITokenController>(TYPES.TokenController);
 const paymentController=container.get<IPaymentController>(TYPES.PaymentController)
+const slotController= container.get<ISlotController>(TYPES.SlotController)
 const authMiddleware= container.get<IAuthMiddleware>(TYPES.AuthMiddleware)
 
 router.post("/create", upload.single("certificate"),authMiddleware.verifyToken.bind(authMiddleware),expertController.createExpert.bind(expertController));
@@ -35,10 +37,14 @@ router.post('/profile/location',verifyExpert,expertProfileController.updateLocat
 router.post('/profile/image',verifyExpert,upload.single('image'),expertProfileController.imagesUpload.bind(expertProfileController))
 router.delete('/profile/image',verifyExpert,expertProfileController.deleteImage.bind(expertProfileController))
 router.post('/auth/refresh',tokenController.refreshToken.bind(tokenController))
+
+// slot management
+router.post('/booking',test,verifyExpert,slotController.addExpertSlot.bind(slotController))
 export default router;
 
-function test(req:Request,res:Response){
+function test(req:Request,res:Response,next:NextFunction){
 
     console.log('working')
+    next()
 
 }

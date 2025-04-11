@@ -1,4 +1,8 @@
+import { BookingController } from "../controllers/booking.controller";
+import { SlotController } from "../controllers/Expert/slot.controller";
 import { PlanRepository } from "../repositories/Admin/plans.repository";
+import { SlotRepository } from "../repositories/Expert/slot.repository";
+import { SlotServices } from "../services/Expert/slot.service";
 
 export const TYPES = {
   // Repositories
@@ -50,4 +54,11 @@ export const TYPES = {
   //user
   UserExpertController: Symbol.for("UserExpertController"),
   UserExpertService: Symbol.for("UserExpertService"),
+
+
+  SlotController:Symbol.for('SlotController'),
+  SlotServices:Symbol.for('SlotServices'),
+  SlotRepository:Symbol.for('SlotRepository'),
+  //booking
+  BookingController:Symbol.for('BookingController')
 };

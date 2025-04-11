@@ -38,4 +38,5 @@ export interface IExpertService {
         accessToken?: string;
         refreshToken?: string;
     }>;
+    checkBlocked(expertId:string):Promise<boolean|{success:boolean,message:string}>
 }

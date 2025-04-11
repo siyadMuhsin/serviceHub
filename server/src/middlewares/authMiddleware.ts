@@ -33,8 +33,6 @@ export class AuthMiddleware implements IAuthMiddleware {
                 this.sendErrorResponse(res, HttpStatus.FORBIDDEN, "Your account has been blocked by the admin.");
                 return;
             }
-            console.log(decoded)
-            
             req.user = decoded;
             next();
         } catch (err) {
@@ -54,6 +52,14 @@ export class AuthMiddleware implements IAuthMiddleware {
             if (decoded.role !== 'expert' || !decoded.expertId) {
                 this.sendErrorResponse(res, HttpStatus.FORBIDDEN, 'Access denied: Not an expert');
                 return;
+            }
+            const isBlocked = await this.authMiddlewareService.checkExpertBlocked(decoded.expertId);
+            if(isBlocked){
+                res.clearCookie('accessToken')
+                res.clearCookie('refreshToken')
+                  this.sendErrorResponse(res, HttpStatus.FORBIDDEN, "Your account has been blocked by the admin.");
+                  return;
+
             }
 
             req.expert = decoded;

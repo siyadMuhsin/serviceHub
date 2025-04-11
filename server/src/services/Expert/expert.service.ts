@@ -20,7 +20,6 @@ export class ExpertService implements IExpertService {
         if (existingName && existingName.userId._id.toString() !== userId) {
             throw new Error("The Account Name is already used by another expert");
         }
-
         const user = await this.userRepository.findUserById(userId);
         if (!user) {
             throw new Error("User not found");
@@ -30,7 +29,6 @@ export class ExpertService implements IExpertService {
                 expertStatus: 'pending',
             });
         }
-
         const result: any = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
                 {
@@ -48,15 +46,12 @@ export class ExpertService implements IExpertService {
             );
             uploadStream.end(file.buffer);
         });
-
         if (!result || !result.secure_url) {
             throw new Error("Cloudinary upload failed");
         }
-
         const url = result.secure_url;
         let response;
         const existingExpert = await this.expertRepository.findOne({ userId: userId });
-
         if (existingExpert) {
             response = await this.expertRepository.findByIdAndUpdate(
                 existingExpert._id,
@@ -73,18 +68,14 @@ export class ExpertService implements IExpertService {
                 status: 'pending'
             }, userId);
         }
-
         await this.userRepository.findByIdAndUpdate(userId, { 
             expertStatus: "pending",
         });
-
         return response;
     }
-
     async getExperts(): Promise<IExpert[]> {
         return await this.expertRepository.getExperts();
     }
-
     async getExpertBy_limit(page: number, limit: number, filter: string, search: string) {
         try {
             const query: any = {};
@@ -108,6 +99,19 @@ export class ExpertService implements IExpertService {
         }
     }
 
+     async checkBlocked(id: string):Promise<boolean|{success:boolean,message:string}> {
+        try {
+            const expert = await this.expertRepository.findById(id);
+            
+            return expert?.isBlocked ?true:false;
+        } catch (error) {
+            console.error("Error checking user block status:", error);
+            return { 
+                success: false, 
+                message: "Failed to check user status" 
+            };
+        }
+    }
     async actionChange(id: string, action: string,reason?:string) {
         try {
             const existingExpert = await this.expertRepository.findById(id);
@@ -136,13 +140,15 @@ export class ExpertService implements IExpertService {
     }
 
     async block_unblock(id: string, active: boolean) {
+        console.log('block expert')
         try {
             const expert = await this.expertRepository.findById(id);
             if (!expert) {
                 return { success: false, message: 'Expert does not exist' };
             }
             const query: any = {};
-            query.isActive = !active;
+            console.log(active)
+            query.isBlocked = active;
             const updatedExpert = await this.expertRepository.findByIdAndUpdate(id, query);
             if (!updatedExpert) {
                 return { success: false, message: 'Failed to update expert status' };
@@ -180,6 +186,9 @@ export class ExpertService implements IExpertService {
             }
             if (expert.status !== 'approved') {
                 return { success: false, message: "Your request has not been accepted" };
+            }
+            if(expert.isBlocked){
+                return {success:false,message:"Your Account has been blocked"}
             }
             const accessToken = generateAccessToken(userId, 'expert', expert.id);
             const refreshToken = generateRefreshToken(userId, 'expert', expert.id);

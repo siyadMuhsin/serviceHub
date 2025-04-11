@@ -8,6 +8,7 @@ import { IExpertController } from "../core/interfaces/controllers/IExpertControl
 import { IProfileController } from "../core/interfaces/controllers/IProfileController";
 import upload from "../config/multer";
 import { IUserExpertController } from "../core/interfaces/controllers/IUserExpertController";
+import { IBookingController } from "../core/interfaces/controllers/IBookingController";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ const servicesController = container.get<IServiceController>(TYPES.ServiceContro
 const profileController = container.get<IProfileController>(TYPES.ProfileController);
 const userExpertController = container.get<IUserExpertController>(TYPES.UserExpertController);
 const expertController = container.get<IExpertController>(TYPES.ExpertController);
-
+const bookingController= container.get<IBookingController>(TYPES.BookingController)
 // ✅ Protected Category Routes
 router.get('/categories', verifyUser, categoryController.categoriesByLimit.bind(categoryController));
 router.get('/categories/all', verifyUser, categoryController.getAllCategories.bind(categoryController));
@@ -41,5 +42,6 @@ router.get('/expert', verifyUser, profileController.getExistingExpert.bind(profi
 // ✅ User-Expert Routes
 router.get('/user/expert/service/:serviceId', verifyUser, userExpertController.getExpertSpecificService.bind(userExpertController));
 router.get('/user/expert/:expertId', verifyUser, userExpertController.getExpertDetails.bind(userExpertController));
+router.post('/book',verifyUser,bookingController.bookingCreate.bind(bookingController))
 
 export default router;

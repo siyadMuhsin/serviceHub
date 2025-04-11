@@ -65,6 +65,14 @@ import { IUserExpertController } from '../core/interfaces/controllers/IUserExper
 import { UserExpertController } from '../controllers/User/user.expert.controller';
 import { IUserExpertService } from '../core/interfaces/services/IUserExpertService';
 import { UserExpertService } from '../services/User/user.expert.service';
+import { IBookingController } from '../core/interfaces/controllers/IBookingController';
+import { BookingController } from '../controllers/booking.controller';
+import { ISlotController } from '../core/interfaces/controllers/ISlotController';
+import { SlotController } from '../controllers/Expert/slot.controller';
+import { ISlotService } from '../core/interfaces/services/ISlotService';
+import { SlotServices } from '../services/Expert/slot.service';
+import { ISlotRespository } from '../core/interfaces/repositories/ISlotRepository';
+import { SlotRepository } from '../repositories/Expert/slot.repository';
 
 const container = new Container();
 
@@ -87,6 +95,7 @@ container.bind<IProfileController>(TYPES.ProfileController).to(ProfileController
 container.bind<AuthMiddlewareService>(TYPES.AuthMiddlewareService)
     .toDynamicValue(() => new AuthMiddlewareService(
         container.get<IUserService>(TYPES.UserService),
+        container.get<IExpertService>(TYPES.ExpertService),
         process.env.ACCESS_SECRET as string
     ));
 container.bind<IAuthMiddleware>(TYPES.AuthMiddleware).to(AuthMiddleware);
@@ -118,4 +127,12 @@ container.bind<IExpertProfileService>(TYPES.ExpertProfileService).to(ExpertProfi
 //user
 container.bind<IUserExpertController>(TYPES.UserExpertController).to(UserExpertController)
 container.bind<IUserExpertService>(TYPES.UserExpertService).to(UserExpertService)
+
+//slot
+container.bind<ISlotController>(TYPES.SlotController).to(SlotController)
+container.bind<ISlotService>(TYPES.SlotServices).to(SlotServices)
+container.bind<ISlotRespository>(TYPES.SlotRepository).to(SlotRepository)
+//booking
+container.bind<IBookingController>(TYPES.BookingController).to(BookingController)
+
 export default container;

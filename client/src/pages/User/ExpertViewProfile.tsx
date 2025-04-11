@@ -95,12 +95,6 @@ export default function ExpertViewProfile() {
               <MessageCircle size={18} />
               Message
             </button>
-            
-            <button className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition flex items-center gap-2">
-              <Bookmark size={18} />
-              Saved
-            </button>
-            
             <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-green-100 text-green-600 rounded-full">
               <CheckCircle size={18} />
               <span>Available</span>
