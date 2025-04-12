@@ -39,7 +39,9 @@ router.delete('/profile/image',verifyExpert,expertProfileController.deleteImage.
 router.post('/auth/refresh',tokenController.refreshToken.bind(tokenController))
 
 // slot management
-router.post('/booking',test,verifyExpert,slotController.addExpertSlot.bind(slotController))
+router.post('/slot',test,verifyExpert,slotController.addExpertSlot.bind(slotController))
+router.get('/slots',verifyExpert,slotController.getSlotsToExpert.bind(slotController))
+router.delete('/slot/:slotId',verifyExpert,slotController.deleteSlot.bind(slotController))
 export default router;
 
 function test(req:Request,res:Response,next:NextFunction){

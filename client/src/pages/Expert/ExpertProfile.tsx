@@ -23,6 +23,7 @@ import {
   CreditCard
 } from 'lucide-react'
 import { fetchLocationFromCoordinates } from '@/components/Location/FethLocation'
+import ExpertSLot from '@/components/Expert/ExpertSLot'
 
 function ExpertProfile() {
   const [expertData, setExpertData] = useState<IExpert | null>(null)
@@ -191,7 +192,6 @@ function ExpertProfile() {
       </div>
 
       <ExpertLocationCard expertData={expertData} />
-
       {/* Account & Status Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-lg shadow-md p-6">

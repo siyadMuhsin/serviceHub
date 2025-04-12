@@ -26,4 +26,31 @@ export class SlotServices implements ISlotService {
       return { success: false, message: "Server error" };
     }
   }
+  async getExpertSlots(expertId: string): Promise<{ success: boolean; message: string; slots?: ISlot[]; }> {
+    try {
+      const slots= await this.slotRespository.getAllSlots(expertId)
+      return {success:true,message:"slot Get in successfully" ,slots:slots}
+    } catch (error:any) {
+      throw new Error(error.message)
+    }
+  }
+  async deleteSlot(expertId: string, slot_Id: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const slot = await this.slotRespository.findSlotById(slot_Id);
+  
+      if (!slot) {
+        return { success: false, message: "Slot not found" };
+      }
+  
+      if (slot.expertId.toString() !== expertId.toString()) {
+        return { success: false, message: "Unauthorized: This slot doesn't belong to the expert" };
+      }
+  
+      await this.slotRespository.deleteSlot(slot_Id);
+  
+      return { success: true, message: "Slot deleted successfully" };
+    } catch (error) {
+      return { success: false, message: "Server error while deleting slot" };
+    }
+  }
 }

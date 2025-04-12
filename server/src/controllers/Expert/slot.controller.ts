@@ -4,6 +4,7 @@ import { AuthRequest } from "../../types/User";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../../di/types";
 import { ISlotService } from "../../core/interfaces/services/ISlotService";
+import { HttpStatus } from "../../types/httpStatus";
 
 @injectable()
 export class SlotController implements ISlotController {
@@ -30,4 +31,32 @@ export class SlotController implements ISlotController {
       res.status(500).json({ success: false, message: "Server error" });
     }
   }
+  async getSlotsToExpert(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const expertId= req?.expert?.expertId
+      const response=await this.slotService.getExpertSlots(expertId)
+      this.sendResponse(res,response,HttpStatus.OK)
+    } catch (error:any) {
+      this.sendResponse(res,{message:error.message||"Internal server error"},HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+  async deleteSlot(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const expertId = req?.expert?.expertId;
+      const { slotId } = req.params;
+      if (!slotId) {
+        res.status(400).json({ success: false, message: "Slot ID is required" });
+        return;
+      }
+      const result = await this.slotService.deleteSlot(expertId, slotId);
+     this.sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+    } catch (error) {
+      console.error("Error deleting slot:", error);
+      this.sendResponse(res,{ success: false, message: "Internal server error" },HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+    private sendResponse(res: Response, data: any, status: HttpStatus): void {
+          res.status(status).json(data);
+      }
+  
 }

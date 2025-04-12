@@ -6,4 +6,13 @@ export interface ISlotService{
         message:string,
         slot?:ISlot 
     }>
+    getExpertSlots(expertId:string):Promise<{
+        success:boolean,
+        message:string,
+        slots?:ISlot[]
+    }>
+    deleteSlot(expertId:string,slot_Id:string):Promise<{
+        success:boolean,
+        message:string
+    }>
 }

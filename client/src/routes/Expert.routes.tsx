@@ -5,6 +5,7 @@ import Dashboard from '@/pages/Expert/Dashboard';
 import ProtectedExpertRoute from './Protect.routes';
 import SubscriptionPage from '@/pages/Expert/SubscriptionPage';
 import ExpertProfile from '@/pages/Expert/ExpertProfile';
+import ExpertSlot from '@/components/Expert/ExpertSLot';
 
 const ExpertRoutes = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -22,6 +23,7 @@ const ExpertRoutes = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path='/subscription' element={<SubscriptionPage/>} />
             <Route path='/profile' element={<ExpertProfile/>} />
+            <Route path='/slot-management' element={<ExpertSlot/>} />
             {/* Add more routes here as needed */}
           </Routes>
         </div>
