@@ -22,7 +22,7 @@ const ExpertSidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({ on
 
   const menuItems = [
     { icon: <LayoutDashboard className="w-5 h-5" />, text: "Dashboard", path: "/expert/" },
-    { icon: <ClipboardList className="w-5 h-5" />, text: "Service Requests", path: "/expert/service-requests" },
+    { icon: <ClipboardList className="w-5 h-5" />, text: "Booking Management", path: "/expert/service-management" },
     { icon: <CalendarClock className="w-5 h-5" />, text: "Slot Management", path: "/expert/slot-management" },
     { icon: <MessageCircle className="w-5 h-5" />, text: "Messages", path: "/expert/messages" },
     { icon: <Star className="w-5 h-5" />, text: "Reviews & Ratings", path: "/expert/reviews" },

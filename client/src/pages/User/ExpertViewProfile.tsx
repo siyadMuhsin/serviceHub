@@ -4,10 +4,12 @@ import { IExpert } from '@/Interfaces/interfaces';
 import { useParams } from 'react-router-dom';
 import { getExpertDetails } from '@/services/User/expert.service';
 import { toast } from 'react-toastify';
+import BookingModal from '@/components/User/modals/BookingModal';
 
 export default function ExpertViewProfile() {
   const [activeTab, setActiveTab] = useState('All Projects');
   const [expertData, setExpertData] = useState<IExpert | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); 
   const { expertId } = useParams();
   
 
@@ -27,6 +29,8 @@ export default function ExpertViewProfile() {
   if (!expertData) {
     return <div className="max-w-6xl mx-auto p-6 bg-white">Loading...</div>;
   }
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   // Calculate years of experience from the dob and experience fields
   const dobDate = new Date(expertData.dob);
@@ -87,7 +91,10 @@ export default function ExpertViewProfile() {
           
           {/* Action Buttons */}
           <div className="mt-6 flex flex-wrap gap-3">
-            <button className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition flex items-center gap-2">
+          <button
+              className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition flex items-center gap-2"
+              onClick={openModal} // Open the modal when "Book Now" is clicked
+            >
               Book Now
             </button>
             
@@ -146,6 +153,13 @@ export default function ExpertViewProfile() {
           </div>
         </div>
       </div>
+      {isModalOpen && (
+  <BookingModal
+    expert={expertData}
+    isOpen={isModalOpen}
+    onClose={closeModal}
+  />
+)}
     </div>
   );
 }

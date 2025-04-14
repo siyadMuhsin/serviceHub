@@ -3,5 +3,6 @@ import { AuthRequest } from "../../../types/User";
 
 export interface IBookingController{
     bookingCreate(req:AuthRequest,res:Response):Promise<void>
+    getBookingToExpert(req:AuthRequest,res:Response):Promise<void>
 
 }

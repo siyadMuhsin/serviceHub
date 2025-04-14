@@ -7,6 +7,8 @@ import SubscriptionPage from '@/pages/Expert/SubscriptionPage';
 import ExpertProfile from '@/pages/Expert/ExpertProfile';
 import ExpertSlot from '@/components/Expert/ExpertSLot';
 
+import BookingMangement from '@/pages/Expert/BookingManagement';
+
 const ExpertRoutes = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
 
@@ -24,6 +26,7 @@ const ExpertRoutes = () => {
             <Route path='/subscription' element={<SubscriptionPage/>} />
             <Route path='/profile' element={<ExpertProfile/>} />
             <Route path='/slot-management' element={<ExpertSlot/>} />
+            <Route path='/service-management' element={<BookingMangement/>} />
             {/* Add more routes here as needed */}
           </Routes>
         </div>

@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { ISlotController } from "../../core/interfaces/controllers/ISlotController";
 import { AuthRequest } from "../../types/User";
 import { inject, injectable } from "inversify";
@@ -53,6 +53,20 @@ export class SlotController implements ISlotController {
     } catch (error) {
       console.error("Error deleting slot:", error);
       this.sendResponse(res,{ success: false, message: "Internal server error" },HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+  async getSlotToUser(req: Request, res: Response): Promise<void> {
+    
+    try {
+      const {expertId}=req.params
+      if(!expertId){
+        this.sendResponse(res,{success:false,message:"Expert ID is missing"},HttpStatus.BAD_REQUEST)
+        return
+      }
+      const result= await this.slotService.getExpertSlots(expertId)
+      this.sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+    } catch (error) {
+      this.sendResponse(res,{message:"Internal server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
     private sendResponse(res: Response, data: any, status: HttpStatus): void {

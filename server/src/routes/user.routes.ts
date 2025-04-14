@@ -9,6 +9,7 @@ import { IProfileController } from "../core/interfaces/controllers/IProfileContr
 import upload from "../config/multer";
 import { IUserExpertController } from "../core/interfaces/controllers/IUserExpertController";
 import { IBookingController } from "../core/interfaces/controllers/IBookingController";
+import { ISlotController } from "../core/interfaces/controllers/ISlotController";
 
 const router = Router();
 
@@ -20,6 +21,7 @@ const servicesController = container.get<IServiceController>(TYPES.ServiceContro
 const profileController = container.get<IProfileController>(TYPES.ProfileController);
 const userExpertController = container.get<IUserExpertController>(TYPES.UserExpertController);
 const expertController = container.get<IExpertController>(TYPES.ExpertController);
+const slotController= container.get<ISlotController>(TYPES.SlotController)
 const bookingController= container.get<IBookingController>(TYPES.BookingController)
 // ✅ Protected Category Routes
 router.get('/categories', verifyUser, categoryController.categoriesByLimit.bind(categoryController));
@@ -42,6 +44,7 @@ router.get('/expert', verifyUser, profileController.getExistingExpert.bind(profi
 // ✅ User-Expert Routes
 router.get('/user/expert/service/:serviceId', verifyUser, userExpertController.getExpertSpecificService.bind(userExpertController));
 router.get('/user/expert/:expertId', verifyUser, userExpertController.getExpertDetails.bind(userExpertController));
-router.post('/book',verifyUser,bookingController.bookingCreate.bind(bookingController))
+router.get('/slots/:expertId',verifyUser,slotController.getSlotToUser.bind(slotController))
+router.post('/book',verifyUser,upload.array('images' ,5),bookingController.bookingCreate.bind(bookingController))
 
 export default router;

@@ -1,42 +1,40 @@
-// models/booking.model.ts or booking.schema.ts
-
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IBooking extends Document {
   userId: mongoose.Types.ObjectId;
   expertId: mongoose.Types.ObjectId;
-  serviceId?: mongoose.Types.ObjectId;
+  slotId: mongoose.Types.ObjectId;
+  time: string;
   date: Date;
-  timeSlot: string;
-  userLocation?: {
-    type: "Point";
-    coordinates: [number, number]; // [lng, lat]
-  };
   notes?: string;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  images?: string[]; // file URLs or paths
+  location?: {address:string, type: string, coordinates: number[] }; // GeoJSON format
+  status: "pending" | "confirmed" | "cancelled";
   createdAt: Date;
 }
 
-const BookingSchema: Schema = new Schema<IBooking>({
+const BookingSchema = new Schema<IBooking>({
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   expertId: { type: Schema.Types.ObjectId, ref: "Expert", required: true },
-  serviceId: { type: Schema.Types.ObjectId, ref: "Service" },
+  slotId: { type: Schema.Types.ObjectId, ref: "Slot", required: true },
+  time: { type: String, required: true },
   date: { type: Date, required: true },
-  timeSlot: { type: String, required: true },
-  userLocation: {
-    type: {
-      type: String,
-      enum: ["Point"],
-      default: "Point",
-    },
+  notes: { type: String },
+  images: {
+    type: [String],
+    default: [],
+  },
+  location: {
+    address:{type:String},
+    type: { type: String, enum: ['Point'], default: 'Point' },
     coordinates: {
       type: [Number], // [lng, lat]
+      default: undefined,
     },
   },
-  notes: { type: String },
   status: {
     type: String,
-    enum: ["pending", "confirmed", "completed", "cancelled"],
+    enum: ["pending", "confirmed", "cancelled"],
     default: "pending",
   },
   createdAt: {
@@ -44,5 +42,8 @@ const BookingSchema: Schema = new Schema<IBooking>({
     default: Date.now,
   },
 });
+
+// 2dsphere index for geolocation features
+BookingSchema.index({ location: "2dsphere" });
 
 export const Booking = mongoose.model<IBooking>("Booking", BookingSchema);

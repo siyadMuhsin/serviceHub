@@ -60,5 +60,7 @@ export const TYPES = {
   SlotServices:Symbol.for('SlotServices'),
   SlotRepository:Symbol.for('SlotRepository'),
   //booking
-  BookingController:Symbol.for('BookingController')
+  BookingController:Symbol.for('BookingController'),
+  BookingService:Symbol.for('BookingService'),
+  BookingRepository:Symbol.for('BookingRepository')
 };

@@ -1,4 +1,5 @@
 import { expertAPI } from "config/axiosConfig"
+import { LIMIT } from "styled-components/dist/utils/createWarnTooManyClasses"
 
 const get_expert=async()=>{
     try {
@@ -35,4 +36,15 @@ return response.data
         throw new Error(error.response.data.message ||'Payment verification failed')
     }
 }
-export {get_expert,availbalePlans,purchaseSubscription,verifyPayment}
+const getBookingsToExpert=async(status?: string,page?: number,limit?: number)=>{
+    try {
+        const response= await expertAPI.get(`/booking?status=${status}&page=${page}&limit=${limit}`)
+        return response.data
+    } catch (error) {
+        throw new Error(error.response.data.message)
+    }
+}
+const updateBookingStatus=async(id:string,status:string)=>{
+
+}
+export {get_expert,availbalePlans,purchaseSubscription,verifyPayment,getBookingsToExpert, updateBookingStatus}
