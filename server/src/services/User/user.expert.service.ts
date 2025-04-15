@@ -26,7 +26,6 @@ export class UserExpertService implements IUserExpertService{
                 const [userLng ,userLat]= user.location?.coordinates
                 const experts= await this.expertResposity.findNearbyExperts(userLat,userLng,25,serviceId)
                 // const res= await this.expertResposity.findDistanceLocation(userLng,userLat)
-                console.log(experts)
                 const result:any=experts?.map((item)=>{
                     return{_id:item._id,
                         name:item.userId.name,

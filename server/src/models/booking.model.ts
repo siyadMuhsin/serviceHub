@@ -9,7 +9,8 @@ export interface IBooking extends Document {
   notes?: string;
   images?: string[]; // file URLs or paths
   location?: {address:string, type: string, coordinates: number[] }; // GeoJSON format
-  status: "pending" | "confirmed" | "cancelled";
+  cancellationReason?:string
+  status:string;
   createdAt: Date;
 }
 
@@ -34,9 +35,10 @@ const BookingSchema = new Schema<IBooking>({
   },
   status: {
     type: String,
-    enum: ["pending", "confirmed", "cancelled"],
+    enum: ["pending", "confirmed","completed", "cancelled"],
     default: "pending",
   },
+  cancellationReason:{type:String},
   createdAt: {
     type: Date,
     default: Date.now,

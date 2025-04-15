@@ -42,6 +42,7 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
     }
   }
 
+  
 
   async updateById(id: string, update: Partial<T>): Promise<LeanDocument<T> | null> {
     try {

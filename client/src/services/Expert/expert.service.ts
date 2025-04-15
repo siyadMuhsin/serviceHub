@@ -1,4 +1,5 @@
 import { expertAPI } from "config/axiosConfig"
+import NoWorkResult_ from "postcss/lib/no-work-result"
 import { LIMIT } from "styled-components/dist/utils/createWarnTooManyClasses"
 
 const get_expert=async()=>{
@@ -44,7 +45,17 @@ const getBookingsToExpert=async(status?: string,page?: number,limit?: number)=>{
         throw new Error(error.response.data.message)
     }
 }
-const updateBookingStatus=async(id:string,status:string)=>{
+const updateBookingStatus=async(bookingId:string,status:string,reason?:string)=>{
+    try{
+        console.log(status,reason);
+        
+        const response= await expertAPI.patch(`/booking/${bookingId}`,{status,reason})
+        return response.data
+    }catch(error){
+        console.log(error)
+        throw new Error(error.response.data.message)
+
+    }
 
 }
 export {get_expert,availbalePlans,purchaseSubscription,verifyPayment,getBookingsToExpert, updateBookingStatus}

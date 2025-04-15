@@ -12,4 +12,5 @@ export interface IUserRepository {
   findOneBYToken(token: string): Promise<IUser | null>;
   findByIdClearToken(token:string,password:string):Promise <IUser |null>;
   getExpertByUserId(id:string):Promise<IExpert |null>
+  findById(id:string):Promise<LeanDocument<IUser> |null>
 }

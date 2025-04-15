@@ -47,4 +47,6 @@ router.get('/user/expert/:expertId', verifyUser, userExpertController.getExpertD
 router.get('/slots/:expertId',verifyUser,slotController.getSlotToUser.bind(slotController))
 router.post('/book',verifyUser,upload.array('images' ,5),bookingController.bookingCreate.bind(bookingController))
 
+router.get('/bookings',verifyUser,bookingController.getUserBooking.bind(bookingController))
+router.patch('/bookings/:bookingId',verifyUser,bookingController.userCancelBooking.bind(bookingController))
 export default router;

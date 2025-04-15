@@ -46,6 +46,7 @@ router.get('/slots',verifyExpert,slotController.getSlotsToExpert.bind(slotContro
 router.delete('/slot/:slotId',verifyExpert,slotController.deleteSlot.bind(slotController))
 //booking management
 router.get('/booking',verifyExpert,bookingController.getBookingToExpert.bind(bookingController))
+router.patch('/booking/:bookingId',verifyExpert,bookingController.bookingStatusChange.bind(bookingController))
 export default router;
 
 function test(req:Request,res:Response,next:NextFunction){

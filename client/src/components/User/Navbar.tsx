@@ -167,14 +167,23 @@ const {userLocation}=useSelector((state:any)=>state.location)
                   <Link
                     to="/profile"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={()=>setDropdownOpen(false)}
                   >
                     Profile
                   </Link>
                   <Link
                     to="/saved-services"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={()=>setDropdownOpen(false)}
                   >
                     Saved Services
+                  </Link>
+                  <Link
+                  to={'/bookings'}
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={()=>setDropdownOpen(false)}
+                  >
+                    Bookings
                   </Link>
                   <button
                     onClick={() => setShowLogoutModal(true)}
@@ -224,6 +233,12 @@ const {userLocation}=useSelector((state:any)=>state.location)
                 onClick={() => setMenuOpen(false)}
               >
                 Saved Services
+              </Link>
+              <Link 
+              to={'/bookings'}
+              className="block py-2 px-6 hover:bg-gray-100"
+              onClick={()=>setMenuOpen(false)}
+              >
               </Link>
               <button
                 onClick={() => {

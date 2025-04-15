@@ -6,4 +6,5 @@ export interface ISlotRespository{
     getAllSlots(expertId:string):Promise<ISlot[] |[]>
     deleteSlot(slot_id:string):Promise<void>
     findSlotById(slot_Id:string):Promise<ISlot | null>
+    updateSlotById(slot_Id:string,udpate:Partial<ISlot>):Promise<ISlot | null>
 }

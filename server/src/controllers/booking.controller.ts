@@ -82,6 +82,69 @@ if(coordinates.length<0){
     }
   }
   
+  async bookingStatusChange(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const expertId = req.expert.expertId;
+      const { bookingId } = req.params;
+      const { status ,reason} = req.body;
+      
+  
+      if (!expertId || !bookingId || !status) {
+        this.sendResponse(res, { message: "Missing required fields." }, HttpStatus.BAD_REQUEST);
+        return;
+      }
+  
+      const result = await this.bookingService.changeStatus(expertId, bookingId, status,reason);
+  
+      if (!result.success) {
+        this.sendResponse(res, { message: result.message }, HttpStatus.BAD_REQUEST);
+        return;
+      }
+  
+      this.sendResponse(res, {
+        success: true,
+        message: "Booking status updated successfully",
+        status: result.status,
+      }, HttpStatus.OK);
+  
+    } catch (error: any) {
+      console.error("Status change error:", error.message);
+      this.sendResponse(res, { message: "Internal server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getUserBooking(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const userId = req.user.userId;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 8;
+      
+      const result = await this.bookingService.userBookings(userId, page, limit);
+      this.sendResponse(res, result, result.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    } catch (error:any) {
+      this.sendResponse(res, {
+        success: false,
+        message: error.message || 'Failed to fetch bookings'
+      }, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  async userCancelBooking(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const { bookingId } = req.params;
+      const userId = req.user.userId;
+      const result = await this.bookingService.userCancelBooking(bookingId, userId);
+      this.sendResponse(
+        res,
+        result,
+        result.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST
+      );
+    } catch (error:any) {
+      this.sendResponse(
+        res,{success: false,message: error.message || 'Failed to cancel booking'},
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
   private sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }

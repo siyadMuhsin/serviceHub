@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import { IExpert } from "@/Interfaces/interfaces";
 import { Calendar, Image as ImageIcon, MapPin, Edit3, X } from "lucide-react";
 import { toast } from "react-toastify";
-import { getAvailableSlots, handlingBooking } from "@/services/User/expert.service";
+import {
+  getAvailableSlots,
+  handlingBooking,
+} from "@/services/User/expert.service";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +35,7 @@ interface LocationData {
 }
 
 interface TimeSlot {
-  _id:string
+  _id: string;
   date: string;
   timeSlots: string[];
 }
@@ -51,7 +54,7 @@ export default function BookingModal({
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [slots, setSlots] = useState<TimeSlot[]>([]);
-  const [slotId,setSlotId]=useState('')
+  const [slotId, setSlotId] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [locationLoading, setLocationLoading] = useState(false);
@@ -62,7 +65,7 @@ export default function BookingModal({
     address: string;
     coordinates?: { lat: number; lng: number };
   } | null>(null);
-const {userLocation} =useSelector((state:any)=>state.location)
+  const { userLocation } = useSelector((state: any) => state.location);
   // Fetch available slots when modal opens
   useEffect(() => {
     const fetchSlots = async () => {
@@ -85,11 +88,13 @@ const {userLocation} =useSelector((state:any)=>state.location)
       setImages([]);
       setImagePreviews([]);
       setManualLocation("");
-      setLocation({address:userLocation.address,coordinates:{lat:userLocation.lat,lng:userLocation.lng}});
+      setLocation({
+        address: userLocation.address,
+        coordinates: { lat: userLocation.lat, lng: userLocation.lng },
+      });
       setIsEditingLocation(false);
     }
   }, [expert._id]);
-
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -206,7 +211,7 @@ const {userLocation} =useSelector((state:any)=>state.location)
   };
 
   const currentDateSlots =
-  slots.find((slot) => slot._id === slotId)?.timeSlots || [];
+    slots.find((slot) => slot._id === slotId)?.timeSlots || [];
 
   const handleSubmit = async () => {
     if (!selectedSlot) {
@@ -220,25 +225,24 @@ const {userLocation} =useSelector((state:any)=>state.location)
     }
 
     try {
-      setLoading(true)
+      setLoading(true);
 
-      const coordinates=[location.coordinates.lng,location.coordinates.lat]
+      const coordinates = [location.coordinates.lng, location.coordinates.lat];
       const formData = new FormData();
       formData.append("expertId", expert._id);
       formData.append("time", selectedSlot.split("|")[1]);
       formData.append("date", selectedDate);
       formData.append("notes", notes);
-      formData.append('slotId',slotId)
+      formData.append("slotId", slotId);
       formData.append("location", JSON.stringify(coordinates));
-      formData.append("address",location.address)
+      formData.append("address", location.address);
 
       images.forEach((image) => {
         formData.append("images", image);
       });
 
-      const response= await handlingBooking(formData)
-      console.log(response)
- 
+      const response = await handlingBooking(formData);
+      console.log(response);
 
       toast.success("Booking created successfully!");
       onClose();
@@ -249,9 +253,7 @@ const {userLocation} =useSelector((state:any)=>state.location)
     }
   };
 
-
   const formatDate = (dateString: string) => {
-
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       weekday: "short",
@@ -263,56 +265,58 @@ const {userLocation} =useSelector((state:any)=>state.location)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             Book a Session with {expert.userId.name}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 max-w-96">
+        <div className="space-y-4 max-w-96 pb-4">
           {/* Date Selector */}
           <div className="space-y-2">
             <Label className="font-medium">Select Date</Label>
             <Select
-  value={slotId}
-  onValueChange={(val) => {
-    setSlotId(val);
-    const selectedSlot = slots.find((slot) => slot._id === val);
-    if (selectedSlot) {
-      setSelectedDate(selectedSlot.date);
-    }
-  }}
-  disabled={slots.length === 0}
->
-  <SelectTrigger className="w-full">
-    <div className="flex items-center gap-2">
-      <Calendar className="h-4 w-4" />
-      <SelectValue
-        placeholder={
-          slots.length === 0 ? "No dates available" : "Select a date"
-        }
-      >
-        {selectedDate ? formatDate(selectedDate) : ""}
-      </SelectValue>
-    </div>
-  </SelectTrigger>
-  <SelectContent>
-    <ScrollArea className="h-60">
-      <SelectGroup>
-        {slots.length > 0 ? (
-          slots.map((slot) => (
-            <SelectItem key={slot._id} value={slot._id}>
-              {formatDate(slot.date)}
-            </SelectItem>
-          ))
-        ) : (
-          <SelectLabel>No available dates</SelectLabel>
-        )}
-      </SelectGroup>
-    </ScrollArea>
-  </SelectContent>
-</Select>   
+              value={slotId}
+              onValueChange={(val) => {
+                setSlotId(val);
+                const selectedSlot = slots.find((slot) => slot._id === val);
+                if (selectedSlot) {
+                  setSelectedDate(selectedSlot.date);
+                }
+              }}
+              disabled={slots.length === 0}
+            >
+              <SelectTrigger className="w-full">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <SelectValue
+                    placeholder={
+                      slots.length === 0
+                        ? "No dates available"
+                        : "Select a date"
+                    }
+                  >
+                    {selectedDate ? formatDate(selectedDate) : ""}
+                  </SelectValue>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <ScrollArea className="h-60">
+                  <SelectGroup>
+                    {slots.length > 0 ? (
+                      slots.map((slot) => (
+                        <SelectItem key={slot._id} value={slot._id}>
+                          {formatDate(slot.date)}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectLabel>No available dates</SelectLabel>
+                    )}
+                  </SelectGroup>
+                </ScrollArea>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Time Slots */}

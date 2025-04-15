@@ -30,10 +30,6 @@ const getAvailableSlots=async(expertId:string)=>{
 }
 const handlingBooking=async (formData:FormData)=>{
     try {
-        
-        for(const [key,val] of formData.entries()){
-            console.log(key ,':',val)
-        }
         const response= await userAPI.post('/book',formData,{
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -45,9 +41,19 @@ const handlingBooking=async (formData:FormData)=>{
         
     }
 }
+const getUserBookings=async (page:number,limit:number)=>{
+    try {
+        const response= await userAPI.get(`/bookings?page=${page}&limit=${limit}`)
+        return response.data
+    } catch (error) {
+        throw new Error(error.response.data.message)
+        
+    }
+}
 export{
     getExpertsSpecificService,
     getExpertDetails,
     getAvailableSlots,
-    handlingBooking
+    handlingBooking,
+    getUserBookings
 }

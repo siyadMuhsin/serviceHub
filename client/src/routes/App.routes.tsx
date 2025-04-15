@@ -13,6 +13,7 @@ import { PublicLayout, PrivateLayout } from "../layout/user.layoute";
 import { LoginRoute } from "./Protect.routes";
 import ExpertsPage from "@/pages/User/ExpertsPage";
 import ExpertViewProfile from "@/pages/User/ExpertViewProfile";
+import Bookings from "@/pages/User/Bookings";
 
 const AppRoutes = () => {
   const loading = useAuthCheck();
@@ -38,6 +39,7 @@ const AppRoutes = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/services/:id" element={<ExpertsPage/>}/>
         <Route path="/user/expert/:expertId" element={<ExpertViewProfile/>}/>
+        <Route path="/bookings" element={<Bookings/>}/>
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

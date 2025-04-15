@@ -26,7 +26,7 @@ const ExpertRoutes = () => {
             <Route path='/subscription' element={<SubscriptionPage/>} />
             <Route path='/profile' element={<ExpertProfile/>} />
             <Route path='/slot-management' element={<ExpertSlot/>} />
-            <Route path='/service-management' element={<BookingMangement/>} />
+            <Route path='/booking-management' element={<BookingMangement/>} />
             {/* Add more routes here as needed */}
           </Routes>
         </div>

@@ -27,4 +27,11 @@ export class SlotRepository extends BaseRepository<ISlot> implements ISlotRespos
         const leanDoc= await this.findById(id)
         return this.transformToObject(leanDoc)
     }
+    async updateSlotById(slot_Id: string, udpate: Partial<ISlot>): Promise<ISlot | null> {
+        try {
+            return await Slot.findByIdAndUpdate(slot_Id,udpate,{new:true})
+        } catch (error:any) {
+            throw new Error(error.message)
+        }
+    }
 }
