@@ -112,6 +112,7 @@ const SubscriptionManagement = () => {
 
   const togglePlanStatus = async(id: string) => {
     try {
+      console.log(id)
       const response= await actionChange(id)
       if(response.success){
         setPlans(

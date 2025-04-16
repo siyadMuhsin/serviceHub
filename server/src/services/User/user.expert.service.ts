@@ -18,7 +18,7 @@ export class UserExpertService implements IUserExpertService{
             if(!service){
                 return {success:false,message:"Invalid ServiceId",experts:[]}
             }
-            const user= await this.userRepository.findUserById(userId)
+            const user= await this.userRepository.findById(userId)
             if(!user){
                 return {success:false,message:"User not Fount",experts:[]}
             }
@@ -46,7 +46,7 @@ export class UserExpertService implements IUserExpertService{
     }
     async getExpertDetails(userId: string, experId: string){
         try {
-            const user=await this.userRepository.findUserById(userId)
+            const user=await this.userRepository.findById(userId)
             if(!user||!user.location){
                 return {success:false,message:"your location not added"}
             }

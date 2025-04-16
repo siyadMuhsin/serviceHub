@@ -13,7 +13,6 @@ const AdminAuthCheck= () => {
     const fetchAdmin = async (): Promise<void> => {
       try {
         const response = await adminAuthCheck();
-        console.log(response)
         if (response.success) {
          
           dispatch(adminLogin());

@@ -14,7 +14,7 @@ export class PlansService implements IPlanService {
   async createPlan(data: Omit<Partial<IPlan>, "durationDisplay">) {
     try {
       if(!data.name)throw new Error ('Name must be requied')
-      const existingPlan = await this.planRepository.findOneByName( data.name );
+      const existingPlan = await this.planRepository.findOne({name: data.name} );
 if(existingPlan){
   return {success:false,message:"The Plan Name already taken"}
 }
@@ -41,7 +41,7 @@ if(existingPlan){
             return {success:false,message:"Plan not fount"}
         }
         const newStatus=!isPlanAvailable.isActive
-        await this.planRepository.findByIdAndUpdate(planId,{isActive:newStatus})
+        await this.planRepository.updateById(planId,{isActive:newStatus})
         return {success:true,message:`plan ${newStatus?'listed':'unlisted'} successfully`}
     } catch (error:any) {
         throw new Error(error.message)
@@ -49,7 +49,7 @@ if(existingPlan){
   }
   async getAllPlans(): Promise<{plans:IPlan[]}> {
     try {
-      const plans=await this.planRepository.getAllPlans()
+      const plans=await this.planRepository.findAll()
       return {plans}
     } catch (error :any) {
       throw new Error(error.message)
@@ -62,7 +62,7 @@ if(existingPlan){
       if(!existPlan){
         return {success:false,message:"No matching plan found"}
       }
-      const updatedPlan= await this.planRepository.findByIdAndUpdate(planId,updateData)
+      const updatedPlan= await this.planRepository.updateById(planId,updateData)
       if(updatedPlan){
         return {success:true,message:"Plan Updated Successfully",planData:updatedPlan}
       }

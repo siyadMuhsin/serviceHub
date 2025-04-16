@@ -239,6 +239,7 @@ const {userLocation}=useSelector((state:any)=>state.location)
               className="block py-2 px-6 hover:bg-gray-100"
               onClick={()=>setMenuOpen(false)}
               >
+                Bookings
               </Link>
               <button
                 onClick={() => {

@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRepository";
 import { IPaymentRepository } from "../../core/interfaces/repositories/IPaymentRepositroy";
 import { ObjectId, Types } from "mongoose";
+import { IPayment } from "../../models/payment.model";
 dotenv.config()
 @injectable()
 export class PaymentService implements IPaymentService{
@@ -80,4 +81,31 @@ export class PaymentService implements IPaymentService{
             return { success: false, message: error.message ||"Internal server error" };
         }
     }
+
+    async getAllEarnings(plan: string, page: number, limit: number) {
+        try {
+          const filter = plan ? { plan } : {};
+          const { data, total,totalEarningsAgg } = await this.paymentRepository.findAll(filter, page, limit);
+          const totalPages = Math.ceil(total / limit);
+      const plans= await this.planRepository.findAll()
+          return {
+            success: true,
+            message: 'Earnings fetched successfully',
+            data: {
+              earnings: data,
+              totalEarnings:totalEarningsAgg[0].total ,
+              plans,
+              pagination: {
+                total,
+                page,
+                limit,
+                totalPages
+              }
+            }
+          };
+        } catch (error:any) {
+          console.error('Service error:', error);
+        throw new Error(error.message)
+        }
+      }
 }

@@ -72,17 +72,14 @@ return this.create(data)
         try {
             const skip = (page - 1) * limit;
             const query: any = {};
-            
             if (search) {
                 query.name = { $regex: search, $options: 'i' };
             }
-
             const services = await Services.find(query)
                 .populate("categoryId")
                 .skip(skip)
                 .limit(limit)
                 .exec();
-                
             const totalServices = await Services.countDocuments(query);
             return { services, totalServices };
         } catch (error: any) {

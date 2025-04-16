@@ -21,7 +21,7 @@ export class AuthMiddleware implements IAuthMiddleware {
             }
 
             const decoded = await this.authMiddlewareService.verifyToken(token);
-            if(decoded.role!=='user'){
+            if(decoded.role!=='user' && decoded.role !=='expert'){
                 this.sendErrorResponse(res,HttpStatus.FORBIDDEN,"Unauthorized")
                 return
             }

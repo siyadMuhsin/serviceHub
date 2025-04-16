@@ -4,6 +4,7 @@ import { IServices } from "../../types/Admin";
 import { CloudinaryService } from "../../config/cloudinary";
 import { IServiceService } from '../../core/interfaces/services/IServiceService';
 import { TYPES } from "../../di/types";
+import mongoose, { ObjectId, Types } from 'mongoose';
 
 @injectable()
 export class ServiceService implements IServiceService {
@@ -23,7 +24,7 @@ export class ServiceService implements IServiceService {
                 return { success: false, message: 'Cloudinary upload failed' };
             }
 
-            const service = await this.serviceRepository.createService({ 
+            const service = await this.serviceRepository.create({ 
                 name, 
                 categoryId, 
                 description, 
@@ -76,7 +77,8 @@ export class ServiceService implements IServiceService {
 
     async getServicesByCategory(categoryId: string) {
         try {
-            const services = await this.serviceRepository.getServicesByCategory(categoryId);
+            const categoryIdObjectId= new mongoose.Schema.Types.ObjectId(categoryId)
+            const services = await this.serviceRepository.findMany({categoryId:categoryIdObjectId});
             return { success: true, services };
         } catch (error) {
             console.error("Error fetching services by category:", error);

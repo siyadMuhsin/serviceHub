@@ -4,6 +4,7 @@ import { ISlot } from "../../models/slot.model";
 import { TYPES } from "../../di/types";
 import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRepository";
 import { ISlotRespository } from "../../core/interfaces/repositories/ISlotRepository";
+import mongoose from "mongoose";
 
 @injectable()
 export class SlotServices implements ISlotService {
@@ -28,7 +29,8 @@ export class SlotServices implements ISlotService {
   }
   async getExpertSlots(expertId: string): Promise<{ success: boolean; message: string; slots?: ISlot[]; }> {
     try {
-      const slots= await this.slotRespository.getAllSlots(expertId)
+      const expertObjectId= new mongoose.Types.ObjectId(expertId)
+      const slots= await this.slotRespository.findMany({expertId:expertObjectId})
       return {success:true,message:"slot Get in successfully" ,slots:slots}
     } catch (error:any) {
       throw new Error(error.message)
@@ -36,7 +38,7 @@ export class SlotServices implements ISlotService {
   }
   async deleteSlot(expertId: string, slot_Id: string): Promise<{ success: boolean; message: string }> {
     try {
-      const slot = await this.slotRespository.findSlotById(slot_Id);
+      const slot = await this.slotRespository.findById(slot_Id);
   
       if (!slot) {
         return { success: false, message: "Slot not found" };
@@ -45,9 +47,7 @@ export class SlotServices implements ISlotService {
       if (slot.expertId.toString() !== expertId.toString()) {
         return { success: false, message: "Unauthorized: This slot doesn't belong to the expert" };
       }
-  
-      await this.slotRespository.deleteSlot(slot_Id);
-  
+      await this.slotRespository.delete(slot_Id);
       return { success: true, message: "Slot deleted successfully" };
     } catch (error) {
       return { success: false, message: "Server error while deleting slot" };

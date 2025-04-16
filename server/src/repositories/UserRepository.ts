@@ -11,16 +11,6 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
     constructor(){
         super(User)
     }
-    async getAlluser(): Promise<LeanDocument<IUser>[]> {
-        try {
-            return await this.findAll(); // Reuse BaseRepository's method
-        } catch (error) {
-            console.error("Error fetching all users:", error);
-            throw new Error("Failed to fetch users");
-        }
-    }
-
-
     async createUser(userData: Partial<IUser>): Promise<IUser> {
         try {
             const newData={...userData,location:{
@@ -32,34 +22,6 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
         } catch (error) {
             console.error("Error creating user:", error);
             throw new Error("Failed to create user");
-        }
-    }
-
-    async findUserByEmail(email: string): Promise<LeanDocument<IUser> | null> {
-        try {
-            return await this.findOne({ email } as FilterQuery<IUser>);
-        } catch (error) {
-            console.error(`Error finding user by email (${email}):`, error);
-            throw new Error("Failed to find user by email");
-        }
-    }
-
-    async findUserById(id: string): Promise<LeanDocument<IUser> | null> {
-        try {
-            return await this.findById(id)
-        } catch (error) {
-            console.error(`Error finding user by ID (${id}):`, error);
-            throw new Error("Failed to find user by ID");
-        }
-    }
-
-    async findByIdAndUpdate(id: string, update: Partial<IUser>): Promise<IUser | null> {
-        try {
-            const leanDoc= await this.updateById(id,update)
-            return this.transformToObject(leanDoc)
-        } catch (error) {
-            console.error(`Error updating user by ID (${id}):`, error);
-            throw new Error("Failed to update user");
         }
     }
 

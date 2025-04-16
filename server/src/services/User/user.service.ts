@@ -20,7 +20,7 @@ export class ProfileService implements IProfileService {
                 type: "Point",
                 coordinates: [lng, lat]  // GeoJSON requires [longitude, latitude]
             };
-            const user = await this.userRepositry.findByIdAndUpdate(
+            const user = await this.userRepositry.updateById(
                 userId,
                 { location },
             );
@@ -63,7 +63,7 @@ export class ProfileService implements IProfileService {
         try {
             const profileImageUrl= await CloudinaryService.uploadImage(file)
             if(profileImageUrl){
-                await this.userRepositry.findByIdAndUpdate(userId,{profile_image:profileImageUrl})
+                await this.userRepositry.updateById(userId,{profile_image:profileImageUrl})
                 return {success:true,message:'Profile updated successFully',profileImageUrl}
             }
             return {success:false,message:"failed to upload cloudnary"}
@@ -84,7 +84,7 @@ export class ProfileService implements IProfileService {
             };
           }
           console.log(updateData)
-          await this.userRepositry.findByIdAndUpdate(userId, updateData);
+          await this.userRepositry.updateById(userId, updateData);
           return {
             success: true,
             message: 'Profile updated successfully',
@@ -99,7 +99,7 @@ export class ProfileService implements IProfileService {
       
     async changePassword(userId: string, oldPassword: string, newPassword: string) {
         try {
-          const user = await this.userRepositry.findUserById(userId);
+          const user = await this.userRepositry.findById(userId);
           if (!user) {
             return { success: false, message: 'User not found' };
           }
@@ -108,7 +108,7 @@ export class ProfileService implements IProfileService {
             return { success: false, message: 'Current password is incorrect' };
           }
           const hashedPassword = await bcrypt.hash(newPassword, 10);
-          await this.userRepositry.findByIdAndUpdate(userId, { password: hashedPassword });
+          await this.userRepositry.updateById(userId, { password: hashedPassword });
           return { success: true, message: 'Password changed successfully' };
         } catch (error) {
           console.error("Change password error:", error); // optional: for debugging

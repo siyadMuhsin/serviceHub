@@ -17,9 +17,8 @@ export class AuthService implements IAuthService {
 
   async registerUser(name: string, email: string, password: string): Promise<AuthResult> {
     try {
-      const exitingUser = await this.userRepository.findUserByEmail(email);
-      const otpSended = await this.otpRepository.findByEmail(email);
-      
+      const exitingUser = await this.userRepository.findOne({email});
+      const otpSended = await this.otpRepository.findOne({email});
       if (otpSended) {
         return { success: true, message: "OTP already sent to this email" };
       }
@@ -70,7 +69,7 @@ export class AuthService implements IAuthService {
       await this.otpRepository.deleteOTP(email);
       await this.userRepository.findUserAndUpdate(email, { isVerified: true });
       
-      const user = await this.userRepository.findUserByEmail(email);
+      const user = await this.userRepository.findOne({email});
       if (!user) {
         return { success: false, message: "User not found" };
       }
@@ -89,12 +88,12 @@ export class AuthService implements IAuthService {
 
   async resendOtp(email: string): Promise<AuthResult> {
     try {
-      const user = await this.userRepository.findUserByEmail(email);
+      const user = await this.userRepository.findOne({email});
       if (!user) {
         return { success: false, message: "User with this email does not exist" };
       }
 
-      const otpSended = await this.otpRepository.findByEmail(email);
+      const otpSended = await this.otpRepository.findOne({email});
       if (otpSended) {
         return { success: true, message: "OTP already sent to this email" };
       }
@@ -108,7 +107,7 @@ export class AuthService implements IAuthService {
 
   async loginUser(email: string, password: string): Promise<AuthResult> {
     try {
-      const user = await this.userRepository.findUserByEmail(email);
+      const user = await this.userRepository.findOne({email});
       if (!user) {
         return {
           success: false,
@@ -150,7 +149,7 @@ export class AuthService implements IAuthService {
 
   async findUser(id: string): Promise<AuthResult> {
     try {
-      const userDetails = await this.userRepository.findUserById(id);
+      const userDetails = await this.userRepository.findById(id);
       if (!userDetails) {
         return { success: false, message: "User not found" };
       }
@@ -163,7 +162,7 @@ export class AuthService implements IAuthService {
 
   async saveGoogleUser(googleId: string, email: string, name: string, image: string): Promise<AuthResult> {
     try {
-      const existingUser = await this.userRepository.findUserByEmail(email);
+      const existingUser = await this.userRepository.findOne({email});
      
       if (existingUser) {
         if (existingUser.isBlocked) {
@@ -207,7 +206,7 @@ export class AuthService implements IAuthService {
 
   async forgetPassword(email: string): Promise<AuthResult> {
     try {
-      const existingUser = await this.userRepository.findUserByEmail(email);
+      const existingUser = await this.userRepository.findOne({email});
       console.log(existingUser)
       if (!existingUser) {
         return { success: false, message: "Email not found" };
@@ -217,7 +216,7 @@ export class AuthService implements IAuthService {
 
       const resetPasswordToken = resetToken;
      const resetPasswordExpires = new Date(Date.now() + 300000);
-     await this.userRepository.findByIdAndUpdate(existingUser._id,{resetPasswordToken,resetPasswordExpires})
+     await this.userRepository.updateById(existingUser._id,{resetPasswordToken,resetPasswordExpires})
 
       await sendResetMail(email, resetToken);
       return { success: true, message: "Password reset email sent" };
@@ -244,8 +243,8 @@ export class AuthService implements IAuthService {
 
   private async generateAndSendOtp(email: string): Promise<AuthResult> {
     const otp = generateOTP();
-    const otpExpires = new Date(Date.now() + 5 * 60 * 1000); 
-    await this.otpRepository.saveOTP(email, otp, otpExpires);
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); 
+    await this.otpRepository.create({email, otp, expiresAt});
     await sendMailer(email, otp);
     return { success: true, message: "OTP sent to email. Please verify." };
   }

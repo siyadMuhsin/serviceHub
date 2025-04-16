@@ -46,7 +46,7 @@ export class TokenController implements ITokenController {
 
     private setAccessTokenCookie(res: Response, token: string): void {
         res.cookie("accessToken", token, {
-            httpOnly: true,
+            httpOnly: false,
             secure: this.isProduction,
             sameSite: "strict",
             maxAge: 15 * 60 * 1000, // 15 minutes

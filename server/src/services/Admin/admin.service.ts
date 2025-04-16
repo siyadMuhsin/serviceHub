@@ -17,7 +17,6 @@ export class AdminService implements IAdminService {
             if (!admin) {
                 return { success: false, message: "Admin not found" };
             }
-
             if (admin.adminPassword === password) {
                 const accessToken = await generateAccessToken(admin._id, 'admin');
                 const refreshToken = await generateRefreshToken(admin._id, 'admin');

@@ -9,14 +9,7 @@ export class OtpRepository extends BaseRepository<IOtp> implements IOtpRepositor
     constructor(){
         super(OTP)
     }
-    async saveOTP(email: string, otp: string, expiresAt: Date): Promise<IOtp> {
-        try {
-         return await this.create({ email, otp, expiresAt });
-        } catch (error) {
-            console.error(`Error saving OTP for ${email}:`, error);
-            throw new Error('Failed to save OTP');
-        }
-    }
+
 
     async findOTP(email: string, otp: string): Promise<IOtp | null | any> {
         try {
@@ -38,12 +31,5 @@ export class OtpRepository extends BaseRepository<IOtp> implements IOtpRepositor
         }
     }
 
-    async findByEmail(email: string): Promise<LeanDocument<IOtp> | null> {
-        try {
-            return await this.findOne({ email })
-        } catch (error) {
-            console.error(`Error finding OTP by email ${email}:`, error);
-            throw new Error('Failed to find OTP by email');
-        }
-    }
+
 }

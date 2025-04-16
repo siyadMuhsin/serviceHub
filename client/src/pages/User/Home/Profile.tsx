@@ -33,8 +33,9 @@ import { fetchLocationFromCoordinates } from "@/Utils/locationUtils";
 import { updateUserProfile } from "@/services/User/profile.service";
 import { setUserLocation } from "@/Slice/locationSlice";
 import ChangePassword from "@/components/User/ChangePassword";
+import { ConfirmationModal } from "@/components/ConfirmModal";
 
-type ProfileViewType = 'overview' | 'edit' | 'password' | 'saved';
+type ProfileViewType = "overview" | "edit" | "password" | "saved";
 
 export const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
@@ -43,17 +44,19 @@ export const ProfilePage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const [user, setUser] = useState<IUser | null>(null);
-  const [currentView, setCurrentView] = useState<ProfileViewType>('overview');
-  const [locationData,setLocationData]=useState<string>('')
-  const [existingExpertData,setExpertData]=useState({accountName:'',
-    dob:'',
-    gender:'',
-    contact:'',
-    service:{_id:'',name:''},
-    category:{_id:'',name:''},
-    experience:'',
-    certificate:''
-   })
+  const [currentView, setCurrentView] = useState<ProfileViewType>("overview");
+  const [isSwitchAccount,setIsSwitchAccount]=useState<boolean>(false)
+  const [locationData, setLocationData] = useState<string>("");
+  const [existingExpertData, setExpertData] = useState({
+    accountName: "",
+    dob: "",
+    gender: "",
+    contact: "",
+    service: { _id: "", name: "" },
+    category: { _id: "", name: "" },
+    experience: "",
+    certificate: "",
+  });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -61,13 +64,18 @@ export const ProfilePage: React.FC = () => {
         setIsLoading(true);
         const response = await get_userData();
         if (response.success) {
-          console.log(response.user)
+          console.log(response.user);
           setUser(response.user);
 
-    if (response.user?.location?.coordinates[1] && response.user?.location?.coordinates[0]) {
-     await fetchLocationFromCoordinates(response.user.location.coordinates[1], response.user.location.coordinates[0]).then(setLocationData);
-    }
-  
+          if (
+            response.user?.location?.coordinates[1] &&
+            response.user?.location?.coordinates[0]
+          ) {
+            await fetchLocationFromCoordinates(
+              response.user.location.coordinates[1],
+              response.user.location.coordinates[0]
+            ).then(setLocationData);
+          }
         } else {
           toast.error(response.message);
         }
@@ -131,7 +139,9 @@ export const ProfilePage: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Error in handleSwitchAccount:", error);
-      toast.error(error.message || "An unexpected error occurred. Please try again.");
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -140,30 +150,38 @@ export const ProfilePage: React.FC = () => {
   const handleProfileUpdate = async (updateProfileData) => {
     if (!updateProfileData) return;
     try {
-      console.log(updateProfileData)
+      console.log(updateProfileData);
       setIsLoading(true);
-      delete updateProfileData.email
+      delete updateProfileData.email;
       const response = await updateUserProfile(updateProfileData);
-      console.log('egvs')
+      console.log("egvs");
       if (response.success) {
         console.log(updateProfileData);
-        
-        if(updateProfileData.location){
-          if(updateProfileData.location.lat!==0 && updateProfileData.location.lng!==0){
-            const locationData= await fetchLocationFromCoordinates(updateProfileData.location.lat,updateProfileData.location.lng)
-            setLocationData(locationData)
-            dispatch(setUserLocation({...updateProfileData.location,address:locationData}))
-  
+
+        if (updateProfileData.location) {
+          if (
+            updateProfileData.location.lat !== 0 &&
+            updateProfileData.location.lng !== 0
+          ) {
+            const locationData = await fetchLocationFromCoordinates(
+              updateProfileData.location.lat,
+              updateProfileData.location.lng
+            );
+            setLocationData(locationData);
+            dispatch(
+              setUserLocation({
+                ...updateProfileData.location,
+                address: locationData,
+              })
+            );
           }
         }
-      
-
 
         setUser((prev) => ({
           ...prev,
-          ...updateProfileData, 
+          ...updateProfileData,
         }));
-        console.log(user)
+        console.log(user);
         // setCurrentView('overview');
         toast.success("Profile updated successfully");
       } else {
@@ -172,43 +190,45 @@ export const ProfilePage: React.FC = () => {
       // toast.success("Profile updated successfully (demo)");
       // setCurrentView('overview');
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
       toast.error(error?.message || "Profile update failed");
     } finally {
       setIsLoading(false);
     }
   };
 
- 
   const handleSidebarClick = (view: ProfileViewType) => {
     setCurrentView(view);
   };
 
-  const reApplyToExpert=async()=>{
+  const reApplyToExpert = async () => {
     try {
-      const existingExpertData= await existingExpert()
-      const data= existingExpertData.expert
+      const existingExpertData = await existingExpert();
+      const data = existingExpertData.expert;
       setExpertData({
-        accountName:data.accountName,
-        dob:data.dob,
-        gender:data.gender,
-        contact:data.contact,
-        service:{_id:data.serviceId._id,name:data.serviceId.name},
-        category:{_id:data.categoryId._id,name:data.categoryId.name},
-        experience:data.experience,
-        certificate:data.certificateUrl
-      })
+        accountName: data.accountName,
+        dob: data.dob,
+        gender: data.gender,
+        contact: data.contact,
+        service: { _id: data.serviceId._id, name: data.serviceId.name },
+        category: { _id: data.categoryId._id, name: data.categoryId.name },
+        experience: data.experience,
+        certificate: data.certificateUrl,
+      });
 
-      setIsModalOpen(true)
-      
+      setIsModalOpen(true);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   if (loading) return <Loading />;
-  if (!user) return <div className="flex items-center justify-center h-screen">User not found</div>;
-
+  if (!user)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        User not found
+      </div>
+    );
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -218,7 +238,7 @@ export const ProfilePage: React.FC = () => {
           <div className="relative">
             <Avatar className="h-24 w-24 mb-2">
               <AvatarImage src={user.profile_image} alt="Profile" />
-              <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
+              <AvatarFallback>{user.name?.[0] || "U"}</AvatarFallback>
             </Avatar>
           </div>
           <h2 className="mt-4 text-xl font-semibold">{user.name}</h2>
@@ -227,33 +247,33 @@ export const ProfilePage: React.FC = () => {
 
         <nav className="mt-6">
           <Button
-            variant={currentView === 'overview' ? 'default' : 'ghost'}
+            variant={currentView === "overview" ? "default" : "ghost"}
             className="w-full justify-start pl-4 mb-1"
-            onClick={() => handleSidebarClick('overview')}
+            onClick={() => handleSidebarClick("overview")}
           >
             <User className="mr-2 h-4 w-4" />
             Profile Overview
           </Button>
           <Button
-            variant={currentView === 'edit' ? 'default' : 'ghost'}
+            variant={currentView === "edit" ? "default" : "ghost"}
             className="w-full justify-start pl-4 mb-1"
-            onClick={() => handleSidebarClick('edit')}
+            onClick={() => handleSidebarClick("edit")}
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit Profile
           </Button>
           <Button
-            variant={currentView === 'password' ? 'default' : 'ghost'}
+            variant={currentView === "password" ? "default" : "ghost"}
             className="w-full justify-start pl-4 mb-1"
-            onClick={() => handleSidebarClick('password')}
+            onClick={() => handleSidebarClick("password")}
           >
             <Lock className="mr-2 h-4 w-4" />
             Change Password
           </Button>
           <Button
-            variant={currentView === 'saved' ? 'default' : 'ghost'}
+            variant={currentView === "saved" ? "default" : "ghost"}
             className="w-full justify-start pl-4 mb-1"
-            onClick={() => handleSidebarClick('saved')}
+            onClick={() => handleSidebarClick("saved")}
           >
             <Heart className="mr-2 h-4 w-4" />
             Saved Services
@@ -276,23 +296,36 @@ export const ProfilePage: React.FC = () => {
 
                   {user.expertStatus === "pending" && (
                     <div className="px-4 py-2 text-sm">
-                      <p className="text-yellow-600">Request Pending Approval</p>
+                      <p className="text-yellow-600">
+                        Request Pending Approval
+                      </p>
                     </div>
                   )}
 
                   {user.expertStatus === "rejected" && (
                     <div className="px-4 py-2">
                       <div className="flex items-start gap-3 p-3 bg-red-100 border-l-4 border-red-500 rounded-md shadow-sm mb-2">
-  <svg className="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-.01-12a9 9 0 110 18 9 9 0 010-18z" />
-  </svg>
-  <p className="text-sm text-red-700">
-    Your request was rejected. {user.rejectReason ? user.rejectReason : ''}
-  </p>
-</div>
-                      <Button 
+                        <svg
+                          className="w-5 h-5 text-red-600 mt-0.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 9v2m0 4h.01m-.01-12a9 9 0 110 18 9 9 0 010-18z"
+                          />
+                        </svg>
+                        <p className="text-sm text-red-700">
+                          Your request was rejected.{" "}
+                          {user.rejectReason ? user.rejectReason : ""}
+                        </p>
+                      </div>
+                      <Button
                         variant="outline"
-                        onClick={ reApplyToExpert}
+                        onClick={reApplyToExpert}
                         className="w-full justify-start pl-2 mb-1 bg-black text-white hover:bg-gray-800"
                       >
                         <Briefcase className="h-4 w-4" />
@@ -304,7 +337,7 @@ export const ProfilePage: React.FC = () => {
                   {user.expertStatus === "approved" && (
                     <Button
                       variant="ghost"
-                      onClick={handleSwitchAccount}
+                      onClick={()=>setIsSwitchAccount(true)}
                       className="w-full justify-start pl-4 mb-1 text-green-600 hover:bg-green-50"
                     >
                       <Briefcase className="mr-2 h-4 w-4" />
@@ -317,7 +350,7 @@ export const ProfilePage: React.FC = () => {
               {user.role === "expert" && (
                 <Button
                   variant="ghost"
-                  onClick={handleSwitchAccount}
+                  onClick={()=>setIsSwitchAccount(true)}
                   className="w-full justify-start pl-4 mb-1"
                 >
                   <User className="mr-2 h-4 w-4" />
@@ -333,10 +366,10 @@ export const ProfilePage: React.FC = () => {
       <div className="flex-1 overflow-y-auto">
         <header className="px-6 py-4 bg-white border-b flex justify-between items-center">
           <h1 className="text-2xl font-bold">
-            {currentView === 'overview' && "Profile Overview"}
-            {currentView === 'edit' && "Edit Profile"}
-            {currentView === 'password' && "Change Password"}
-            {currentView === 'saved' && "Saved Services"}
+            {currentView === "overview" && "Profile Overview"}
+            {currentView === "edit" && "Edit Profile"}
+            {currentView === "password" && "Change Password"}
+            {currentView === "saved" && "Saved Services"}
           </h1>
           <div className="flex items-center">
             <Button variant="ghost" size="icon">
@@ -347,17 +380,17 @@ export const ProfilePage: React.FC = () => {
 
         <div className="p-6">
           {/* Profile Overview */}
-          {currentView === 'overview' && (
+          {currentView === "overview" && (
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start">
                     <Avatar className="h-20 w-20 mr-6">
-                      <AvatarImage 
-                        src={user.profile_image || "/api/placeholder/150/150"} 
-                        alt="Profile" 
+                      <AvatarImage
+                        src={user.profile_image || "/api/placeholder/150/150"}
+                        alt="Profile"
                       />
-                      <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
+                      <AvatarFallback>{user.name?.[0] || "U"}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <h2 className="text-2xl font-bold mb-3">{user.name}</h2>
@@ -368,9 +401,9 @@ export const ProfilePage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setCurrentView('edit')}
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentView("edit")}
                   >
                     <Edit className="mr-2 h-4 w-4" /> Edit Profile
                   </Button>
@@ -381,23 +414,22 @@ export const ProfilePage: React.FC = () => {
 
           {/* Edit Profile */}
           {currentView === "edit" && (
-  <EditProfile
-    user={user}
-    updateUser={setUser}
-    onCancel={() => setCurrentView("overview")}
-    locationData={locationData}
-    onUpdateProfile={handleProfileUpdate}
-  />
-)}
+            <EditProfile
+              user={user}
+              updateUser={setUser}
+              onCancel={() => setCurrentView("overview")}
+              locationData={locationData}
+              onUpdateProfile={handleProfileUpdate}
+            />
+          )}
 
           {/* Change Password */}
-          {currentView === 'password' && (
-         <ChangePassword
-         setCurrentView={setCurrentView}/>
+          {currentView === "password" && (
+            <ChangePassword setCurrentView={setCurrentView} />
           )}
 
           {/* Saved Services */}
-          {currentView === 'saved' && (
+          {currentView === "saved" && (
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <div>
@@ -419,6 +451,13 @@ export const ProfilePage: React.FC = () => {
         existingData={existingExpertData}
         onClose={() => setIsModalOpen(false)}
         onCreate={handleCreateExpert}
+      />
+      <ConfirmationModal
+      isOpen={isSwitchAccount}
+      onClose={()=>setIsSwitchAccount(false)}
+      onConfirm={handleSwitchAccount}
+      title="Switching To Expert"
+      description="Are you sure want switch account"
       />
     </div>
   );

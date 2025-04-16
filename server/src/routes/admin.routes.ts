@@ -11,6 +11,7 @@ import { IUsersController } from "../core/interfaces/controllers/IUsersControlle
 import { IServiceController } from "../core/interfaces/controllers/IServiceController";
 import { IExpertController } from "../core/interfaces/controllers/IExpertController";
 import { IPlansController } from "../core/interfaces/controllers/IPlansController";
+import { IPaymentController } from "../core/interfaces/controllers/IPaymentController";
 
 const router = express.Router();
 
@@ -58,4 +59,7 @@ router.patch('/plan/:planId', verifyAdmin, plansController.listAndUnlist.bind(pl
 router.put('/plan/:planId', verifyAdmin, plansController.updatePlan.bind(plansController));
 router.get('/plans', verifyAdmin, plansController.getAllPlans.bind(plansController));
 
+// earnings
+const paymentController= container.get<IPaymentController>(TYPES.PaymentController)
+router.get('/earnings',verifyAdmin,paymentController.getAllEarnings.bind(paymentController))
 export default router;

@@ -3,4 +3,5 @@ import { Response } from "express";
 export interface IPaymentController{
     planPurchase(req:AuthRequest,res:Response):Promise<void>;
     verifyPayment(req:AuthRequest,res:Response):Promise<void>
+    getAllEarnings(req:AuthRequest,res:Response):Promise<void>
 }

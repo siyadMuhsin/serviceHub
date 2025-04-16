@@ -32,7 +32,7 @@ export class BookingService implements IBookingService {
       const expert = await this.expertRepository.findById(expertId);
       if (!expert) return { success: false, message: "Expert not found" };
 
-      const slot = await this.slotRepository.findSlotById(slotId);
+      const slot = await this.slotRepository.findById(slotId);
       if (!slot) return { success: false, message: "Slot not found" };
 
       if (!slot.timeSlots.includes(time)) {
@@ -49,7 +49,7 @@ export class BookingService implements IBookingService {
         geoLocation = { address, type: "Point", coordinates: location };
       }
 
-      const booking = await this.bookingRepository.createBooking({
+      const booking = await this.bookingRepository.create({
         userId: new mongoose.Types.ObjectId(userId),
         expertId: new mongoose.Types.ObjectId(expertId),
         slotId: new mongoose.Types.ObjectId(slotId),
@@ -108,7 +108,7 @@ export class BookingService implements IBookingService {
     expertId: string, bookingId: string, status: string,reason?:string
   ): Promise<{ success: boolean; message: string; status?: string }> {
     try {
-      const booking = await this.bookingRepository.getBookingById(bookingId);
+      const booking = await this.bookingRepository.findById(bookingId);
       if (!booking) return { success: false, message: "Booking not found" };
       if (booking.expertId.toString() !== expertId.toString()) {
         return { success: false, message: "Unauthorized access to this booking" };
@@ -119,15 +119,15 @@ export class BookingService implements IBookingService {
       if (status === "cancelled" && reason) {
         updateData.cancellationReason = reason;
       }
-      await this.bookingRepository.findByIdAndUpdate(bookingId,updateData );
+      await this.bookingRepository.updateById(bookingId,updateData );
       const slotId= booking.slotId.toString()
       if(status==='confirmed'){
-        const slot=await this.slotRepository.findSlotById(slotId)
+        const slot=await this.slotRepository.findById(slotId)
         if (slot) {
           const updatedTimeSlots = slot.timeSlots.filter(
             (time: string) => time !== booking.time
           )
-          await this.slotRepository.updateSlotById(slotId, {timeSlots:updatedTimeSlots});
+          await this.slotRepository.updateById(slotId, {timeSlots:updatedTimeSlots});
         }
       }
       return { success: true, message: "Status updated", status };
@@ -170,7 +170,7 @@ export class BookingService implements IBookingService {
         return { success: false, message: 'User not found' };
       }
 
-      const booking = await this.bookingRepository.getBookingById(bookingId);
+      const booking = await this.bookingRepository.findById(bookingId);
     if (!booking) {
       return { success: false, message: 'Booking not found' };
     }

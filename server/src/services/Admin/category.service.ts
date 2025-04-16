@@ -23,7 +23,7 @@ export class CategoryService implements ICategoryService {
                 return { success: false, message: "Cloudinary upload failed" };
             }
 
-            const category = await this.categoryRepository.createCategory({
+            const category = await this.categoryRepository.create({
                 name,
                 description,
                 image: imageUrl,
@@ -44,7 +44,7 @@ export class CategoryService implements ICategoryService {
 
     async getAllCategories() {
         try {
-            const categories = await this.categoryRepository.getAllCategories();
+            const categories = await this.categoryRepository.findAll();
             return { success: true, categories };
         } catch (error: any) {
             console.error("Error in getAllCategories:", error);
@@ -54,12 +54,12 @@ export class CategoryService implements ICategoryService {
 
     async changeStatus(id: string) {
         try {
-            const category = await this.categoryRepository.getCategoryById(id);
+            const category = await this.categoryRepository.findById(id);
             if (!category) {
                 return { success: false, message: "Category not found" };
             }
             const updateStatus = !category.isActive;
-            const updatedCategory = await this.categoryRepository.updateCategory(id, { isActive: updateStatus });
+            const updatedCategory = await this.categoryRepository.updateById(id, { isActive: updateStatus });
             if(updatedCategory){
               return { 
                 success: true,
@@ -77,7 +77,7 @@ export class CategoryService implements ICategoryService {
 
     async getCategoryById(id: string) {
         try {
-            const category = await this.categoryRepository.getCategoryById(id);
+            const category = await this.categoryRepository.findById(id);
             if (!category) {
                 return { success: false, message: "Category not found" };
             }
@@ -92,15 +92,13 @@ export class CategoryService implements ICategoryService {
     async updateCategory(id: string, name?: string, description?: string, file?: Express.Multer.File) {
         try {
             let imageUrl: string | null = null;
-    
             if (file) {
                 imageUrl = await CloudinaryService.uploadImage(file);
                 if (!imageUrl) {
                     return { success: false, message: "Cloudinary upload failed" };
                 }
             }
-    
-            const existingCategory = await this.categoryRepository.getCategoryById(id);
+            const existingCategory = await this.categoryRepository.findById(id);
             if (!existingCategory) {
                 return { success: false, message: "Category not found" };
             }
@@ -114,11 +112,10 @@ export class CategoryService implements ICategoryService {
                 updatedData.image = existingCategory.image;
             }
     
-            const updatedCategory = await this.categoryRepository.updateCategory(id, updatedData);
+            const updatedCategory = await this.categoryRepository.updateById(id, updatedData);
             if (!updatedCategory) {
                 return { success: false, message: "Failed to update category" };
             }
-    
             return {
                 success: true,
                 message: "Category updated successfully",
@@ -129,12 +126,10 @@ export class CategoryService implements ICategoryService {
             return { success: false, message: "Failed to update category" };
         }
     }
-
     async getCategoriesByLimit(page: number, limit: number, search: string) {
         const result = await this.categoryRepository.getCategoriesByLimit(page, limit, search);
         return result;
     }
-
     async getCategoryToMange(page: number, limit: number, search: string) {
         try {
             const isAdmin = true;

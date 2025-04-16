@@ -11,7 +11,7 @@ export class UserService implements IUserService {
 
     async getUsers() {
         try {
-            const users = await this.userRepository.getAlluser();
+            const users = await this.userRepository.findAll();
             return { success: true, users };
         } catch (error) {
             console.error("Error fetching users:", error);
@@ -24,7 +24,7 @@ export class UserService implements IUserService {
 
     async blockUnblockUser(id: string, block: boolean) {
         try {
-            const user = await this.userRepository.findUserById(id);
+            const user = await this.userRepository.findById(id);
             if (!user) {
                 return { 
                     success: false, 
@@ -33,7 +33,7 @@ export class UserService implements IUserService {
             }
 
             const newStatus = !user.isBlocked;
-            const updatedUser = await this.userRepository.findByIdAndUpdate(id, { 
+            const updatedUser = await this.userRepository.updateById(id, { 
                 isBlocked: newStatus 
             });
 
@@ -53,7 +53,7 @@ export class UserService implements IUserService {
 
     async checkBlocked(id: string) {
         try {
-            const user = await this.userRepository.findUserById(id);
+            const user = await this.userRepository.findById(id);
             
             return user?.isBlocked ?true:false;
         } catch (error) {

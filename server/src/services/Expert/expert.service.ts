@@ -20,12 +20,12 @@ export class ExpertService implements IExpertService {
         if (existingName && existingName.userId._id.toString() !== userId) {
             throw new Error("The Account Name is already used by another expert");
         }
-        const user = await this.userRepository.findUserById(userId);
+        const user = await this.userRepository.findById(userId);
         if (!user) {
             throw new Error("User not found");
         }
         if (user.expertStatus === 'rejected') {
-            await this.userRepository.findByIdAndUpdate(userId, { 
+            await this.userRepository.updateById(userId, { 
                 expertStatus: 'pending',
             });
         }
@@ -68,7 +68,7 @@ export class ExpertService implements IExpertService {
                 status: 'pending'
             }, userId);
         }
-        await this.userRepository.findByIdAndUpdate(userId, { 
+        await this.userRepository.updateById(userId, { 
             expertStatus: "pending",
         });
         return response;
@@ -125,7 +125,7 @@ export class ExpertService implements IExpertService {
             }
           
             const userId: string = updatedExpert.userId.toString();
-            await this.userRepository.findByIdAndUpdate(userId, {
+            await this.userRepository.updateById(userId, {
                 role: action === 'approved' ? 'expert' : 'user',
                 expertStatus: action === "approved" ? "approved" : "rejected",
                 rejectReason:action==='rejected'?reason:undefined

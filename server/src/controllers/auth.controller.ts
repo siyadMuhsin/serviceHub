@@ -179,7 +179,7 @@ export class AuthController implements IAuthController {
     };
 
     res.cookie("accessToken", accessToken, {
-      ...cookieOptions,
+      ...cookieOptions,httpOnly:false,
       maxAge: 15 * 60 * 1000 // 15 minutes
     });
 

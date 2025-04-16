@@ -65,7 +65,22 @@ async verifyPayment(req: AuthRequest, res: Response): Promise<void> {
       this.sendResponse(res, { message: "Server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  
+  async getAllEarnings(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const plan = req.query.plan as string || '';
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const result = await this.paymentService.getAllEarnings(plan, page, limit);
+      res.status(result.success ? 200 : 400).json(result);
+    } catch (error) {
+      console.error('Controller error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
   private sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }

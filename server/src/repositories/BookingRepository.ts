@@ -7,10 +7,6 @@ export class BookingRepository extends BaseRepository<IBooking> implements IBook
   constructor(){
     super(Booking)
   }
-    async createBooking(data: Partial<IBooking>): Promise<IBooking> {
-        const booking= new Booking(data)
-        return await booking.save()
-    }
     async getBookingsToExpert(
         expertId: string,
         page: number = 1,
@@ -42,20 +38,6 @@ export class BookingRepository extends BaseRepository<IBooking> implements IBook
           throw error;
         }
       }
-      async getBookingById(id: string): Promise<IBooking | null> {
-        return await Booking.findById(id)
-       
-        
-      }
-      async findByIdAndUpdate(id: string,data:Partial<IBooking>): Promise<IBooking | null> {
-        try {
-          const leanDoc= await this.updateById(id,data)
-          return this.transformToObject(leanDoc)
-        } catch (error:any) {
-          console.log(error)
-          throw new Error(error.message)
-        } 
-      }
       async findUserBookings(
         query: Partial<IBooking>,
         page: number = 1,
@@ -79,8 +61,6 @@ export class BookingRepository extends BaseRepository<IBooking> implements IBook
                   select: 'name profile_image' // Or whatever fields you need from Service
                 }
               }),
-             
-              
             Booking.countDocuments(filter)
           ]);
     

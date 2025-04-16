@@ -11,23 +11,5 @@ export class PlanRepository extends BaseRepository<IPlan> implements IPlanRespos
         return this.create(planData)
 
     }
-   async findById(id: string): Promise<IPlan | null> {
-    const leanDoc= await this.findById(id)
-        return this.transformToObject(leanDoc)
-    }
-   async findByIdAndUpdate(id: string,update:Partial<IPlan>): Promise<IPlan |null> {
-    const leanDoc= await this.updateById(id,update)
-     return this.transformToObject(leanDoc)
-   }
-   async getAllPlans(): Promise<IPlan[]> {
-    const leanDoc= await this.findAll()
-    return this.transformAllToObjects(leanDoc)
-   }
-   async findOneByName(name: string): Promise<IPlan | null> {
-    const leanDoc= await this.findOne({name})
-    return this.transformToObject(leanDoc)
-   }
-   async findMany(query:Partial<PlainPlan>): Promise<IPlan[] | null> {
-    return await Plans.find(query) || null;
-  }
+
 }
