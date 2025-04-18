@@ -21,6 +21,7 @@ const useAuthCheck = () => {
         });
         if (response.data.success) {
           let role = getRoleFromToken();
+          console.log(role)
           if (role === "expert") {
             dispatch(changeRole("expert"));
           }
@@ -29,13 +30,14 @@ const useAuthCheck = () => {
           dispatch(logout());
         }
       } catch (error) {
-        toast.error(error.response.data.message);
 
         if (error.response.status == 403) {
           toast.error(error.response.data.message);
           return;
         } else {
           dispatch(logout());
+        // toast.error(error.response.data.message);
+
         }
       } finally {
         setLoading(false);

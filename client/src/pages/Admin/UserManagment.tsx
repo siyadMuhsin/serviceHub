@@ -95,10 +95,10 @@ const UserManagement: React.FC = () => {
   const columns = [
     {
       name: "Profile",
-      selector: (row: any) => row.avatar,
+      selector: (row: any) => row.profile_image,
       cell: (row: any) => (
         <img
-          src={row.avatar}
+          src={row.profile_image}
           alt={row.name}
           className="w-12 h-12 object-cover rounded-full"
         />

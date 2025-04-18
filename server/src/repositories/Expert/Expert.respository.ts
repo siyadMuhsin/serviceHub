@@ -93,6 +93,7 @@ export class ExpertRepository extends BaseRepository<IExpert> implements IExpert
       ): Promise<any[] | null> {
         try {
           const maxDistanceInMeters = distanceInKm * 1000;
+         
       
           const results = await Expert.aggregate([
             {
@@ -107,7 +108,9 @@ export class ExpertRepository extends BaseRepository<IExpert> implements IExpert
                 distanceMultiplier: 0.001, // convert to km
                 query: {
                   isBlocked: false,
+                  "subscription.isActive": true,
                   serviceId: new mongoose.Types.ObjectId(serviceId),
+                  
                 },
               },
             },

@@ -3,6 +3,8 @@ import { Navigate ,Outlet} from "react-router-dom";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated ,role} = useSelector((state: any) => state.auth);
+  console.log(role);
+  
 if(role==="expert")return <Navigate to={'/expert'}/>;
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
@@ -14,7 +16,6 @@ const LoginRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AdminProtectRoute = () => {
   const { adminAuthenticated } = useSelector((state: any) => state.adminAuth);
-
   return adminAuthenticated ? <Outlet /> : <Navigate to="/admin/login" replace />;
 };
 const AdminLoginRoute =({children}:{children:React.ReactNode})=>{
