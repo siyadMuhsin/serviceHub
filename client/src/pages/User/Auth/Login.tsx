@@ -258,12 +258,12 @@ const Login: React.FC = () => {
             dispatch(loginSuccess(response));
             navigate("/");
           }else{
-            toast.error(response.message)
+            toast.error(response.messagen ||"Failed to login")
             
           }
         } catch (error) {
           console.error("Google Sign-In API Error:", error);
-          toast.error(error.message)
+          toast.error(error.message || 'Internal server error')
         }
       }
     };

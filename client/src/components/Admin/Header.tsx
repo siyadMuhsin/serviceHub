@@ -43,27 +43,27 @@ const Header: React.FC = () => {
         <div className="text-2xl font-semibold cursor-pointer transition-transform hover:scale-110">
           Admin<span className="text-[#3F8CFF]">Dash</span>
         </div>
-        <div className="flex-1 mx-5">
+        {/* <div className="flex-1 mx-5">
           <input
             type="text"
             placeholder="Search..."
             className="w-full px-3 py-2 rounded-full bg-[#2A2A3C] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3F8CFF]"
           />
-        </div>
+        </div> */}
         <div className="flex items-center space-x-5">
-          <div className="relative cursor-pointer">
+          {/* <div className="relative cursor-pointer">
             <span>🔔</span>
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
               3
             </span>
-          </div>
-          <div className="cursor-pointer">
+          </div> */}
+          {/* <div className="cursor-pointer">
             <img
               src="https://via.placeholder.com/30"
               alt="User Avatar"
               className="rounded-full"
             />
-          </div>
+          </div> */}
           <button
             onClick={() => setIsModalOpen(true)} // Open confirmation modal
             className="px-4 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"

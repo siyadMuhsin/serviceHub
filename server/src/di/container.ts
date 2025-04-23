@@ -77,6 +77,12 @@ import { IBookingService } from '../core/interfaces/services/IBookingService';
 import { BookingService } from '../services/booking.service';
 import { IBookingRepository } from '../core/interfaces/repositories/IBookingRespository';
 import { BookingRepository } from '../repositories/BookingRepository';
+import { IReviewController } from '../core/interfaces/controllers/IReviewController';
+import { ReviewController } from '../controllers/review.controller';
+import { IReviewRepository } from '../core/interfaces/repositories/IReviewRepository';
+import { IReviewService } from '../core/interfaces/services/IReviewService';
+import { ReviewService } from '../services/review.service';
+import { ReviewRepository } from '../repositories/ReviewRepository';
 
 const container = new Container();
 
@@ -140,5 +146,8 @@ container.bind<ISlotRespository>(TYPES.SlotRepository).to(SlotRepository)
 container.bind<IBookingController>(TYPES.BookingController).to(BookingController)
 container.bind<IBookingService>(TYPES.BookingService).to(BookingService)
 container.bind<IBookingRepository>(TYPES.BookingRepository).to(BookingRepository)
-
+//review
+container.bind<IReviewController>(TYPES.ReviewController).to(ReviewController)
+container.bind<IReviewRepository>(TYPES.ReviewRepository).to(ReviewRepository)
+container.bind<IReviewService>(TYPES.ReviewService).to(ReviewService)
 export default container;

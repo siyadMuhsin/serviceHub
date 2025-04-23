@@ -9,6 +9,8 @@ export class SlotRepository extends BaseRepository<ISlot> implements ISlotRespos
         super(Slot)
     }
     async createSLot(expertId: string, data: Partial<ISlot>): Promise<ISlot > {
+        
+        
         const slot = new Slot({...data,expertId});
   return await slot.save();       
     }

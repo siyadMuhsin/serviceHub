@@ -11,6 +11,9 @@ import { getUserBookings } from "@/services/User/expert.service";
 import Pagination from "@/components/Pagination";
 import { cancelBooking } from "@/services/User/booking.service";
 import { ConfirmationModal } from "@/components/ConfirmModal";
+import ReviewModal from "@/components/User/modals/AddReviewModal";
+import AddReviewModal from "@/components/User/modals/AddReviewModal";
+
 
 export default function UserBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -21,6 +24,8 @@ export default function UserBookingsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+const [bookingToReview, setBookingToReview] = useState<any | null>(null);
   const limit = 8;
 
   const fetchBookings = async (page: number) => {
@@ -95,7 +100,15 @@ export default function UserBookingsPage() {
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
-
+  const openReviewModal = (booking: any) => {
+    setBookingToReview(booking);
+    setIsReviewModalOpen(true);
+  };
+  
+  const handleReviewSuccess = () => {
+    // Optional: refetch bookings or update booking locally to hide review button
+    fetchBookings(currentPage);
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -148,6 +161,7 @@ export default function UserBookingsPage() {
                         {booking?.expertId?.userId?.name?.charAt(0) || "E"}
                       </AvatarFallback>
                     </Avatar>
+                    
                     <div>
                       <h3 className="font-medium text-gray-900 line-clamp-1">
                         {booking?.expertId?.userId?.name || "Expert"}
@@ -156,6 +170,16 @@ export default function UserBookingsPage() {
                         {booking?.expertId?.serviceId?.name || "Service"}
                       </div>
                     </div>
+                    {booking.status === "completed" && !booking.review && (
+  <Button 
+    size="sm" 
+    variant="outline" 
+    onClick={() => openReviewModal(booking)} 
+    className="mt-2"
+  >
+    Add Review
+  </Button>
+)}
                     {(booking.status === 'pending' || booking.status === 'confirmed') && (
                       <Button 
                         variant="destructive" 
@@ -166,7 +190,9 @@ export default function UserBookingsPage() {
                         Cancel
                       </Button>
                     )}
+
                   </div>
+                  
 
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
@@ -188,6 +214,7 @@ export default function UserBookingsPage() {
                         {booking?.location?.address || "Location not specified"}
                       </span>
                     </div>
+                    
                   </div>
                 </div>
                 <Separator />
@@ -215,9 +242,17 @@ export default function UserBookingsPage() {
                     </p>
                   )}
                 </div>
+                
               </Card>
             ))}
           </div>
+          {isReviewModalOpen && bookingToReview && (
+  <AddReviewModal
+    expertId={bookingToReview.expertId._id}
+    onClose={() => setIsReviewModalOpen(false)}
+    onSuccess={handleReviewSuccess}
+  />
+)}
 
           {totalPages > 1 && (
             <Pagination

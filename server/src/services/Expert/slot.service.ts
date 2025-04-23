@@ -4,7 +4,7 @@ import { ISlot } from "../../models/slot.model";
 import { TYPES } from "../../di/types";
 import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRepository";
 import { ISlotRespository } from "../../core/interfaces/repositories/ISlotRepository";
-import mongoose from "mongoose";
+import mongoose, { Date } from "mongoose";
 
 @injectable()
 export class SlotServices implements ISlotService {
@@ -20,7 +20,19 @@ export class SlotServices implements ISlotService {
         return { success: false, message: "Expert Id not match" };
       }
 
-      const slot = await this.slotRespository.createSLot(expertId, data);
+if(!data.date){
+  return { success: false, message: "Date not fount" };
+}
+
+      const date = new Date(data.date);
+      const expireAt = new Date(date);
+      expireAt.setUTCHours(23, 59, 59, 999); 
+      const slotData = {
+        ...data,
+        date,
+        expireAt, // include TTL field
+      };
+      const slot = await this.slotRespository.createSLot(expertId, slotData);
       return { success: true, message: "Slot created", slot };
     } catch (error: any) {
       console.log(error.message);

@@ -8,6 +8,7 @@ import ExpertProfile from '@/pages/Expert/ExpertProfile';
 import ExpertSlot from '@/components/Expert/ExpertSLot';
 
 import BookingMangement from '@/pages/Expert/BookingManagement';
+import ReviewsManagement from '@/pages/Expert/ReviewsManagement';
 
 const ExpertRoutes = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -27,6 +28,7 @@ const ExpertRoutes = () => {
             <Route path='/profile' element={<ExpertProfile/>} />
             <Route path='/slot-management' element={<ExpertSlot/>} />
             <Route path='/booking-management' element={<BookingMangement/>} />
+            <Route path='/reviews' element={<ReviewsManagement/>}/>
             {/* Add more routes here as needed */}
           </Routes>
         </div>

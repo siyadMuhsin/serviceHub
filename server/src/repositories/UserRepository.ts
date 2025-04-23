@@ -17,7 +17,6 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
                 type:'Point',
                 coordinates:[0,0]
             }}
-           
             return await this.create(newData)
         } catch (error) {
             console.error("Error creating user:", error);
@@ -71,4 +70,19 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
             throw new Error("failed to get expert by userId")
         }
     }
+    async addToSavedServices(userId: string, serviceId: string): Promise<void> {
+       await User.updateOne(
+          { _id: userId },
+          { $addToSet: { savedServices: serviceId } } ,// Add only if not already present
+        );
+      }
+      async removeFromSavedServices(userId: string, serviceId: string): Promise<void> {
+        await User.updateOne(
+          { _id: userId },
+          { $pull: { savedServices: serviceId } } // Remove the serviceId from savedServices array
+        );
+      }
+      async findUserWithSavedServices(userId: string):Promise<any > {
+        return await User.findById(userId).populate("savedServices");
+      }
 }

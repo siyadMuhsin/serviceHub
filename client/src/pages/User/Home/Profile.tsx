@@ -34,6 +34,7 @@ import { updateUserProfile } from "@/services/User/profile.service";
 import { setUserLocation } from "@/Slice/locationSlice";
 import ChangePassword from "@/components/User/ChangePassword";
 import { ConfirmationModal } from "@/components/ConfirmModal";
+import SavedServices from "@/components/User/SavedServices";
 
 type ProfileViewType = "overview" | "edit" | "password" | "saved";
 
@@ -430,17 +431,7 @@ export const ProfilePage: React.FC = () => {
 
           {/* Saved Services */}
           {currentView === "saved" && (
-            <Card className="mb-6">
-              <CardContent className="pt-6">
-                <div>
-                  <h3 className="text-lg font-semibold">Saved Services</h3>
-                  <div className="mt-4">
-                    <p className="text-gray-500">No saved services yet.</p>
-                    {/* You can add your saved services list here */}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <SavedServices/>
           )}
         </div>
       </div>

@@ -1,8 +1,11 @@
 import { BookingController } from "../controllers/booking.controller";
 import { SlotController } from "../controllers/Expert/slot.controller";
+import { ReviewController } from "../controllers/review.controller";
 import { PlanRepository } from "../repositories/Admin/plans.repository";
 import { SlotRepository } from "../repositories/Expert/slot.repository";
+import { ReviewRepository } from "../repositories/ReviewRepository";
 import { SlotServices } from "../services/Expert/slot.service";
+import { ReviewService } from "../services/review.service";
 
 export const TYPES = {
   // Repositories
@@ -62,5 +65,10 @@ export const TYPES = {
   //booking
   BookingController:Symbol.for('BookingController'),
   BookingService:Symbol.for('BookingService'),
-  BookingRepository:Symbol.for('BookingRepository')
+  BookingRepository:Symbol.for('BookingRepository'),
+
+    //review
+    ReviewRepository:Symbol.for('ReviewRepository'),
+    ReviewService:Symbol.for('ReviewService'),
+    ReviewController:Symbol.for('ReviewController')
 };

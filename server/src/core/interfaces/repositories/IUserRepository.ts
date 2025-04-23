@@ -1,6 +1,7 @@
 import { FilterQuery, LeanDocument, UpdateQuery } from "mongoose";
 import { IUser } from "../../../models/user.model";
 import { IExpert } from "../../../types/Expert";
+import { IServices } from "../../../types/Admin";
 
 export interface IUserRepository {
   findAll(): Promise<LeanDocument<IUser>[]>;
@@ -12,5 +13,8 @@ export interface IUserRepository {
   findOneBYToken(token: string): Promise<IUser | null>;
   findByIdClearToken(token:string,password:string):Promise <IUser |null>;
   getExpertByUserId(id:string):Promise<IExpert |null>
+  addToSavedServices(userId:string,serviceId:string):Promise<void>
+  removeFromSavedServices(userId:string,serviceId:string):Promise<void>
+  findUserWithSavedServices(userId:string):Promise<IUser>
 
 }

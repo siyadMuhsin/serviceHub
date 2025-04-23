@@ -20,7 +20,7 @@ import LocationFetcher from "../Location/GeoLocation";
 
 import { fetchLocationFromCoordinates } from "@/Utils/locationUtils";
 import { number } from "yup";
-import { setUserLocation } from "@/Slice/locationSlice";
+import { resetLocations, setUserLocation } from "@/Slice/locationSlice";
 
 const Navbar: React.FC = () => {
   // const { categories, services } = useSelector((state: any) => state.categoryService);
@@ -56,6 +56,7 @@ const {userLocation}=useSelector((state:any)=>state.location)
       if(response.success){
         navigate("/login")
         dispatch(logout());
+        dispatch(resetLocations())
         setShowLogoutModal(false)
       }else{
         toast.error(response.message || "Cannot log out now!")

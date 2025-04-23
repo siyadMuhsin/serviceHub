@@ -7,10 +7,13 @@ import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRep
 import { IExpert } from "../../types/Expert";
 import { CloudinaryService } from "../../config/cloudinary";
 import { IUser } from "../../models/user.model";
+import { IServiceRepository } from "../../core/interfaces/repositories/IServiceRepository";
+import { IServices } from "../../types/Admin";
 @injectable()
 export class ProfileService implements IProfileService {
     constructor(
         @inject(TYPES.UserRepository) private userRepositry :IUserRepository,
+        @inject(TYPES.ServiceRepository) private serviceRepository:IServiceRepository
      ){}
 
    
@@ -48,12 +51,9 @@ export class ProfileService implements IProfileService {
         try {
             const expertData= await this.userRepositry.getExpertByUserId(id)
             if(expertData){
-                
                 return {success:true,message:'Expert data fetched successfully',expert:expertData}
             }
             return {success:false,message:"Expert data not found"}
-           
-
         } catch (error:any) {
             return {success:false,message: error.message ||'something error in getExpert data'}
         }
@@ -113,6 +113,60 @@ export class ProfileService implements IProfileService {
         } catch (error) {
           console.error("Change password error:", error); // optional: for debugging
           return { success: false, message: 'Failed to change password' };
+        }
+      }
+
+      async saveService(userId: string, serviceId: string): Promise<{ success: boolean; message: string }> {
+        try {
+          const user = await this.userRepositry.findById(userId);
+          if (!user) {
+            return { success: false, message: "User not found" };
+          }
+          const service = await this.serviceRepository.getServiceById(serviceId);
+          if (!service) {
+            return { success: false, message: "Service not found" };
+          }
+          // Add serviceId to savedServices using repository method
+          await this.userRepositry.addToSavedServices(userId, serviceId);
+      
+          return { success: true, message: "Service saved successfully" };
+        } catch (error) {
+          console.error("Error saving service:", error);
+          return { success: false, message: "Failed to save service" };
+        }
+      }
+      async unsaveService(userId: string, serviceId: string): Promise<{ success: boolean; message: string }> {
+        try {
+          const user = await this.userRepositry.findById(userId);
+          if (!user) {
+            return { success: false, message: "User not found" };
+          }
+          const service = await this.serviceRepository.getServiceById(serviceId);
+          if (!service) {
+            return { success: false, message: "Service not found" };
+          }
+      
+          await this.userRepositry.removeFromSavedServices(userId, serviceId);
+      
+          return { success: true, message: "Service unsaved successfully" };
+        } catch (error) {
+          console.error("Error unsaving service:", error);
+          return { success: false, message: "Failed to unsave service" };
+        }
+      }
+      async getSavedServices(userId: string): Promise<{ success: boolean;  message: string,services?: any[]; }> {
+        try {
+          const user = await this.userRepositry.findUserWithSavedServices(userId);
+          if (!user) {
+            return { success: false, message: "User not found" };
+          }
+      
+          console.log(user.savedServices);
+          
+          return { success: true,message:"saved survice get in success", services: user.savedServices };
+        } catch (error) {
+          console.error("Error fetching saved services:", error);
+          return { success: false, message: "Failed to fetch saved services" };
         }
       }
 }

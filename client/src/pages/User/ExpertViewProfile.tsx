@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { getExpertDetails } from '@/services/User/expert.service';
 import { toast } from 'react-toastify';
 import BookingModal from '@/components/User/modals/BookingModal';
+import RatingsReviews from '@/components/User/ReviewRating';
 
 export default function ExpertViewProfile() {
   const [activeTab, setActiveTab] = useState('All Projects');
@@ -129,30 +130,8 @@ export default function ExpertViewProfile() {
       )}
       
       {/* Ratings & Reviews */}
-      <div className="rounded-lg border border-gray-200 p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Ratings & Reviews</h2>
-        
-        <div className="flex flex-col md:flex-row items-center gap-6">
-          {/* Rating Score */}
-          <div className="text-center md:text-left">
-            <div className="text-5xl font-bold text-gray-800">4.8</div>
-            <div className="flex mt-2 justify-center md:justify-start">
-              {[1, 2, 3, 4].map((star) => (
-                <Star key={star} size={20} fill="#FFB800" color="#FFB800" />
-              ))}
-              <Star size={20} fill="#FFB800" color="#FFB800" className="fill-[50%]" />
-            </div>
-            <div className="text-gray-500 mt-2">Based on 127 verified reviews</div>
-          </div>
-          
-          {/* Leave Review Button */}
-          <div className="flex-grow md:ml-auto">
-            <button className="w-full md:w-auto px-6 py-3 border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 transition flex items-center justify-center gap-2">
-              Leave a Review
-            </button>
-          </div>
-        </div>
-      </div>
+      <RatingsReviews expertId={expertId}/>
+
       {isModalOpen && (
   <BookingModal
     expert={expertData}

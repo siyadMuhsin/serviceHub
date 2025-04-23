@@ -11,6 +11,7 @@ import { verify } from "crypto";
 import { ITokenController } from "../core/interfaces/controllers/ITokenController";
 import { ISlotController } from "../core/interfaces/controllers/ISlotController";
 import { IBookingController } from "../core/interfaces/controllers/IBookingController";
+import { IReviewController } from "../core/interfaces/controllers/IReviewController";
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -23,6 +24,8 @@ const paymentController=container.get<IPaymentController>(TYPES.PaymentControlle
 const slotController= container.get<ISlotController>(TYPES.SlotController)
 const authMiddleware= container.get<IAuthMiddleware>(TYPES.AuthMiddleware)
 const bookingController=container.get<IBookingController>(TYPES.BookingController)
+const reviewController= container.get<IReviewController>(TYPES.ReviewController)
+
 
 router.post("/create", upload.single("certificate"),authMiddleware.verifyToken.bind(authMiddleware),expertController.createExpert.bind(expertController));
 router.get("/fetch-data",authMiddleware.verifyExpert.bind(authMiddleware),expertProfileController.get_expertData.bind(expertProfileController))
@@ -47,6 +50,10 @@ router.delete('/slot/:slotId',verifyExpert,slotController.deleteSlot.bind(slotCo
 //booking management
 router.get('/booking',verifyExpert,bookingController.getBookingToExpert.bind(bookingController))
 router.patch('/booking/:bookingId',verifyExpert,bookingController.bookingStatusChange.bind(bookingController))
+
+// review management
+router.get('/reviews',verifyExpert,reviewController.getReviewsForExpert.bind(reviewController))
+
 export default router;
 
 function test(req:Request,res:Response,next:NextFunction){

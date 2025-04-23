@@ -24,4 +24,17 @@ export interface IProfileService{
         success:boolean,
         message:string
     }>
+    saveService(userId:string,serviceId:string):Promise<{
+        success:boolean,
+        message:string,
+    }>
+    unsaveService(userId:string,serviceId:string):Promise<{
+        success:boolean,
+        message:string,
+    }>
+    getSavedServices(userId:string):Promise<{
+        success:boolean,
+        message:string,
+        services?:any[]
+    }>
 }

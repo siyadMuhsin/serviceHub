@@ -29,9 +29,7 @@ export class ProfileController implements IProfileController {
               HttpStatus.BAD_REQUEST
             );
           }
-    
           const response = await this.profileService.addLocation(userId, lat, lng);
-          
           if (!response.success) {
             return this.sendResponse(
               res,
@@ -39,7 +37,6 @@ export class ProfileController implements IProfileController {
               HttpStatus.INTERNAL_SERVER_ERROR
             );
           }
-    
           this.sendResponse(
             res,
             { success: true, message: "Location added successfully" },
@@ -54,7 +51,6 @@ export class ProfileController implements IProfileController {
           );
         }
     }
-
     async getExistingExpert (req:AuthRequest,res:Response):Promise<void>{
       try {
         const userId= req?.user?.userId
@@ -105,10 +101,6 @@ export class ProfileController implements IProfileController {
           }
       
         }
-        // if(!location.lat || !location.lng){ 
-        //   this.sendResponse(res,{message:"Add Location"},HttpStatus.BAD_REQUEST)
-        //   return
-        // }
         const response= await this.profileService.profileUpdate(userId,req.body)
         if(response.success){
           this.sendResponse(res,response,HttpStatus.OK)
@@ -132,8 +124,46 @@ export class ProfileController implements IProfileController {
       } catch (error:any) {
         this.sendResponse(res,error.message|| "Internal server error",HttpStatus.INTERNAL_SERVER_ERROR)
       }
-
     }
+async saveService(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const userId= req?.user?.userId
+    const {serviceId}=req.params
+    if(!serviceId){
+      this.sendResponse(res,{message:"ServiceId is required"},HttpStatus.BAD_REQUEST)
+      return
+    }
+    const result= await this.profileService.saveService(userId,serviceId)
+    this.sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+  } catch (error) {
+    this.sendResponse(res,{message:"Internal server error"},HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+}
+async unsaveService(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const userId= req?.user?.userId
+    const {serviceId}=req.params
+    if(!serviceId){
+      this.sendResponse(res,{message:"ServiceId is required"},HttpStatus.BAD_REQUEST)
+      return
+    }
+    const result= await this.profileService.unsaveService(userId,serviceId)
+    this.sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+  } catch (error) {
+    this.sendResponse(res,{message:"Internal server error"},HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+}
+
+async getSavedServices(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const userId = req?.user?.userId;
+    const result = await this.profileService.getSavedServices(userId);
+    this.sendResponse(res, result, result.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+  } catch (error) {
+    this.sendResponse(res, { message: "Internal server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+    
   private sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }

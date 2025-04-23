@@ -7,7 +7,10 @@ import adminRoute from './routes/admin.routes'
 import expertRoute from './routes/expert.routes'
 import userRoute from './routes/user.routes'
 import cookieParser from 'cookie-parser'
+import http from 'http'
 import cors from 'cors'
+import { Server } from "socket.io";
+import { initializeSocketHandler } from "./sockets/socketHandler";
 const app=express()
 
 const corsOptions: cors.CorsOptions = {
@@ -15,6 +18,17 @@ const corsOptions: cors.CorsOptions = {
     credentials: true, 
    
 };
+
+
+const server= http.createServer(app)
+const io = new Server(server, {
+    cors: {
+      origin: "http://127.0.0.1:5500",
+      methods: ["GET", "POST"]
+    }
+  });
+
+  initializeSocketHandler(io);
 app.use(cors(corsOptions))
 app.use(cookieParser())
 dotenv.config()
@@ -27,6 +41,6 @@ app.use('/auth',authRoutes)
 app.use('/admin',adminRoute)
 app.use('/expert',expertRoute)
 const PORT=process.env.PORT || 3000
-app.listen(PORT,()=>{
+server.listen(PORT,()=>{
     console.log("server running succesfully")
 })

@@ -32,6 +32,32 @@ const changePassword= async(currentPassword:string,newPassword:string)=>{
     } catch (error) {
         throw new Error (error.response.data.message)  
     }
-
 }
-export {uploadProfileImage,updateUserProfile,changePassword}
+
+const saveService=async(serviceId:string)=>{
+    try {
+        const response= await userAPI.patch(`/service-save/${serviceId}`)
+        return response.data
+    } catch (error) {
+        throw new Error(error.response.data.message)
+        
+    }
+}
+const unsaveService=async(serviceId:string)=>{
+    try {
+        const response= await userAPI.patch(`/service-unsave/${serviceId}`)
+        return response.data
+    } catch (error) {
+        throw new Error(error.response.data.message)  
+    }
+}
+const fetchSavedService=async()=>{
+try {
+    const response= await userAPI.get('/saved-service')
+    return response.data
+} catch (error) {
+    throw new Error(error?.response?.data?.message)
+    
+}
+}
+export {uploadProfileImage,updateUserProfile,changePassword,saveService,unsaveService,fetchSavedService}

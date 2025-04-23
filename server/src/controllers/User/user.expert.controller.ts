@@ -6,7 +6,6 @@ import { TYPES } from "../../di/types";
 import { IUserExpertService } from "../../core/interfaces/services/IUserExpertService";
 import mongoose from "mongoose";
 import { HttpStatus } from "../../types/httpStatus";
-import { realpathSync } from "fs";
 
 @injectable()
 export class UserExpertController implements IUserExpertController {

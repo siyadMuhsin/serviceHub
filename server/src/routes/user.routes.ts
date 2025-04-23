@@ -10,6 +10,7 @@ import upload from "../config/multer";
 import { IUserExpertController } from "../core/interfaces/controllers/IUserExpertController";
 import { IBookingController } from "../core/interfaces/controllers/IBookingController";
 import { ISlotController } from "../core/interfaces/controllers/ISlotController";
+import { IReviewController } from "../core/interfaces/controllers/IReviewController";
 
 const router = Router();
 
@@ -23,6 +24,8 @@ const userExpertController = container.get<IUserExpertController>(TYPES.UserExpe
 const expertController = container.get<IExpertController>(TYPES.ExpertController);
 const slotController= container.get<ISlotController>(TYPES.SlotController)
 const bookingController= container.get<IBookingController>(TYPES.BookingController)
+const reviewController= container.get<IReviewController>(TYPES.ReviewController)
+
 // ✅ Protected Category Routes
 router.get('/categories', verifyUser, categoryController.categoriesByLimit.bind(categoryController));
 router.get('/categories/all', verifyUser, categoryController.getAllCategories.bind(categoryController));
@@ -49,4 +52,12 @@ router.post('/book',verifyUser,upload.array('images' ,5),bookingController.booki
 
 router.get('/bookings',verifyUser,bookingController.getUserBooking.bind(bookingController))
 router.patch('/bookings/:bookingId',verifyUser,bookingController.userCancelBooking.bind(bookingController))
+
+router.post('/review',verifyUser,reviewController.reviewSubmit.bind(reviewController))
+router.get('/reviews/:expertId',verifyUser,reviewController.getReviewsForUser.bind(reviewController))
+
+// save service
+router.patch('/service-save/:serviceId',verifyUser,profileController.saveService.bind(profileController))
+router.patch('/service-unsave/:serviceId',verifyUser,profileController.unsaveService.bind(profileController))
+router.get('/saved-service',verifyUser,profileController.getSavedServices.bind(profileController))
 export default router;

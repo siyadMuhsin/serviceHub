@@ -5,6 +5,7 @@ export interface ISlot extends Document {
   date: Date;
   timeSlots: string[];
   createdAt: Date;
+  expireAt:Date
 }
 
 const SlotSchema: Schema = new Schema<ISlot>({
@@ -12,6 +13,7 @@ const SlotSchema: Schema = new Schema<ISlot>({
   date: { type: Date, required: true },
   timeSlots: [{ type: String, required: true }],
   createdAt: { type: Date, default: Date.now },
+  expireAt: { type: Date, required: true },
 });
-
+SlotSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 export const Slot = mongoose.model<ISlot>("Slot", SlotSchema);

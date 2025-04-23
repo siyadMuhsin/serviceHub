@@ -93,8 +93,6 @@ export class ExpertRepository extends BaseRepository<IExpert> implements IExpert
       ): Promise<any[] | null> {
         try {
           const maxDistanceInMeters = distanceInKm * 1000;
-         
-      
           const results = await Expert.aggregate([
             {
               $geoNear: {

@@ -103,6 +103,7 @@ export default function BookingDetailsView({
       setShowCancelModal(false);
     }
   };
+  console.log(selectedImage)
   return (
     <div className="w-full bg-gray-50 min-h-screen">
       {/* Header */}
@@ -257,13 +258,7 @@ export default function BookingDetailsView({
                               className="w-full h-full object-cover" 
                             />
                           </div>
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
-                            <div className="bg-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M15 10L20 15M20 15L15 20M20 15H8M13 4L8 9M8 9L3 4M8 9V2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                              </svg>
-                            </div>
-                          </div>
+                        
                         </div>
                       ))}
                     </div>
