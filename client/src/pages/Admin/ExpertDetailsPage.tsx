@@ -37,6 +37,7 @@ const ExpertDetailsPage = () => {
     };
     fetchExpertData(id);
   }, [id]);
+console.log(expertData);
 
   // Function to get status color
   const getStatusColor = (status) => {
@@ -93,7 +94,7 @@ const ExpertDetailsPage = () => {
             <div className="px-6 pb-6">
               <div className="flex justify-center -mt-16">
                 <Avatar className="w-32 h-32 border-4 border-white">
-                  <AvatarImage src={expertData.certificateUrl} alt={expertData.accountName} />
+                  <AvatarImage src={expertData.userId.profile_image} alt={expertData.accountName} />
                   <AvatarFallback className="bg-blue-100 text-blue-800 text-2xl">
                     {expertData.accountName?.charAt(0) || 'E'}
                   </AvatarFallback>
@@ -158,33 +159,7 @@ const ExpertDetailsPage = () => {
             </div>
           </Card>
 
-          <Card className="mt-6">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Approval Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Is Approved</span>
-                <Badge className={expertData.isApproved ? "bg-green-100 text-green-800 border-green-300" : "bg-red-100 text-red-800 border-red-300"}>
-                  {expertData.isApproved ? "Yes" : "No"}
-                </Badge>
-              </div>
-              
-              <div className="mt-4">
-                <span className="font-medium">User Status</span>
-                <Badge className="ml-2" variant={expertData.userId?.isBlocked ? "destructive" : "outline"}>
-                  {expertData.userId?.isBlocked ? "Blocked" : "Active"}
-                </Badge>
-              </div>
-
-              <div className="mt-4">
-                <span className="font-medium">Expert Status</span>
-                <Badge className="ml-2" variant={expertData.userId?.expertStatus === "rejected" ? "destructive" : "outline"}>
-                  {expertData.userId?.expertStatus}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
+          
         </div>
 
         {/* Main content */}
@@ -235,37 +210,7 @@ const ExpertDetailsPage = () => {
                     </div>
                   </div>
 
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-3 flex items-center">
-                      <span className="text-green-600 mr-2">⏱️</span>
-                      Timeline
-                    </h3>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex flex-col space-y-4">
-                        <div className="flex">
-                          <div className="w-1 bg-blue-300 rounded mr-4"></div>
-                          <div>
-                            <p className="text-sm text-gray-500">Created At</p>
-                            <p className="font-medium">{new Date(expertData.createdAt).toLocaleString()}</p>
-                          </div>
-                        </div>
-                        <div className="flex">
-                          <div className="w-1 bg-purple-300 rounded mr-4"></div>
-                          <div>
-                            <p className="text-sm text-gray-500">Updated At</p>
-                            <p className="font-medium">{new Date(expertData.updatedAt).toLocaleString()}</p>
-                          </div>
-                        </div>
-                        <div className="flex">
-                          <div className="w-1 bg-green-300 rounded mr-4"></div>
-                          <div>
-                            <p className="text-sm text-gray-500">User Created At</p>
-                            <p className="font-medium">{new Date(expertData.userId?.createdAt).toLocaleString()}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  
                 </CardContent>
               </Card>
             </TabsContent>
@@ -333,45 +278,7 @@ const ExpertDetailsPage = () => {
             </TabsContent>
           </Tabs>
 
-          <Card className="mt-6">
-            <CardHeader className="bg-gradient-to-r from-pink-50 to-red-50">
-              <CardTitle className="flex items-center">
-                <span className="mr-2">🔒</span> Account Security
-              </CardTitle>
-              <CardDescription>User verification status</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Email Verification</p>
-                      <p className="font-medium">{expertData.userId?.isVerified ? "Verified" : "Not Verified"}</p>
-                    </div>
-                    <Badge className={expertData.userId?.isVerified ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                      {expertData.userId?.isVerified ? "✓" : "✗"}
-                    </Badge>
-                  </div>
-                </div>
-                
-                <div className="bg-white border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Account Type</p>
-                      <p className="font-medium">{expertData.userId?.isGoogleUser ? "Google Account" : "Email & Password"}</p>
-                    </div>
-                    <Badge variant="outline">
-                      {expertData.userId?.isGoogleUser ? "Google" : "Standard"}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="bg-pink-50 flex justify-between text-sm text-gray-600">
-              <p>User Role: <Badge>{expertData.userId?.role}</Badge></p>
-              <p>User ID: {expertData.userId?._id.toString().substring(0, 8)}...</p>
-            </CardFooter>
-          </Card>
+
         </div>
       </div>
     </div>

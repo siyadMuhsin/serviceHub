@@ -1,5 +1,6 @@
-import { LeanDocument } from "mongoose";
+import { FilterQuery, LeanDocument } from "mongoose";
 import { IExpert } from "../../../types/Expert";
+import { IUser } from "../../../models/user.model";
 
 export interface IExpertRepository {
     createExpert(data: Partial<IExpert>, userId: string): Promise<IExpert>;
@@ -13,5 +14,6 @@ export interface IExpertRepository {
     findNearbyExperts(lat:number,lng:number,distanceInKm:number,serviceId:string):Promise<any[] |null>
     getExpertDataToUser(userlat:number,userlng:number,distanceInKm:number,experId:string):Promise<IExpert|null>
     findDistanceLocation(userLng:number,userLat:number):Promise<any>
+    count(data:FilterQuery<IUser>):Promise<number>
    
 }

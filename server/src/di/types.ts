@@ -1,3 +1,4 @@
+import { DashboardController } from "../controllers/Admin/dashboard.controller";
 import { BookingController } from "../controllers/booking.controller";
 import { SlotController } from "../controllers/Expert/slot.controller";
 import { MessageController } from "../controllers/message.controller";
@@ -77,5 +78,6 @@ export const TYPES = {
 
     MessageController:Symbol.for('MessageController'),
     MessageService:Symbol.for('MessageService'),
-    MessageRepository:Symbol.for('MessageRepository')
+    MessageRepository:Symbol.for('MessageRepository'),
+  DashboardController:Symbol.for('DashboardController')
 };

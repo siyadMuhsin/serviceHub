@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
-import DataTable from "react-data-table-component";
 import Header from "../../components/Admin/Header";
 import Sidebar from "../../components/Admin/Sidebar";
 import { user_block_unbloack, get_users } from "../../services/Admin/user.service";
 import Loading from "../../components/Loading";
 import { Snackbar, Alert } from "@mui/material";
 import { ConfirmationModal } from "@/components/ConfirmModal";
-
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
+import debounce from "@/Utils/debouce";
 
 const UserManagement: React.FC = () => {
   const [filterText, setFilterText] = useState("");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [users, setUsers] = useState<[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -24,14 +25,22 @@ const UserManagement: React.FC = () => {
     isBlocked: false,
     userName: "",
   });
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
       try {
-        const response = await get_users();
+        const response = await get_users(currentPage, itemsPerPage, filterText);
         if (response.success) {
           setUsers(response.users);
+          setTotalUsers(response.totalUsers);
+          setTotalPages(Math.ceil(response.totalUsers / itemsPerPage));
         }
       } catch (error) {
         setSnackbar({
@@ -44,7 +53,7 @@ const UserManagement: React.FC = () => {
       }
     };
     fetchUsers();
-  }, []);
+  }, [currentPage, filterText]);
 
   const showConfirmation = (user: any) => {
     setConfirmationModal({
@@ -92,78 +101,19 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const columns = [
-    {
-      name: "Profile",
-      selector: (row: any) => row.profile_image,
-      cell: (row: any) => (
-        <img
-          src={row.profile_image}
-          alt={row.name}
-          className="w-12 h-12 object-cover rounded-full"
-        />
-      ),
-      width: "80px",
-    },
-    {
-      name: "Name",
-      selector: (row: any) => row.name,
-      sortable: true,
-    },
-    {
-      name: "Email",
-      selector: (row: any) => row.email,
-      sortable: true,
-    },
-    {
-      name: "Google User",
-      selector: (row: any) => row.isGoogleUser,
-      cell: (row: any) => (
-        <span
-          className={`px-2 py-1 rounded text-sm text-white ${
-            row.isGoogleUser ? "bg-green-500" : "bg-red-500"
-          }`}
-        >
-          {row.isGoogleUser ? "Yes" : "No"}
-        </span>
-      ),
-      width: "120px",
-    },
-    {
-      name: "Status",
-      cell: (row: any) => (
-        <span
-          className={`px-2 py-1 rounded text-sm text-white ${
-            row.isBlocked ? "bg-red-500" : "bg-green-500"
-          }`}
-        >
-          {row.isBlocked ? "Blocked" : "Active"}
-        </span>
-      ),
-      width: "100px",
-    },
-    {
-      name: "Actions",
-      cell: (row: any) => (
-        <div className="flex space-x-2">
-          <button
-            onClick={() => showConfirmation(row)}
-            className={`px-4 py-2 rounded-md font-semibold ${
-              row.isBlocked ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
-            } text-white`}
-          >
-            {row.isBlocked ? "Unblock" : "Block"}
-          </button>
-        </div>
-      ),
-      width: "150px",
-    },
-  ];
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleSearch = debounce((value:string) => {
+    setFilterText(value);
+    setCurrentPage(1); // Reset to first page when searching
+  },400);
 
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#1E1E2F] text-white transition-all pt-14">
+      <div className="min-h-screen bg-[#171730] text-white transition-all pt-14">
         <Sidebar
           onToggle={(expanded: boolean) => setIsSidebarExpanded(expanded)}
         />
@@ -177,25 +127,106 @@ const UserManagement: React.FC = () => {
             <input
               type="text"
               placeholder="Search users..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-              className="p-2 rounded bg-[#2A2A3C] text-white placeholder-gray-400"
+              defaultValue={filterText}
+              onChange={(e)=>handleSearch(e.target.value)}
+              className="p-2 rounded bg-[#2A2A3C] text-white placeholder-gray-400 w-64"
             />
           </div>
-          {isLoading && <Loading />}
-          <div className="overflow-auto max-h-[calc(100vh-200px)]">
-            <DataTable
-              columns={columns}
-              data={users.filter((user: any) =>
-                user.name.toLowerCase().includes(filterText.toLowerCase())
+          
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <>
+              <div className="overflow-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-[#2A2A3C]">
+                      <th className="p-3 text-left">Profile</th>
+                      <th className="p-3 text-left">Name</th>
+                      <th className="p-3 text-left">Email</th>
+                      <th className="p-3 text-left">Google User</th>
+                      <th className="p-3 text-left">Status</th>
+                      <th className="p-3 text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.length > 0 ? (
+                      users.map((user) => (
+                        <tr key={user._id} className="border-b border-[#2A2A3C] hover:bg-[#2A2A3C]">
+                          <td className="p-3">
+                            <img
+                              src={user.profile_image}
+                              alt={user.name}
+                              className="w-12 h-12 object-cover rounded-full"
+                            />
+                          </td>
+                          <td className="p-3">{user.name}</td>
+                          <td className="p-3">{user.email}</td>
+                          <td className="p-3">
+                            <span
+                              className={`px-2 py-1 rounded text-sm text-white ${
+                                user.isGoogleUser ? "bg-green-500" : "bg-red-500"
+                              }`}
+                            >
+                              {user.isGoogleUser ? "Yes" : "No"}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <span
+                              className={`px-2 py-1 rounded text-sm text-white ${
+                                user.isBlocked ? "bg-red-500" : "bg-green-500"
+                              }`}
+                            >
+                              {user.isBlocked ? "Blocked" : "Active"}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <button
+                              onClick={() => showConfirmation(user)}
+                              className={`px-4 py-2 rounded-md font-semibold ${
+                                user.isBlocked ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
+                              } text-white`}
+                            >
+                              {user.isBlocked ? "Unblock" : "Block"}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="p-5 text-center">
+                          No users found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              
+              {totalPages > 1 && (
+                <div className="mt-5 flex justify-center">
+                  <Stack spacing={2}>
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                      color="primary"
+                      size="large"
+                      sx={{
+                        '& .MuiPaginationItem-root': {
+                          color: 'white',
+                        },
+                        '& .MuiPaginationItem-page.Mui-selected': {
+                          backgroundColor: '#3b82f6',
+                          color: 'white',
+                        },
+                      }}
+                    />
+                  </Stack>
+                </div>
               )}
-              pagination
-              paginationPerPage={5}
-              paginationRowsPerPageOptions={[5, 10, 20, 30]}
-              highlightOnHover
-              customStyles={customStyles}
-            />
-          </div>
+            </>
+          )}
         </main>
       </div>
 
@@ -228,32 +259,6 @@ const UserManagement: React.FC = () => {
       </Snackbar>
     </>
   );
-};
-
-const customStyles = {
-  headCells: {
-    style: {
-      backgroundColor: "#2A2A3C",
-      color: "#FFFFFF",
-      fontSize: "14px",
-      fontWeight: "bold",
-    },
-  },
-  cells: {
-    style: {
-      backgroundColor: "#1E1E2F",
-      color: "#FFFFFF",
-      fontSize: "14px",
-    },
-  },
-  rows: {
-    style: {
-      backgroundColor: "#1E1E2F",
-      "&:hover": {
-        backgroundColor: "#2A2A3C",
-      },
-    },
-  },
 };
 
 export default UserManagement;

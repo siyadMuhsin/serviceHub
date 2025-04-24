@@ -85,4 +85,36 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
       async findUserWithSavedServices(userId: string):Promise<any > {
         return await User.findById(userId).populate("savedServices");
       }
+
+      async findUsersByPagination(page: number,limit: number,search?: string): Promise<{
+        users: IUser[];
+        total: number;
+        totalPages: number;
+        currentPage: number;
+      }> {
+        const skip = (page - 1) * limit;
+        // Create a query for search
+        const query: any = {};
+        if (search) {
+          query.$or = [
+            { name: { $regex: search, $options: 'i' } },
+            { email: { $regex: search, $options: 'i' } }
+          ];
+        }
+        const [users, total] = await Promise.all([
+          User.find(query)
+          .sort({createdAt:-1})
+            .skip(skip)
+            .limit(limit)
+            
+            .exec(),
+          User.countDocuments(query)
+        ]);
+        return {
+          users: users.map(user => user.toObject()), 
+          total,
+          totalPages: Math.ceil(total / limit),
+          currentPage: page
+        };
+      }
 }

@@ -89,6 +89,8 @@ import { IMessageService } from '../core/interfaces/services/IMessageService';
 import { MessageService } from '../services/message.service';
 import { IMessageRepository } from '../core/interfaces/repositories/IMessageRepository';
 import { MessageRepository } from '../repositories/MessageRepository';
+import { IDashboardController } from '../core/interfaces/controllers/IDashboardController';
+import { DashboardController } from '../controllers/Admin/dashboard.controller';
 
 const container = new Container();
 
@@ -160,4 +162,5 @@ container.bind<IReviewService>(TYPES.ReviewService).to(ReviewService)
 container.bind<IMessageController>(TYPES.MessageController).to(MessageController)
 container.bind<IMessageService>(TYPES.MessageService).to(MessageService)
 container.bind<IMessageRepository>(TYPES.MessageRepository).to(MessageRepository)
+container.bind<IDashboardController>(TYPES.DashboardController).to(DashboardController)
 export default container;

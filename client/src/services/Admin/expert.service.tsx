@@ -1,7 +1,7 @@
 import { adminAPI } from "config/axiosConfig";
 export const get_experts=async(page:number,limit:number,filter:string,search:string)=>{
     try {
-        const response= await adminAPI.get(`/experts/?page=${page+1}&limit=${limit}&filter=${filter}&search=${search}`)
+        const response= await adminAPI.get(`/experts/?page=${page}&limit=${limit}&filter=${filter}&search=${search}`)
         return response.data
     } catch (error) {
         console.log(error)

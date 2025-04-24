@@ -10,8 +10,10 @@ import {
 import AddCategoryModal from "../../components/Admin/Modals/CategoryModal";
 import { toast } from "react-toastify";
 import Loading from "../../components/Loading";
-import Pagination from "../../components/Pagination";
+
 import { ConfirmationModal } from "@/components/ConfirmModal";
+import {  Pagination, Stack } from "@mui/material";
+import debounce from "@/Utils/debouce";
 
 
 const Category: React.FC = () => {
@@ -21,7 +23,7 @@ const Category: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [editingCategory, setEditCategory] = useState<any>();
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
@@ -112,6 +114,9 @@ const Category: React.FC = () => {
       currentStatus: category.isActive,
     });
   };
+  const handleSearch=debounce((value:string)=>{
+setFilterText(value)
+  },500)
 
   const handleConfirmAction = async () => {
     setIsLoading(true);
@@ -153,14 +158,15 @@ const Category: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#1E1E2F] text-white transition-all pt-14">
+      <div className="min-h-screen bg-[#171730] text-white transition-all pt-14">
         <Sidebar onToggle={(expanded: boolean) => setIsSidebarExpanded(expanded)} />
         <main className={`p-5 transition-all duration-300 ${isSidebarExpanded ? "ml-64" : "ml-16"}`}>
           <h2 className="text-2xl font-bold mb-5">Category Management</h2>
@@ -169,8 +175,8 @@ const Category: React.FC = () => {
             <input
               type="text"
               placeholder="Search categories..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
+              defaultValue={filterText}
+              onChange={(e) => handleSearch(e.target.value)}
               className="p-2 rounded bg-[#2A2A3C] text-white placeholder-gray-400"
             />
             <button
@@ -246,11 +252,26 @@ const Category: React.FC = () => {
             </table>
           </div>
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          <div className="mt-16 flex justify-center">
+            <Stack spacing={2}>
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                size="large"
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    fontSize: '1rem',
+                  },
+                  '& .Mui-selected': {
+                    fontWeight: 'bold',
+                  },
+                }}
+              />
+            </Stack>
+          </div>
+        
         </main>
       </div>
 

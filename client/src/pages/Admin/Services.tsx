@@ -12,8 +12,10 @@ import AddServiceModal from "../../components/Admin/Modals/ServiceModal";
 import { add_service } from "../../services/Admin/service.service";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../components/Loading";
-import Pagination from "../../components/Pagination";
+
 import { ConfirmationModal } from "@/components/ConfirmModal";
+import { Pagination, Stack } from "@mui/material";
+import debounce from "@/Utils/debouce";
 
 
 const Services: React.FC = () => {
@@ -28,7 +30,7 @@ const Services: React.FC = () => {
     message: "",
     severity: "success",
   });
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
@@ -157,14 +159,17 @@ const Services: React.FC = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
+const handleSearch=debounce((value:string)=>{
+  setFilterText(value)
+},500)
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#1E1E2F] text-white transition-all">
+      <div className="min-h-screen bg-[#171730] text-white transition-all">
         <Sidebar onToggle={(expanded: boolean) => setIsSidebarExpanded(expanded)} />
         <main className={`transition-all duration-300 ${isSidebarExpanded ? "ml-64" : "ml-16"} pt-16 p-5`}>
           <h3 className="text-2xl font-bold mb-5">Service Management</h3>
@@ -173,8 +178,8 @@ const Services: React.FC = () => {
             <input
               type="text"
               placeholder="Search services..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
+              defaultValue={filterText}
+              onChange={(e) => handleSearch(e.target.value)}
               className="p-2 rounded bg-[#2A2A3C] text-white placeholder-gray-400"
             />
             <button
@@ -253,11 +258,25 @@ const Services: React.FC = () => {
             </table>
           </div>
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          <div className="mt-16 flex justify-center">
+            <Stack spacing={2}>
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                size="large"
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    fontSize: '1rem',
+                  },
+                  '& .Mui-selected': {
+                    fontWeight: 'bold',
+                  },
+                }}
+              />
+            </Stack>
+          </div>
         </main>
       </div>
 

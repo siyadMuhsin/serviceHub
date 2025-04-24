@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { IMessage, IUser } from '@/Interfaces/interfaces';
 import { getConversationToUser, getChatUsers } from '@/services/chat.service';
 import { getUserIdAndRole } from '@/Utils/getUserIdAndRole';
+import { baseUrl } from 'config/axiosConfig';
 
 export default function ExpertChatPage() {
   const [messages, setMessages] = useState<IMessage[]>([]);
@@ -19,7 +20,7 @@ export default function ExpertChatPage() {
     const { id } = getUserIdAndRole();
     setUserId(id);
 
-    socketRef.current = io('http://localhost:3000', {
+    socketRef.current = io(baseUrl, {
       autoConnect: true,
       reconnection: true,
     });

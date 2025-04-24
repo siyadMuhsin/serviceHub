@@ -8,11 +8,11 @@ import { MapPin, CalendarDays, Clock, Loader2, Star } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
 import { getUserBookings } from "@/services/User/expert.service";
-import Pagination from "@/components/Pagination";
 import { cancelBooking } from "@/services/User/booking.service";
 import { ConfirmationModal } from "@/components/ConfirmModal";
 import ReviewModal from "@/components/User/modals/AddReviewModal";
 import AddReviewModal from "@/components/User/modals/AddReviewModal";
+import { Pagination, Stack } from "@mui/material";
 
 
 export default function UserBookingsPage() {
@@ -50,8 +50,9 @@ const [bookingToReview, setBookingToReview] = useState<any | null>(null);
     fetchBookings(currentPage);
   }, [currentPage]);
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const openCancelConfirmation = (bookingId: string) => {
@@ -255,11 +256,25 @@ const [bookingToReview, setBookingToReview] = useState<any | null>(null);
 )}
 
           {totalPages > 1 && (
+          <div className="mt-16 flex justify-center">
+          <Stack spacing={2}>
             <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              size="large"
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  fontSize: '1rem',
+                },
+                '& .Mui-selected': {
+                  fontWeight: 'bold',
+                },
+              }}
             />
+          </Stack>
+        </div>
           )}
 
           <ConfirmationModal

@@ -133,7 +133,7 @@ const SubscriptionManagement = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#1E1E2F] text-white transition-all pt-14">
+      <div className="min-h-screen bg-[#171730] text-white transition-all pt-14">
         <Sidebar
           onToggle={(expanded: boolean) => setIsSidebarExpanded(expanded)}
         />

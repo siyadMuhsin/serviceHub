@@ -5,6 +5,7 @@ import { IMessage } from '@/Interfaces/interfaces';
 import { getConversation } from '@/services/chat.service';
 import { useSelector } from 'react-redux';
 import { getUserIdAndRole } from '@/Utils/getUserIdAndRole';
+import { baseUrl } from 'config/axiosConfig';
 import { RootState } from '@/store';
 
 export default function ChatPage() {
@@ -29,7 +30,7 @@ export default function ChatPage() {
     setUserRole(role === 'expert' ? 'Expert' : 'User');
 
     // Initialize socket
-    socketRef.current = io('http://localhost:3000', {
+    socketRef.current = io(baseUrl, {
       autoConnect: true,
       reconnection: true,
     });
@@ -58,7 +59,6 @@ export default function ChatPage() {
     socketRef.current.on('messageError', ({ error }) => {
       setError(error);
     });
-
     return () => {
       socketRef.current?.disconnect();
     };

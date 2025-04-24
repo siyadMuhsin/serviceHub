@@ -4,7 +4,15 @@ import { IExpert } from "../../../types/Expert";
 import { IServices } from "../../../types/Admin";
 
 export interface IUserRepository {
-  findAll(): Promise<LeanDocument<IUser>[]>;
+
+  findUsersByPagination(page: number,limit: number,search?: string): Promise<{
+    users: IUser[];
+    total: number;
+    totalPages: number;
+    currentPage: number;
+  }>;
+
+
   createUser(userData: Partial<IUser>): Promise<IUser>;
   findOne(quary: Partial<IUser>): Promise<LeanDocument<IUser> | null>;
   findById(id: string): Promise<LeanDocument<IUser> | null>;
@@ -16,5 +24,6 @@ export interface IUserRepository {
   addToSavedServices(userId:string,serviceId:string):Promise<void>
   removeFromSavedServices(userId:string,serviceId:string):Promise<void>
   findUserWithSavedServices(userId:string):Promise<IUser>
+  count(data:FilterQuery<IUser>):Promise<number>
 
 }

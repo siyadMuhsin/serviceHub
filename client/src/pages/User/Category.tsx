@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { get_categoryBy_limit } from "../../services/category.service";
-import Pagination from "../../components/Pagination";
+
 import debounce from "../../Utils/debouce";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { Pagination, Stack } from "@mui/material";
 
 const Category: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const itemsPerPage = 4;
 
@@ -33,9 +34,9 @@ const Category: React.FC = () => {
   const handleSearchChange = debounce((value: string) => {
     setSearchQuery(value);
     setCurrentPage(0); // Reset to the first page when searching
-  }, 300);
+  }, 400);
 
-  const handlePageChange = (page: number) => {
+ const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -139,13 +140,26 @@ const Category: React.FC = () => {
 
         {/* Pagination - positioned better */}
         {categories.length > 0 && (
-          <div className="mt-16">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
+         <div className="mt-16 flex justify-center">
+         <Stack
+          spacing={2}>
+           <Pagination
+             count={totalPages}
+             page={currentPage}
+             onChange={handlePageChange}
+             color="primary"
+             size="large"
+             sx={{
+               '& .MuiPaginationItem-root': {
+                 fontSize: '1rem',
+               },
+               '& .Mui-selected': {
+                 fontWeight: 'bold',
+               },
+             }}
+           />
+         </Stack>
+       </div>
         )}
       </div>
     </div>

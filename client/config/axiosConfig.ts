@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+
 import { store } from "../src/store";
 import { logout } from "../src/Slice/authSlice";
 import { adminLogout } from "../src/Slice/adminAuthSlice";
@@ -9,10 +10,12 @@ interface ApiResponse {
   success: boolean;
   [key: string]: any;
 }
+export const baseUrl = import.meta.env.VITE_SERVER_API;
+
 
 // Create an Axios instance for user API
 const userAPI: AxiosInstance = axios.create({
-  baseURL: "http://localhost:3000/", // Replace with your backend API URL
+  baseURL: baseUrl, 
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -43,7 +46,7 @@ userAPI.interceptors.response.use(
 
 // Create an Axios instance for admin API
 const adminAPI: AxiosInstance = axios.create({
-  baseURL: "http://localhost:3000/admin/",
+  baseURL: `${baseUrl}/admin/`,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
@@ -74,7 +77,7 @@ adminAPI.interceptors.response.use(
 );
 
 const expertAPI: AxiosInstance = axios.create({
-  baseURL: "http://localhost:3000/expert/",
+  baseURL: `${baseUrl}/expert/`,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });

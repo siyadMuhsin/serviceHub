@@ -4,6 +4,7 @@ import { IUserService } from "../../core/interfaces/services/IUserService";
 import { HttpStatus } from "../../types/httpStatus";
 import { IUsersController } from "../../core/interfaces/controllers/IUsersController";
 import { TYPES } from "../../di/types";
+import { AuthRequest } from '../../types/User';
 
 @injectable()
 export class UsersController implements IUsersController {
@@ -13,8 +14,16 @@ export class UsersController implements IUsersController {
 
     async getUsers(req: Request, res: Response): Promise<void> {
         try {
-            const response = await this.userService.getUsers();
-            this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 5;
+            const search = req.query.search as string || "";
+            const response = await this.userService.getUsers(page, limit, search);
+            
+            if (response.success) {
+                this.sendResponse(res, response, HttpStatus.OK);
+            } else {
+                this.sendResponse(res, response, HttpStatus.BAD_REQUEST);
+            }
         } catch (error) {
             this.handleError(res, "Failed to fetch users", error);
         }
@@ -43,6 +52,14 @@ export class UsersController implements IUsersController {
             );
         } catch (error) {
             this.handleError(res, "Failed to update user status", error);
+        }
+    }
+    async getLatestUsers(req: AuthRequest, res: Response): Promise<void> {
+        try {
+            const {users}=await this.userService.getUsers(1,3,"")
+            res.status(HttpStatus.OK).json(users)
+        } catch (error) {
+            this.sendResponse(res,{message:"Interval server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 

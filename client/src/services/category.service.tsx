@@ -2,7 +2,7 @@ import { userAPI } from "config/axiosConfig"
 
 export const get_categoryBy_limit=async(page:number,limit:number,searchQuary:string)=>{
     try {
-        const response= await userAPI.get(`/categories?page=${page+1}&limit=${limit}&searchQuary=${searchQuary}`)
+        const response= await userAPI.get(`/categories?page=${page}&limit=${limit}&searchQuary=${searchQuary}`)
         return response.data
     } catch (error) {
         console.log(error)

@@ -164,6 +164,15 @@ export class ExpertController implements IExpertController {
             this.sendErrorResponse(res, err);
         }
     }
+    async getLatestExperts(req: AuthRequest, res: Response): Promise<void> {
+        try {
+            const {experts}=await this.expertService.getExpertBy_limit(1,3,"","")
+            this.sendResponse(res,experts,HttpStatus.OK)
+        } catch (error) {
+            this.sendErrorResponse(res,error)
+            
+        }
+    }
 
     private sendResponse(res: Response, data: any, status: HttpStatus): void {
         res.status(status).json(data);

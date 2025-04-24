@@ -2,8 +2,6 @@ import { BrowserRouter as Router ,Route,Routes} from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import AppRoutes from "./routes/App.routes";
 import AdminRoutes from "./routes/Admin.routes";
-
-import Loading from "./components/Loading";
 import ExpertRoutes from "./routes/Expert.routes";
 import NotFound from "./pages/User/NotFount";
 

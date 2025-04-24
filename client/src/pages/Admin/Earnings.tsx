@@ -1,11 +1,10 @@
-import Header from '@/components/Admin/Header';
-import Sidebar from '@/components/Admin/Sidebar';
-import { getAllEarnings } from '@/services/Admin/subscription.service';
-import React, { useEffect, useState } from 'react';
-import { FiDollarSign } from 'react-icons/fi';
-import { toast } from 'react-toastify';
-import { MdCurrencyRupee } from 'react-icons/md';
-
+import Header from "@/components/Admin/Header";
+import Sidebar from "@/components/Admin/Sidebar";
+import { getAllEarnings } from "@/services/Admin/subscription.service";
+import React, { useEffect, useState } from "react";
+import { FiDollarSign } from "react-icons/fi";
+import { toast } from "react-toastify";
+import { MdCurrencyRupee } from "react-icons/md";
 
 interface Pagination {
   total: number;
@@ -21,7 +20,7 @@ interface Plan {
 
 function Earnings() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const [selectedPlan, setSelectedPlan] = useState('all');
+  const [selectedPlan, setSelectedPlan] = useState("all");
   const [page, setPage] = useState(1);
   const [limit] = useState(5);
   const [loading, setLoading] = useState(true);
@@ -33,18 +32,22 @@ function Earnings() {
   const fetchEarnings = async () => {
     try {
       setLoading(true);
-      const response = await getAllEarnings(selectedPlan === 'all' ? '' : selectedPlan, page, limit);
-      console.log(response)
+      const response = await getAllEarnings(
+        selectedPlan === "all" ? "" : selectedPlan,
+        page,
+        limit
+      );
+      console.log(response);
       if (response.success) {
         setEarnings(response.data.earnings);
         setTotalEarnings(response.data.totalEarnings);
         setPagination(response.data.pagination);
         setPlans(response.data.plans || []);
       } else {
-        toast.error(response.message || 'Failed to fetch earnings');
+        toast.error(response.message || "Failed to fetch earnings");
       }
     } catch (error: any) {
-      toast.error(error.message || 'Something went wrong');
+      toast.error(error.message || "Something went wrong");
       console.error(error);
     } finally {
       setLoading(false);
@@ -65,34 +68,47 @@ function Earnings() {
       setPage(newPage);
     }
   };
-if(!earnings){
-  return(
-    <>
-    <h1>onnullage</h1>
-    </>
-  )
-}
+  if (!earnings) {
+    return (
+      <>
+        <h1>onnullage</h1>
+      </>
+    );
+  }
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#1E1E2F] text-white transition-all pt-14">
+      <div className="min-h-screen bg-[#171730] text-white transition-all pt-14">
         <Sidebar onToggle={setIsSidebarExpanded} />
-        <main className={`transition-all duration-300 ${isSidebarExpanded ? 'pl-64' : 'pl-20'} pr-4 py-6`}>
+        <main
+          className={`transition-all duration-300 ${
+            isSidebarExpanded ? "pl-72" : "pl-20"
+          } pr-4 py-6`}
+        >
           <div className="container mx-auto">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Expert Subscription Earnings</h1>
+              <h1 className="text-2xl font-bold">
+                Expert Subscription Earnings
+              </h1>
               <div className="bg-[#27293D] px-6 py-3 rounded-lg flex items-center">
                 <MdCurrencyRupee className="mr-3 text-green-400 text-xl" />
                 <div>
                   <p className="text-sm text-gray-400">Total Earnings</p>
-                  <p className="text-2xl font-bold">{totalEarnings.toFixed(2)}</p>
+                  <p className="text-2xl font-bold">
+                    {totalEarnings.toFixed(2)}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Plan Filter */}
             <div className="mb-6">
-              <label htmlFor="plan-filter" className="block text-sm text-gray-400 mb-2">Filter by Plan:</label>
+              <label
+                htmlFor="plan-filter"
+                className="block text-sm text-gray-400 mb-2"
+              >
+                Filter by Plan:
+              </label>
               <select
                 id="plan-filter"
                 value={selectedPlan}
@@ -101,7 +117,7 @@ if(!earnings){
                 disabled={loading}
               >
                 <option value="all">All Plans</option>
-                {plans.map(plan => (
+                {plans.map((plan) => (
                   <option key={plan._id} value={plan.name}>
                     {plan.name}
                   </option>
@@ -120,32 +136,43 @@ if(!earnings){
                   <table className="min-w-full">
                     <thead className="bg-[#1E1E2F]">
                       <tr>
-                        <th className="px-6 py-4 text-left text-sm text-gray-400 uppercase">Expert</th>
-                        <th className="px-6 py-4 text-left text-sm text-gray-400 uppercase">Plan</th>
-                        <th className="px-6 py-4 text-left text-sm text-gray-400 uppercase">Amount</th>
-                        <th className="px-6 py-4 text-left text-sm text-gray-400 uppercase">Date</th>
+                        <th className="px-6 py-4 text-left text-sm text-gray-400 uppercase">
+                          Expert
+                        </th>
+                        <th className="px-6 py-4 text-left text-sm text-gray-400 uppercase">
+                          Plan
+                        </th>
+                        <th className="px-6 py-4 text-left text-sm text-gray-400 uppercase">
+                          Amount
+                        </th>
+                        <th className="px-6 py-4 text-left text-sm text-gray-400 uppercase">
+                          Date
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700">
-                      {earnings.map(payment => (
+                      {earnings.map((payment) => (
                         <tr key={payment._id} className="hover:bg-[#1E1E2F]">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                            <div className="h-10 w-10 rounded-full overflow-hidden mr-3 bg-gray-800">
-  {payment.expertId?.userId?.profile_image ? (
-    <img
-      src={payment.expertId.userId.profile_image}
-      alt="Expert Profile"
-      className="h-full w-full object-cover"
-    />
-  ) : (
-    <div className="h-full w-full flex items-center justify-center text-white font-bold bg-blue-500">
-      {payment.expertId?.userId?.name?.charAt(0) || 'N'}
-    </div>
-  )}
-</div>
+                              <div className="h-10 w-10 rounded-full overflow-hidden mr-3 bg-gray-800">
+                                {payment.expertId?.userId?.profile_image ? (
+                                  <img
+                                    src={payment.expertId.userId.profile_image}
+                                    alt="Expert Profile"
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-full w-full flex items-center justify-center text-white font-bold bg-blue-500">
+                                    {payment.expertId?.userId?.name?.charAt(
+                                      0
+                                    ) || "N"}
+                                  </div>
+                                )}
+                              </div>
                               <div className="font-medium">
-                                {payment.expertId?.userId?.name || 'Unknown Expert'}
+                                {payment.expertId?.userId?.name ||
+                                  "Unknown Expert"}
                               </div>
                             </div>
                           </td>
@@ -154,7 +181,9 @@ if(!earnings){
                               {payment.planId.name}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium">₹{payment.amount.toFixed(2)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap font-medium">
+                            ₹{payment.amount.toFixed(2)}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-gray-400">
                             {new Date(payment.createdAt).toLocaleDateString()}
                           </td>
@@ -178,7 +207,9 @@ if(!earnings){
                       >
                         Previous
                       </button>
-                      <span className="px-3 py-1 rounded bg-blue-600 text-white">{page}</span>
+                      <span className="px-3 py-1 rounded bg-blue-600 text-white">
+                        {page}
+                      </span>
                       <button
                         onClick={() => handlePageChange(page + 1)}
                         disabled={page >= pagination.totalPages}

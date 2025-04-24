@@ -65,7 +65,6 @@ export class AuthService implements IAuthService {
       if (otpData.expiresAt < new Date()) {
         return { success: false, message: "OTP Expired" };
       }
-      
       await this.otpRepository.deleteOTP(email);
       await this.userRepository.findUserAndUpdate(email, { isVerified: true });
       
@@ -73,12 +72,12 @@ export class AuthService implements IAuthService {
       if (!user) {
         return { success: false, message: "User not found" };
       }
-
+      const userId=user._id?.toString() as string
       return { 
         success: true, 
         message: "OTP verified successfully",
-        accessToken: generateAccessToken(user._id, 'user'),
-        refreshToken: generateRefreshToken(user._id, 'user')
+        accessToken: generateAccessToken(userId, 'user'),
+        refreshToken: generateRefreshToken(userId, 'user')
       };
     } catch (error) {
       console.error("Error in verifyOtp:", error);
@@ -133,13 +132,13 @@ export class AuthService implements IAuthService {
           message: "Admin has blocked your account",
         };
       }
-
+      const userId=user._id?.toString() as string
       return { 
         success: true, 
         message: "Login successful",
         user: user,
-        accessToken: generateAccessToken(user._id, 'user'),
-        refreshToken: generateRefreshToken(user._id, 'user')
+        accessToken: generateAccessToken(userId, 'user'),
+        refreshToken: generateRefreshToken(userId, 'user')
       };
     } catch (error) {
       console.error("Error in loginUser:", error);
@@ -216,7 +215,8 @@ export class AuthService implements IAuthService {
 
       const resetPasswordToken = resetToken;
      const resetPasswordExpires = new Date(Date.now() + 300000);
-     await this.userRepository.updateById(existingUser._id,{resetPasswordToken,resetPasswordExpires})
+     const userId=existingUser._id?.toString() as string
+     await this.userRepository.updateById(userId,{resetPasswordToken,resetPasswordExpires})
 
       await sendResetMail(email, resetToken);
       return { success: true, message: "Password reset email sent" };
@@ -233,7 +233,8 @@ export class AuthService implements IAuthService {
         return { success: false, message: "Invalid or expired token" };
       }
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this .userRepository.findByIdClearToken(user._id, hashedPassword)
+      const userId= user._id?.toString() as string
+    await this .userRepository.findByIdClearToken(userId, hashedPassword)
       return { success: true, message: "Password reset successful" };
     } catch (error) {
       // console.error("Error in resetPassword:", error);

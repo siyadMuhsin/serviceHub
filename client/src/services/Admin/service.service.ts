@@ -3,7 +3,7 @@ import { adminAPI } from "../../../config/axiosConfig";
 
 export const getServices = async (page:number,limit:number,search:string) => {
   try {
-    const response = await adminAPI.get(`/services?page=${page+1}&limit=${limit}&search=${search}`);
+    const response = await adminAPI.get(`/services?page=${page}&limit=${limit}&search=${search}`);
     console.log(response.data);
     return response.data;
   } catch (error) {

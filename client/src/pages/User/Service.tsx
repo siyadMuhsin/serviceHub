@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import Pagination from "../../components/Pagination";
 import { get_servicesByCategory_limit } from "../../services/category.service";
 import debounce from "@/Utils/debouce";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -9,6 +8,9 @@ import { Search, Bookmark, BookmarkCheck } from "lucide-react";
 import { saveService, unsaveService } from "@/services/User/profile.service";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "@/Slice/authSlice";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
+
 
 const Service: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,7 +24,7 @@ const Service: React.FC = () => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 3;
   const [totalPages, setTotalPages] = useState<number>(0);
   const dispatch = useDispatch();
 
@@ -54,8 +56,6 @@ const Service: React.FC = () => {
       if (response.success) {
         setServices(response.services || []);
         setTotalPages(response.totalPages || 0);
-        
-        // Initialize saved services state from user's saved services in Redux
         if (user?.savedServices) {
           setSavedServices(new Set(user.savedServices));
         }
@@ -75,11 +75,6 @@ const Service: React.FC = () => {
     fetchServices();
   }, [id, currentPage, searchQuery]);
 
-  // Handle page change
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   const handleSaveToggle = async (serviceId: string) => {
     try {
@@ -126,7 +121,10 @@ const Service: React.FC = () => {
       console.error('Error toggling save status:', error);
     }
   };
-
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   return (
     <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -258,12 +256,24 @@ const Service: React.FC = () => {
 
         {/* Pagination - positioned consistently with Category page */}
         {services.length > 0 && totalPages > 1 && (
-          <div className="mt-16">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+          <div className="mt-16 flex justify-center">
+            <Stack spacing={2}>
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                size="large"
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    fontSize: '1rem',
+                  },
+                  '& .Mui-selected': {
+                    fontWeight: 'bold',
+                  },
+                }}
+              />
+            </Stack>
           </div>
         )}
       </div>

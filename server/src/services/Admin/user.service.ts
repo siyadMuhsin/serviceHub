@@ -9,10 +9,17 @@ export class UserService implements IUserService {
         @inject(TYPES.UserRepository) private userRepository: IUserRepository
     ) {}
 
-    async getUsers() {
+    async getUsers(page: number, limit: number, search: string = "") {
         try {
-            const users = await this.userRepository.findAll();
-            return { success: true, users };
+            const { users, total, totalPages, currentPage } = 
+                await this.userRepository.findUsersByPagination(page, limit, search);
+            return { 
+                success: true, 
+                users,
+                totalUsers: total,
+                totalPages,
+                currentPage
+            };
         } catch (error) {
             console.error("Error fetching users:", error);
             return { 
@@ -64,4 +71,12 @@ export class UserService implements IUserService {
             };
         }
     }
+   async getTotalUserCount(): Promise<{ totalUsers: number; }> {
+       try {
+        const result= await this.userRepository.count({})
+        return {totalUsers:result}
+       } catch (error:any) {
+        throw new Error(error.message)
+       }
+   }
 }

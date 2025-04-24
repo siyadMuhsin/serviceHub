@@ -1,54 +1,72 @@
-import React, { useEffect, useState } from "react";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { 
+  FiChevronLeft, 
+  FiChevronRight, 
+  FiGrid, 
+  FiUsers, 
+  FiTool, 
+  FiFolder, 
+  FiSettings, 
+  FiDollarSign,
+  FiFileText
+} from "react-icons/fi";
+import { MdOutlineCategory } from "react-icons/md";
 
-const Sidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({onToggle}) => {
+const Sidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({ onToggle }) => {
   const [isExpanded, setIsExpanded] = useState(true);
- 
   const navigate = useNavigate();
   const location = useLocation();
 
   const menuItems = [
-    { icon: "📊", text: "Dashboard", path: "/admin/dashboard" },
-    { icon: "👥", text: "User Management", path: "/admin/users" },
-    { icon: "🛠", text: "Expert Management", path: "/admin/experts" },
-    { icon: "🗂️", text: "Category Management", path: "/admin/categories" },
-    { icon: "🔧", text: "Service Management", path: "/admin/services" },
-    { icon: "💰", text: "Earnings", path: "/admin/earnings" },
-    { icon: "📝", text: "Subscription", path: "/admin/subscription" },
+    { icon: <FiGrid size={20} />, text: "Dashboard", path: "/admin/dashboard" },
+    { icon: <FiUsers size={20} />, text: "User Management", path: "/admin/users" },
+    { icon: <FiTool size={20} />, text: "Expert Management", path: "/admin/experts" },
+    { icon: <MdOutlineCategory size={20} />, text: "Category Management", path: "/admin/categories" },
+    { icon: <FiSettings size={20} />, text: "Service Management", path: "/admin/services" },
+    { icon: <FiDollarSign size={20} />, text: "Earnings", path: "/admin/earnings" },
+    { icon: <FiFileText size={20} />, text: "Subscription", path: "/admin/subscription" },
   ];
 
   const toggleSidebar = () => {
-    setIsExpanded(!isExpanded);
-    onToggle(!isExpanded); // Notify parent component
+    const newState = !isExpanded;
+    setIsExpanded(newState);
+    onToggle(newState);
   };
 
   return (
     <aside 
-      className={`fixed top-16 left-0 h-[calc(100%-4rem)] bg-[#2A2A3C] bg-opacity-90 backdrop-blur-md pt-5 overflow-y-auto transition-all duration-300 ${
-        isExpanded ? "w-64" : "w-16"
-      }`}
+      className={`fixed top-16 left-0 h-[calc(100%-4rem)] bg-[#0d0d26] bg-opacity-90 backdrop-blur-md pt-5 overflow-y-auto transition-all duration-300 z-10
+        ${isExpanded ? "w-64 rounded-r-xl" : "w-20 rounded-r-lg"}`}
     >
       <button
         onClick={toggleSidebar}
-        className="absolute right-0 top-2 text-white bg-[#3F8CFF] bg-opacity-20 rounded-l-md p-1"
+        className={`absolute -right-0 top-5 flex items-center justify-center text-white bg-[#3F8CFF] rounded-full p-2 shadow-lg hover:bg-[#2d6fd1] transition-all
+          ${isExpanded ? "rotate-0" : "rotate-180"}`}
       >
-        {isExpanded ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+        {isExpanded ? <FiChevronLeft size={18} /> : <FiChevronRight size={18} />}
       </button>
       
-      <ul className="mt-8">
+      <ul className="mt-8 px-2">
         {menuItems.map((item, index) => (
           <li
             key={index}
             onClick={() => navigate(item.path)}
-            className={`flex items-center px-4 py-3 cursor-pointer transition-all ${
-              location.pathname === item.path
-                ? "bg-[#3F8CFF] bg-opacity-20 border-l-4 border-[#3F8CFF] text-white"
-                : "hover:bg-[#3F8CFF] hover:bg-opacity-10 text-gray-300"
-            }`}
+            className={`flex items-center px-4 py-3 cursor-pointer transition-all rounded-lg mx-2 mb-1
+              ${location.pathname === item.path
+                ? "bg-[#3F8CFF] bg-opacity-20 text-white"
+                : "hover:bg-[#3F8CFF] hover:bg-opacity-10 text-gray-300"}`}
           >
-            <span className="text-xl flex-shrink-0 w-6 flex justify-center">{item.icon}</span>
-            {isExpanded && <span className="ml-3 whitespace-nowrap overflow-hidden">{item.text}</span>}
+            <span className={`flex items-center justify-center ${isExpanded ? "mr-3" : "mx-auto"}`}>
+              {React.cloneElement(item.icon, { 
+                className: location.pathname === item.path ? "text-[#3F8CFF]" : "text-gray-400" 
+              })}
+            </span>
+            {isExpanded && (
+              <span className="whitespace-nowrap overflow-hidden text-sm font-medium">
+                {item.text}
+              </span>
+            )}
           </li>
         ))}
       </ul>

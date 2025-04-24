@@ -12,6 +12,7 @@ import { IServiceController } from "../core/interfaces/controllers/IServiceContr
 import { IExpertController } from "../core/interfaces/controllers/IExpertController";
 import { IPlansController } from "../core/interfaces/controllers/IPlansController";
 import { IPaymentController } from "../core/interfaces/controllers/IPaymentController";
+import { IDashboardController } from "../core/interfaces/controllers/IDashboardController";
 
 const router = express.Router();
 
@@ -62,4 +63,10 @@ router.get('/plans', verifyAdmin, plansController.getAllPlans.bind(plansControll
 // earnings
 const paymentController= container.get<IPaymentController>(TYPES.PaymentController)
 router.get('/earnings',verifyAdmin,paymentController.getAllEarnings.bind(paymentController))
+
+// dashboard
+const dashboardCotroller= container.get<IDashboardController>(TYPES.DashboardController)
+router.get('/users/latest',verifyAdmin,usersController.getLatestUsers.bind(usersController))
+router.get('/experts/latest',verifyAdmin,expertController.getLatestExperts.bind(expertController))
+router.get('/dashboard/stats',verifyAdmin,dashboardCotroller.getDashboardStats.bind(dashboardCotroller))
 export default router;

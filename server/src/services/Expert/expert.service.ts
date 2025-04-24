@@ -225,4 +225,12 @@ export class ExpertService implements IExpertService {
             throw error;
         }
     }
+    async getTotalExpertCount(): Promise<{ totalExperts: number; }> {
+        try {
+            const total= await this.expertRepository.count({})
+return {totalExperts:total}
+        } catch (error:any) {
+            throw new Error(error.message)
+        }
+    }
 }

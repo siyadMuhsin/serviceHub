@@ -39,4 +39,5 @@ export interface IExpertService {
         refreshToken?: string;
     }>;
     checkBlocked(expertId:string):Promise<boolean|{success:boolean,message:string}>
+    getTotalExpertCount():Promise<{totalExperts:number}>
 }
