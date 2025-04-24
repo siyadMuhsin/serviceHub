@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Star, MessageCircle, Bookmark, CheckCircle, Zap, Calendar, MapPin, Shield, Clock } from 'lucide-react';
 import { IExpert } from '@/Interfaces/interfaces';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useNavigation, useParams } from 'react-router-dom';
 import { getExpertDetails } from '@/services/User/expert.service';
 import { toast } from 'react-toastify';
 import BookingModal from '@/components/User/modals/BookingModal';
@@ -12,9 +12,7 @@ export default function ExpertViewProfile() {
   const [expertData, setExpertData] = useState<IExpert | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false); 
   const { expertId } = useParams();
-  
-
-
+  const navigate=useNavigate()
   useEffect(() => {
     const fetchExpertDetails = async () => {
       try {
@@ -39,6 +37,10 @@ export default function ExpertViewProfile() {
   const age = currentDate.getFullYear() - dobDate.getFullYear();
   const yearsExperience = expertData.experience || 0;
 
+  const handleMessageClick = () => {
+    if (!expertData) return;
+    navigate(`/chat/${expertId}`);
+  };
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
       {/* Profile Section */}
@@ -99,10 +101,13 @@ export default function ExpertViewProfile() {
               Book Now
             </button>
             
-            <button className="px-6 py-2 border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 transition flex items-center gap-2">
-              <MessageCircle size={18} />
-              Message
-            </button>
+            <button 
+  className="px-6 py-2 border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 transition flex items-center gap-2"
+  onClick={handleMessageClick}
+>
+  <MessageCircle size={18} />
+  Message
+</button>
             <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-green-100 text-green-600 rounded-full">
               <CheckCircle size={18} />
               <span>Available</span>

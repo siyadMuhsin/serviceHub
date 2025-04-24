@@ -1,6 +1,7 @@
+import { IMessageRepository } from "../core/interfaces/repositories/IMessageRepository";
 import Message, { IMessage } from "../models/message.model";
 
-export class MessageRepository {
+export class MessageRepository implements IMessageRepository{
     async createMessage(data: Partial<IMessage>): Promise<IMessage> {
         try {
             return await Message.create(data);
@@ -30,5 +31,10 @@ export class MessageRepository {
         } catch (error) {
             throw new Error(`Failed to fetch conversation: ${error instanceof Error ? error.message : String(error)}`);
         }
+    }
+    async getChatUsers(expertId: string): Promise<IMessage[]> {
+       return  await Message.find({
+            $or: [{ sender: expertId }, { receiver: expertId }],
+          }).populate('sender', 'name profile_image role').populate('receiver.userId','name profile_image role')
     }
 }

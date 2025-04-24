@@ -243,6 +243,8 @@ export class AuthService implements IAuthService {
 
   private async generateAndSendOtp(email: string): Promise<AuthResult> {
     const otp = generateOTP();
+    console.log(otp);
+    
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); 
     await this.otpRepository.create({email, otp, expiresAt});
     await sendMailer(email, otp);

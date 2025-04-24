@@ -1,10 +1,13 @@
 import { BookingController } from "../controllers/booking.controller";
 import { SlotController } from "../controllers/Expert/slot.controller";
+import { MessageController } from "../controllers/message.controller";
 import { ReviewController } from "../controllers/review.controller";
 import { PlanRepository } from "../repositories/Admin/plans.repository";
 import { SlotRepository } from "../repositories/Expert/slot.repository";
+import { MessageRepository } from "../repositories/MessageRepository";
 import { ReviewRepository } from "../repositories/ReviewRepository";
 import { SlotServices } from "../services/Expert/slot.service";
+import { MessageService } from "../services/message.service";
 import { ReviewService } from "../services/review.service";
 
 export const TYPES = {
@@ -70,5 +73,9 @@ export const TYPES = {
     //review
     ReviewRepository:Symbol.for('ReviewRepository'),
     ReviewService:Symbol.for('ReviewService'),
-    ReviewController:Symbol.for('ReviewController')
+    ReviewController:Symbol.for('ReviewController'),
+
+    MessageController:Symbol.for('MessageController'),
+    MessageService:Symbol.for('MessageService'),
+    MessageRepository:Symbol.for('MessageRepository')
 };

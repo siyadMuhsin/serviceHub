@@ -12,6 +12,8 @@ import { ITokenController } from "../core/interfaces/controllers/ITokenControlle
 import { ISlotController } from "../core/interfaces/controllers/ISlotController";
 import { IBookingController } from "../core/interfaces/controllers/IBookingController";
 import { IReviewController } from "../core/interfaces/controllers/IReviewController";
+import { IMessageController } from "../core/interfaces/controllers/IMessageController";
+
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -25,7 +27,7 @@ const slotController= container.get<ISlotController>(TYPES.SlotController)
 const authMiddleware= container.get<IAuthMiddleware>(TYPES.AuthMiddleware)
 const bookingController=container.get<IBookingController>(TYPES.BookingController)
 const reviewController= container.get<IReviewController>(TYPES.ReviewController)
-
+const messageController=container.get<IMessageController>(TYPES.MessageController)
 
 router.post("/create", upload.single("certificate"),authMiddleware.verifyToken.bind(authMiddleware),expertController.createExpert.bind(expertController));
 router.get("/fetch-data",authMiddleware.verifyExpert.bind(authMiddleware),expertProfileController.get_expertData.bind(expertProfileController))
@@ -53,6 +55,10 @@ router.patch('/booking/:bookingId',verifyExpert,bookingController.bookingStatusC
 
 // review management
 router.get('/reviews',verifyExpert,reviewController.getReviewsForExpert.bind(reviewController))
+
+// messages
+router.get('/chat/users',verifyExpert,messageController.getChatUsers.bind(messageController))
+router.get('/chat/:receiverId',verifyExpert,messageController.getConversation.bind(messageController))
 
 export default router;
 

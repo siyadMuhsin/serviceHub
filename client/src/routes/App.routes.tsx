@@ -14,6 +14,7 @@ import { LoginRoute } from "./Protect.routes";
 import ExpertsPage from "@/pages/User/ExpertsPage";
 import ExpertViewProfile from "@/pages/User/ExpertViewProfile";
 import Bookings from "@/pages/User/Bookings";
+import ChatPage from "@/pages/User/ChatPage";
 
 const AppRoutes = () => {
   const loading = useAuthCheck();
@@ -40,6 +41,7 @@ const AppRoutes = () => {
         <Route path="/services/:id" element={<ExpertsPage/>}/>
         <Route path="/user/expert/:expertId" element={<ExpertViewProfile/>}/>
         <Route path="/bookings" element={<Bookings/>}/>
+        <Route path="/chat/:receiverId" element={<ChatPage/>}/>
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

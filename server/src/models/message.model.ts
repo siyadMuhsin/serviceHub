@@ -3,9 +3,9 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IMessage extends Document {
   sender: mongoose.Types.ObjectId;
-  senderModel: 'User' | 'Worker';
+  senderModel: 'User' | 'Expert';
   receiver: mongoose.Types.ObjectId;
-  receiverModel: 'User' | 'Worker';
+  receiverModel: 'User' | 'Expert';
   content: string;
   timestamp?: Date;
   read?: boolean;
@@ -19,7 +19,7 @@ const messageSchema = new Schema<IMessage>({
   senderModel: {
     type: String,
     required: true,
-    enum: ['User', 'Worker']
+    enum: ['User', 'Expert']
   },
   receiver: {
     type: Schema.Types.ObjectId,
@@ -29,7 +29,7 @@ const messageSchema = new Schema<IMessage>({
   receiverModel: {
     type: String,
     required: true,
-    enum: ['User', 'Worker']
+    enum: ['User', 'Expert']
   },
   content: {
     type: String,

@@ -23,6 +23,7 @@ export interface Service {
 }
 
 export interface IUser{
+  _id?:string;
     name: string;
     email: string;
     password: string;
@@ -80,4 +81,15 @@ export interface IExpert  {
   updatedAt?: Date;
 }
 
+}
+
+export interface IMessage {
+  _id?:string;
+  sender: string;
+  senderModel: 'User' | 'Expert';
+  receiver: string;
+  receiverModel: 'User' | 'Expert';
+  content: string;
+  timestamp?: Date;
+  read?: boolean;
 }

@@ -26,7 +26,6 @@ const Service: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(0);
   const dispatch = useDispatch();
 
-  // Debounced search handler
   const debouncedSetSearchQuery = useCallback(
     debounce((value: string) => {
       setSearchQuery(value);

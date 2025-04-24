@@ -83,6 +83,12 @@ import { IReviewRepository } from '../core/interfaces/repositories/IReviewReposi
 import { IReviewService } from '../core/interfaces/services/IReviewService';
 import { ReviewService } from '../services/review.service';
 import { ReviewRepository } from '../repositories/ReviewRepository';
+import { IMessageController } from '../core/interfaces/controllers/IMessageController';
+import { MessageController } from '../controllers/message.controller';
+import { IMessageService } from '../core/interfaces/services/IMessageService';
+import { MessageService } from '../services/message.service';
+import { IMessageRepository } from '../core/interfaces/repositories/IMessageRepository';
+import { MessageRepository } from '../repositories/MessageRepository';
 
 const container = new Container();
 
@@ -150,4 +156,8 @@ container.bind<IBookingRepository>(TYPES.BookingRepository).to(BookingRepository
 container.bind<IReviewController>(TYPES.ReviewController).to(ReviewController)
 container.bind<IReviewRepository>(TYPES.ReviewRepository).to(ReviewRepository)
 container.bind<IReviewService>(TYPES.ReviewService).to(ReviewService)
+
+container.bind<IMessageController>(TYPES.MessageController).to(MessageController)
+container.bind<IMessageService>(TYPES.MessageService).to(MessageService)
+container.bind<IMessageRepository>(TYPES.MessageRepository).to(MessageRepository)
 export default container;

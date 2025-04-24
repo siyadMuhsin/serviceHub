@@ -11,6 +11,8 @@ import { IUserExpertController } from "../core/interfaces/controllers/IUserExper
 import { IBookingController } from "../core/interfaces/controllers/IBookingController";
 import { ISlotController } from "../core/interfaces/controllers/ISlotController";
 import { IReviewController } from "../core/interfaces/controllers/IReviewController";
+import { MessageController } from "../controllers/message.controller";
+import { IMessageController } from "../core/interfaces/controllers/IMessageController";
 
 const router = Router();
 
@@ -25,7 +27,7 @@ const expertController = container.get<IExpertController>(TYPES.ExpertController
 const slotController= container.get<ISlotController>(TYPES.SlotController)
 const bookingController= container.get<IBookingController>(TYPES.BookingController)
 const reviewController= container.get<IReviewController>(TYPES.ReviewController)
-
+const messageController= container.get<IMessageController>(TYPES.MessageController)
 // ✅ Protected Category Routes
 router.get('/categories', verifyUser, categoryController.categoriesByLimit.bind(categoryController));
 router.get('/categories/all', verifyUser, categoryController.getAllCategories.bind(categoryController));
@@ -60,4 +62,7 @@ router.get('/reviews/:expertId',verifyUser,reviewController.getReviewsForUser.bi
 router.patch('/service-save/:serviceId',verifyUser,profileController.saveService.bind(profileController))
 router.patch('/service-unsave/:serviceId',verifyUser,profileController.unsaveService.bind(profileController))
 router.get('/saved-service',verifyUser,profileController.getSavedServices.bind(profileController))
+
+// messages
+router.get('/chat/:receiverId',verifyUser,messageController.getConversation.bind(messageController))
 export default router;
