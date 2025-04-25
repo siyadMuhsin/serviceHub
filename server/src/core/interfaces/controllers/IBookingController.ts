@@ -7,4 +7,5 @@ export interface IBookingController{
     bookingStatusChange(req:AuthRequest,res:Response):Promise<void>
     getUserBooking(req:AuthRequest,res:Response):Promise<void>
     userCancelBooking(req:AuthRequest,res:Response):Promise<void>
+    getAllBookingsCount(req:AuthRequest,res:Response):Promise<void>
 }

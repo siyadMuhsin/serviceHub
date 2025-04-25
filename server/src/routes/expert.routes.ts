@@ -60,6 +60,7 @@ router.get('/reviews',verifyExpert,reviewController.getReviewsForExpert.bind(rev
 router.get('/chat/users',verifyExpert,messageController.getChatUsers.bind(messageController))
 router.get('/chat/:receiverId',verifyExpert,messageController.getConversation.bind(messageController))
 
+router.get('/booking/stats',verifyExpert,bookingController.getAllBookingsCount.bind(bookingController))
 export default router;
 
 function test(req:Request,res:Response,next:NextFunction){

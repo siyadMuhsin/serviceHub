@@ -234,135 +234,136 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-64 bg-white border-r">
-        <div className="flex flex-col items-center py-8">
-          <div className="relative">
-            <Avatar className="h-24 w-24 mb-2">
-              <AvatarImage src={user.profile_image} alt="Profile" />
-              <AvatarFallback>{user.name?.[0] || "U"}</AvatarFallback>
-            </Avatar>
-          </div>
-          <h2 className="mt-4 text-xl font-semibold">{user.name}</h2>
-          <p className="text-gray-500">{user.role}</p>
-        </div>
+      <div className="w-64 bg-blue-50 border-r border-blue-100 rounded-r-lg">
+  <div className="flex flex-col items-center py-8">
+    <div className="relative">
+      <Avatar className="h-24 w-24 mb-2 border-2 border-blue-200">
+        <AvatarImage src={user.profile_image} alt="Profile" />
+        <AvatarFallback className="bg-blue-100 text-blue-600">
+          {user.name?.[0] || "U"}
+        </AvatarFallback>
+      </Avatar>
+    </div>
+    <h2 className="mt-4 text-xl font-semibold text-blue-800">{user.name}</h2>
+    <p className="text-blue-500">{user.role}</p>
+  </div>
 
-        <nav className="mt-6">
+  <nav className="mt-6 px-2">
+    <Button
+      variant={currentView === "overview" ? "default" : "ghost"}
+      className={`w-full justify-start pl-4 mb-1 rounded-lg ${currentView === "overview" ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-blue-700 hover:bg-blue-100'}`}
+      onClick={() => handleSidebarClick("overview")}
+    >
+      <User className="mr-2 h-4 w-4" />
+      Profile Overview
+    </Button>
+    <Button
+      variant={currentView === "edit" ? "default" : "ghost"}
+      className={`w-full justify-start pl-4 mb-1 rounded-lg ${currentView === "edit" ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-blue-700 hover:bg-blue-100'}`}
+      onClick={() => handleSidebarClick("edit")}
+    >
+      <Edit className="mr-2 h-4 w-4" />
+      Edit Profile
+    </Button>
+    <Button
+      variant={currentView === "password" ? "default" : "ghost"}
+      className={`w-full justify-start pl-4 mb-1 rounded-lg ${currentView === "password" ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-blue-700 hover:bg-blue-100'}`}
+      onClick={() => handleSidebarClick("password")}
+    >
+      <Lock className="mr-2 h-4 w-4" />
+      Change Password
+    </Button>
+    <Button
+      variant={currentView === "saved" ? "default" : "ghost"}
+      className={`w-full justify-start pl-4 mb-1 rounded-lg ${currentView === "saved" ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-blue-700 hover:bg-blue-100'}`}
+      onClick={() => handleSidebarClick("saved")}
+    >
+      <Heart className="mr-2 h-4 w-4" />
+      Saved Services
+    </Button>
+
+    {isAuthenticated && user && (
+      <>
+        {user.role === "user" && (
+          <>
+            {(!user.expertStatus || user.expertStatus === "default") && (
+              <Button
+                variant="outline"
+                onClick={() => setIsModalOpen(true)}
+                className="w-full justify-start pl-4 mb-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
+              >
+                <Briefcase className="mr-2 h-4 w-4" />
+                Become Expert Account
+              </Button>
+            )}
+
+            {user.expertStatus === "pending" && (
+              <div className="px-4 py-2 text-sm bg-blue-100 rounded-lg border border-blue-200 mb-2">
+                <p className="text-blue-600">
+                  Request Pending Approval
+                </p>
+              </div>
+            )}
+
+            {user.expertStatus === "rejected" && (
+              <div className="px-4 py-2">
+                <div className="flex items-start gap-3 p-3 bg-red-100 border-l-4 border-red-500 rounded-md shadow-sm mb-2">
+                  <svg
+                    className="w-5 h-5 text-red-600 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v2m0 4h.01m-.01-12a9 9 0 110 18 9 9 0 010-18z"
+                    />
+                  </svg>
+                  <p className="text-sm text-red-700">
+                    Your request was rejected.{" "}
+                    {user.rejectReason ? user.rejectReason : ""}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={reApplyToExpert}
+                  className="w-full justify-start pl-2 mb-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
+                >
+                  <Briefcase className="h-4 w-4" />
+                  Re-apply for Expert
+                </Button>
+              </div>
+            )}
+
+            {user.expertStatus === "approved" && (
+              <Button
+                variant="ghost"
+                onClick={()=>setIsSwitchAccount(true)}
+                className="w-full justify-start pl-4 mb-1 rounded-lg text-blue-600 hover:bg-blue-100"
+              >
+                <Briefcase className="mr-2 h-4 w-4" />
+                Switch to Expert Account
+              </Button>
+            )}
+          </>
+        )}
+
+        {user.role === "expert" && (
           <Button
-            variant={currentView === "overview" ? "default" : "ghost"}
-            className="w-full justify-start pl-4 mb-1"
-            onClick={() => handleSidebarClick("overview")}
+            variant="ghost"
+            onClick={()=>setIsSwitchAccount(true)}
+            className="w-full justify-start pl-4 mb-1 rounded-lg text-blue-600 hover:bg-blue-100"
           >
             <User className="mr-2 h-4 w-4" />
-            Profile Overview
+            Switch to User Account
           </Button>
-          <Button
-            variant={currentView === "edit" ? "default" : "ghost"}
-            className="w-full justify-start pl-4 mb-1"
-            onClick={() => handleSidebarClick("edit")}
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Profile
-          </Button>
-          <Button
-            variant={currentView === "password" ? "default" : "ghost"}
-            className="w-full justify-start pl-4 mb-1"
-            onClick={() => handleSidebarClick("password")}
-          >
-            <Lock className="mr-2 h-4 w-4" />
-            Change Password
-          </Button>
-          <Button
-            variant={currentView === "saved" ? "default" : "ghost"}
-            className="w-full justify-start pl-4 mb-1"
-            onClick={() => handleSidebarClick("saved")}
-          >
-            <Heart className="mr-2 h-4 w-4" />
-            Saved Services
-          </Button>
-
-          {isAuthenticated && user && (
-            <>
-              {user.role === "user" && (
-                <>
-                  {(!user.expertStatus || user.expertStatus === "default") && (
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsModalOpen(true)}
-                      className="w-full justify-start pl-4 mb-1 bg-black text-white hover:bg-gray-800"
-                    >
-                      <Briefcase className="mr-2 h-4 w-4" />
-                      Become Expert Account
-                    </Button>
-                  )}
-
-                  {user.expertStatus === "pending" && (
-                    <div className="px-4 py-2 text-sm">
-                      <p className="text-yellow-600">
-                        Request Pending Approval
-                      </p>
-                    </div>
-                  )}
-
-                  {user.expertStatus === "rejected" && (
-                    <div className="px-4 py-2">
-                      <div className="flex items-start gap-3 p-3 bg-red-100 border-l-4 border-red-500 rounded-md shadow-sm mb-2">
-                        <svg
-                          className="w-5 h-5 text-red-600 mt-0.5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 9v2m0 4h.01m-.01-12a9 9 0 110 18 9 9 0 010-18z"
-                          />
-                        </svg>
-                        <p className="text-sm text-red-700">
-                          Your request was rejected.{" "}
-                          {user.rejectReason ? user.rejectReason : ""}
-                        </p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={reApplyToExpert}
-                        className="w-full justify-start pl-2 mb-1 bg-black text-white hover:bg-gray-800"
-                      >
-                        <Briefcase className="h-4 w-4" />
-                        Re-apply for Expert
-                      </Button>
-                    </div>
-                  )}
-
-                  {user.expertStatus === "approved" && (
-                    <Button
-                      variant="ghost"
-                      onClick={()=>setIsSwitchAccount(true)}
-                      className="w-full justify-start pl-4 mb-1 text-green-600 hover:bg-green-50"
-                    >
-                      <Briefcase className="mr-2 h-4 w-4" />
-                      Switch to Expert Account
-                    </Button>
-                  )}
-                </>
-              )}
-
-              {user.role === "expert" && (
-                <Button
-                  variant="ghost"
-                  onClick={()=>setIsSwitchAccount(true)}
-                  className="w-full justify-start pl-4 mb-1"
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Switch to Expert Account
-                </Button>
-              )}
-            </>
-          )}
-        </nav>
-      </div>
-
+        )}
+      </>
+    )}
+  </nav>
+</div>
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
         <header className="px-6 py-4 bg-white border-b flex justify-between items-center">

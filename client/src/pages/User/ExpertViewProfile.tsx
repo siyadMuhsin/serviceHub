@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Star, MessageCircle, Bookmark, CheckCircle, Zap, Calendar, MapPin, Shield, Clock } from 'lucide-react';
 import { IExpert } from '@/Interfaces/interfaces';
 import { useNavigate, useNavigation, useParams } from 'react-router-dom';
-import { getExpertDetails } from '@/services/User/expert.service';
+import { getExpertDetails, getReviewsByExpertId } from '@/services/User/expert.service';
 import { toast } from 'react-toastify';
 import BookingModal from '@/components/User/modals/BookingModal';
 import RatingsReviews from '@/components/User/ReviewRating';
@@ -17,6 +17,7 @@ export default function ExpertViewProfile() {
     const fetchExpertDetails = async () => {
       try {
         const response = await getExpertDetails(expertId);
+      
         setExpertData(response.expert);
       } catch (error) {
         toast.error(error.message);

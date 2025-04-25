@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { IReviewRepository } from "../core/interfaces/repositories/IReviewRepository";
 import { BaseRepository } from "./BaseRepository";
 import reviewModel, { IReview } from "../models/review.model";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 export class ReviewRepository extends BaseRepository<IReview> implements IReviewRepository{
     constructor(){
         super(reviewModel)
@@ -37,4 +37,33 @@ export class ReviewRepository extends BaseRepository<IReview> implements IReview
         totalRating: ratingInfo.totalRating
       }
    }
+
+   async getAverageRatingsByExpertIds(expertIds: Types.ObjectId[]): Promise<{
+    expertId: Types.ObjectId;
+    average: number;
+    count: number;
+  }[]> {
+    return this.model.aggregate([
+      {
+        $match: {
+          expertId: { $in: expertIds }
+        }
+      },
+      {
+        $group: {
+          _id: "$expertId",
+          average: { $avg: "$rating" },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          expertId: "$_id",
+          average: { $round: ["$average", 1] }, 
+          count: 1,
+          _id: 0
+        }
+      }
+    ]);
+  }
 }

@@ -46,4 +46,5 @@ export interface IBookingService {
   }>
   userBookings(userId:string,page:number,limit:number):Promise<PaginatedBookings>
   userCancelBooking(bookingId:string,userId:string):Promise<{success:boolean,message:string}>
+  allBookings(expertId:string):Promise<any>
 }

@@ -29,7 +29,6 @@ export class BookingController implements IBookingController {
         this.sendResponse(res, { success: false, message: "All fields (expertId, slotId, time, notes) are required" }, HttpStatus.BAD_REQUEST);
         return;
       }
-      console.log(address)
 const coordinates=JSON.parse(location)
 if(coordinates.length<0){
   this.sendResponse(res,{message:"invalid location"},HttpStatus.BAD_REQUEST)
@@ -60,14 +59,12 @@ if(coordinates.length<0){
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const status = req.query.status as string | undefined;
-  
       const result = await this.bookingService.getBookingsToExpert(
         expertId, 
         page, 
         limit, 
         status
       );
-      
       this.sendResponse(
         res,
         result,
@@ -81,7 +78,15 @@ if(coordinates.length<0){
       );
     }
   }
-  
+  async getAllBookingsCount(req:AuthRequest,res:Response):Promise<void>{
+    try {
+      const expertId=req.expert.expertId
+      const result=await this.bookingService.allBookings(expertId)
+      this.sendResponse(res,result,HttpStatus.OK)
+    } catch (error) {
+      this.sendResponse(res,{message:"Intervel server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
   async bookingStatusChange(req: AuthRequest, res: Response): Promise<void> {
     try {
       const expertId = req.expert.expertId;

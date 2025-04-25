@@ -199,4 +199,20 @@ export class BookingService implements IBookingService {
     }
     
   }
+  async allBookings(expertId: string): Promise<any> {
+    try {
+      const expertObjectId = new mongoose.Types.ObjectId(expertId);
+const [total, pending, completed,cancelled] = await Promise.all([
+  this.bookingRepository.count({ expertId: expertObjectId }),
+  this.bookingRepository.count({ expertId: expertObjectId, status: 'pending' }),
+  this.bookingRepository.count({ expertId: expertObjectId, status: 'completed' }),
+  this.bookingRepository.count({ expertId: expertObjectId, status: 'cancelled' }),
+
+]);
+      console.log(total,pending,completed,cancelled);
+      return {total,pending,completed,cancelled}
+    } catch (error) {
+      
+    }
+  }
 }

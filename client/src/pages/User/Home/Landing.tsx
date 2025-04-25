@@ -12,10 +12,6 @@ const Landing = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false); // Add loading state
  
- 
- 
-
-
 
   return (
     <div className="flex flex-col min-h-screen">

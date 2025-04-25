@@ -113,6 +113,7 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
   }
 
   async count(filter: FilterQuery<T> = {}): Promise<number> {
+    console.log(filter);
     try {
       return await this.model.countDocuments(filter).exec();
     } catch (error) {

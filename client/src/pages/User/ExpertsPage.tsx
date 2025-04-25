@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Lock, MapPin, Star } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getExpertsSpecificService } from "@/services/User/expert.service";
+import { getExpertsSpecificService, getReviewsByExpertId } from "@/services/User/expert.service";
 import { toast } from "react-toastify";
 import { IExpert } from "@/Interfaces/interfaces";
 
@@ -68,24 +68,19 @@ const StarRating = ({ rating }: { rating: number }) => {
 
   return (
     <div className="flex items-center">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          size={16}
-          className={`${
-            i < fullStars ? "fill-yellow-400 text-yellow-400" : ""
-          } ${
-            i === fullStars && hasHalfStar
-              ? "fill-yellow-400 text-yellow-400"
-              : "text-gray-300"
-          }`}
-        />
-      ))}
-      <span className="text-sm text-gray-600 ml-1">{rating}</span> {/* Updated to show actual rating */}
+      {[...Array(5)].map((_, i) => {
+        if (i < fullStars) {
+          return <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />;
+        } else if (i === fullStars && hasHalfStar) {
+          return <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />;
+        } else {
+          return <Star key={i} size={16} className="text-gray-300" />;
+        }
+      })}
+      <span className="text-sm text-gray-600 ml-1">{rating.toFixed(1)}</span>
     </div>
   );
 };
-
 const ExpertCard = ({ 
   expert, 
   onViewProfile 
@@ -94,53 +89,52 @@ const ExpertCard = ({
   onViewProfile: (expertId: string) => void; 
 }) => {
   return (
-<Card className="hover:shadow-md transition-shadow">
-  <CardContent className="p-4">
-    <div className="flex justify-between items-start gap-4">
-      {/* Left: Profile Image + Info */}
-      <div className="flex gap-4  ">
-        <img
-          src={expert.profile}
-          alt={expert.name}
-          className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
-        />
-        <div className="flex flex-col justify-between">
-          {/* Name & Service */}
-          <div>
-            <h3 className="font-bold text-lg">{expert.name}</h3>
-            <p className="text-sm text-gray-600">{expert.service} Specialist</p>
-          </div>
+    <Card className="hover:shadow-md transition-shadow">
+    <CardContent className="p-4">
+      <div className="flex justify-between items-start gap-4">
+        {/* Left: Profile Image + Info */}
+        <div className="flex gap-4">
+          <img
+            src={expert.profile}
+            alt={expert.name}
+            className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
+          />
+          <div className="flex flex-col justify-between">
+            {/* Name & Service */}
+            <div>
+              <h3 className="font-bold text-lg">{expert.name}</h3>
+              <p className="text-sm text-gray-600">{expert.service} Specialist</p>
+            </div>
 
-          {/* Distance */}
-          <div className="flex items-center mt-1 text-sm text-blue-600 font-medium">
-            <MapPin className="w-4 h-4 mr-1 text-blue-500" />
-            <span>{expert.distanceInKm.toFixed(2)} km away</span>
-          </div>
+            {/* Distance */}
+            <div className="flex items-center mt-1 text-sm text-blue-600 font-medium">
+              <MapPin className="w-4 h-4 mr-1 text-blue-500" />
+              <span>{expert.distanceInKm.toFixed(2)} km away</span>
+            </div>
 
-          {/* Rating & Experience */}
-          <div className="mt-2">
-            <StarRating rating={5} />
-            <div className="flex items-center text-sm text-gray-500 mt-1">
-              <Lock className="w-3 h-3 mr-1" />
-              <span>{expert.experience} experience • 19 jobs</span>
+            {/* Rating & Reviews */}
+            <div className="mt-2">
+              <StarRating rating={expert.averageRating} />
+              <div className="flex items-center text-sm text-gray-500 mt-1">
+                <span>{expert.ratingCount} reviews</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Right: Button */}
-      <div>
-        <Button
-          variant="default"
-          className="mt-1"
-          onClick={() => onViewProfile(expert._id)}
-        >
-          View Profile
-        </Button>
+        {/* Right: Button */}
+        <div>
+          <Button
+            variant="default"
+            className="mt-1"
+            onClick={() => onViewProfile(expert._id)}
+          >
+            View Profile
+          </Button>
+        </div>
       </div>
-    </div>
-  </CardContent>
-</Card>
+    </CardContent>
+  </Card>
 
   );
 };

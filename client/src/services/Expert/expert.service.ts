@@ -56,6 +56,13 @@ const updateBookingStatus=async(bookingId:string,status:string,reason?:string)=>
         throw new Error(error.response.data.message)
 
     }
-
 }
-export {get_expert,availbalePlans,purchaseSubscription,verifyPayment,getBookingsToExpert, updateBookingStatus}
+const get_expert_bookings=async ()=>{
+    try {
+        const response= await expertAPI.get('/booking/stats')
+        return response.data
+    } catch (error) {
+        throw new Error(error.response.data.message)
+    }
+}
+export {get_expert,availbalePlans,purchaseSubscription,verifyPayment,getBookingsToExpert, updateBookingStatus,get_expert_bookings}
