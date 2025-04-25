@@ -16,7 +16,7 @@ export class AuthController implements IAuthController {
     try {
       const { name, email, password } = req.body;
       const response = await this.authService.registerUser(name, email, password);
-      this.sendResponse(res, response, HttpStatus.CREATED, HttpStatus.BAD_REQUEST);
+      this._sendResponse(res, response, HttpStatus.CREATED, HttpStatus.BAD_REQUEST);
     } catch (error: any) {
       res.status(HttpStatus.BAD_REQUEST).json({ 
         success: false, 
@@ -29,7 +29,7 @@ export class AuthController implements IAuthController {
     try {
       const { email, otp } = req.body;
       const response = await this.authService.verifyOtp(email, otp);
-      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
+      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
     } catch (err: any) {
       res.status(HttpStatus.BAD_REQUEST).json({ 
         success: false, 
@@ -44,7 +44,7 @@ export class AuthController implements IAuthController {
       const response = await this.authService.loginUser(email, password);
 
       if (response.success && response.accessToken && response.refreshToken) {
-        this.setAuthCookies(res, response.accessToken, response.refreshToken);
+        this._setAuthCookies(res, response.accessToken, response.refreshToken);
         res.status(HttpStatus.OK).json({ 
           success: true, 
           user: response.user 
@@ -65,7 +65,7 @@ export class AuthController implements IAuthController {
     try {
       const { email } = req.body;
       const response = await this.authService.resendOtp(email);
-      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
+      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
     } catch (err: any) {
       res.status(HttpStatus.BAD_REQUEST).json({ 
         success: false, 
@@ -85,7 +85,7 @@ export class AuthController implements IAuthController {
     try {
       const response = await this.authService.findUser(userId);
       console.log(response)
-      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.INTERNAL_SERVER_ERROR);
+      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.INTERNAL_SERVER_ERROR);
     } catch (err: any) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
         success: false, 
@@ -116,7 +116,7 @@ export class AuthController implements IAuthController {
       const response = await this.authService.saveGoogleUser(id, email, name, picture);
 
       if (response?.success && response.accessToken && response.refreshToken) {
-        this.setAuthCookies(res, response.accessToken, response.refreshToken);
+        this._setAuthCookies(res, response.accessToken, response.refreshToken);
         res.status(HttpStatus.OK).json({ 
           success: true, 
           user: response.user 
@@ -136,7 +136,7 @@ export class AuthController implements IAuthController {
     try {
       const { email } = req.body;
       const response = await this.authService.forgetPassword(email);
-      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
+      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
     } catch (err: any) {
       res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
@@ -149,7 +149,7 @@ export class AuthController implements IAuthController {
     try {
       const { token, newPassword } = req.body;
       const response = await this.authService.resetPassword(token, newPassword);
-      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
+      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
     } catch (err: any) {
       res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
@@ -158,7 +158,7 @@ export class AuthController implements IAuthController {
     }
   }
 
-  private sendResponse(
+  private _sendResponse(
     res: Response, 
     response: any, 
     successStatus: number, 
@@ -171,7 +171,7 @@ export class AuthController implements IAuthController {
     }
   }
 
-  private setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
+  private _setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

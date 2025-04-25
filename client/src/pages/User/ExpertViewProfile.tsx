@@ -8,15 +8,17 @@ import BookingModal from '@/components/User/modals/BookingModal';
 import RatingsReviews from '@/components/User/ReviewRating';
 
 export default function ExpertViewProfile() {
-  const [activeTab, setActiveTab] = useState('All Projects');
   const [expertData, setExpertData] = useState<IExpert | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [avgReview,setAvgReview]=useState(0)
   const { expertId } = useParams();
   const navigate=useNavigate()
   useEffect(() => {
     const fetchExpertDetails = async () => {
       try {
         const response = await getExpertDetails(expertId);
+        const review=await getReviewsByExpertId(expertId,1,1)
+        setAvgReview(review.avgRating)
       
         setExpertData(response.expert);
       } catch (error) {
@@ -69,11 +71,7 @@ export default function ExpertViewProfile() {
               <Calendar size={18} />
               <span>{yearsExperience} Years of Experience</span>
             </div>
-            
-            <div className="flex items-center gap-2 text-gray-600">
-              <MapPin size={18} />
-              <span>Coordinates: {expertData.location.coordinates.join(', ')}</span>
-            </div>
+           
             
             <div className="flex items-center gap-2 text-gray-600">
               <Shield size={18} />
@@ -86,11 +84,16 @@ export default function ExpertViewProfile() {
             </div>
             
             <div className="flex items-center gap-1">
-              {[1, 2, 3, 4].map((star) => (
-                <Star key={star} size={20} fill="#FFB800" color="#FFB800" />
-              ))}
-              <Star size={20} fill="#FFB800" color="#FFB800" className="fill-[50%]" />
-            </div>
+  {[1, 2, 3, 4, 5].map((star) => (
+    <Star
+      key={star}
+      size={20}
+      fill={star <= Math.floor(avgReview) ? "#FFB800" : star === Math.ceil(avgReview) && avgReview % 1 >= 0.5 ? "#FFB800" : "none"}
+      color={star <= avgReview ? "#FFB800" : "#D1D5DB"}
+    />
+  ))}
+  {/* <span className="ml-2 text-gray-600">{avgReview.toFixed(1)} ({expertData.ratingCount || 0} reviews)</span> */}
+</div>
           </div>
           
           {/* Action Buttons */}

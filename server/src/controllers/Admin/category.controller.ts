@@ -16,7 +16,7 @@ export class CategoryController implements ICategoryController {
             const { name, description } = req.body;
 
             if (!name || !description) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     message: "Name and description are required"
                 }, HttpStatus.BAD_REQUEST);
@@ -24,7 +24,7 @@ export class CategoryController implements ICategoryController {
             }
 
             if (!req.file) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     message: "Image upload is required"
                 }, HttpStatus.BAD_REQUEST);
@@ -37,10 +37,10 @@ export class CategoryController implements ICategoryController {
                 req.file
             );
 
-            this.sendResponse(res, response, response.success ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
         } catch (error: any) {
             console.error("Error in createCategory Controller:", error);
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success: false,
                 message: "Internal server error"
             }, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -50,10 +50,10 @@ export class CategoryController implements ICategoryController {
     async getAllCategories(req: Request, res: Response): Promise<void> {
         try {
             const response = await this.categoryService.getAllCategories();
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (err: any) {
             console.error("Error in getAllCategories:", err);
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success: false,
                 message: "Internal Server Error"
             }, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -64,10 +64,10 @@ export class CategoryController implements ICategoryController {
         try {
             const { id } = req.params;
             const response = await this.categoryService.getCategoryById(id);
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
         } catch (err: any) {
             console.error("Error in getCategoryById:", err);
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success: false,
                 message: "Internal Server Error"
             }, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -78,10 +78,10 @@ export class CategoryController implements ICategoryController {
         try {
             const { id } = req.params;
             const response = await this.categoryService.changeStatus(id);
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
         } catch (error) {
             console.error("Error in list_and_unlist:", error);
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success: false,
                 message: "Internal Server Error"
             }, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -93,10 +93,10 @@ export class CategoryController implements ICategoryController {
             const { id } = req.params;
             const { name, description } = req.body;
             const response = await this.categoryService.updateCategory(id, name, description, req.file);
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (err: any) {
             console.error("Error in updateCategory:", err);
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success: false,
                 message: "Internal Server Error"
             }, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -111,14 +111,14 @@ export class CategoryController implements ICategoryController {
             
             const { categories, total } = await this.categoryService.getCategoriesByLimit(page, limit, search);
             
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 categories,
                 currentPage: page,
                 totalPages: Math.ceil(total / limit),
                 totalItems: total,
             }, HttpStatus.OK);
         } catch (error) {
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 error: "Failed to fetch categories"
             }, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -133,11 +133,11 @@ export class CategoryController implements ICategoryController {
             const { success, message, result } = await this.categoryService.getCategoryToMange(page, limit, search);
             
             if (!success || !result) {
-                this.sendResponse(res, { message }, HttpStatus.BAD_REQUEST);
+                this._sendResponse(res, { message }, HttpStatus.BAD_REQUEST);
                 return;
             }
             
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success,
                 categories: result.categories,
                 currentPage: page,
@@ -146,14 +146,14 @@ export class CategoryController implements ICategoryController {
             }, HttpStatus.OK);
         } catch (err: any) {
             console.error("Error in getCategoryToManage:", err);
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success: false,
                 message: "Internal Server Error"
             }, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private sendResponse(res: Response, data: any, status: HttpStatus): void {
+    private _sendResponse(res: Response, data: any, status: HttpStatus): void {
         res.status(status).json(data);
     }
 }

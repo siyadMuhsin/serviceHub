@@ -85,9 +85,9 @@ handleConnection(io: Server, socket: Socket) {
         try {
             const expertId = req?.expert?.expertId; 
             const users = await this.messageService.getChatUsers(expertId);
-            res.status(200).json(users);
+            res.status(HttpStatus.OK).json(users);
           } catch (error) {
-            res.status(500).json({ message: 'Failed to fetch chat users', error });
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch chat users', error });
           }
           
       }

@@ -36,7 +36,7 @@ export class AuthService implements IAuthService {
         await this.userRepository.findUserAndUpdate(exitingUser.email, {
           password: hashedPassword,
         });
-        return this.generateAndSendOtp(email);
+        return this._generateAndSendOtp(email);
       }
 
       if (!exitingUser) {
@@ -46,7 +46,7 @@ export class AuthService implements IAuthService {
           email,
           password: hashedPassword,
         });
-        return this.generateAndSendOtp(email);
+        return this._generateAndSendOtp(email);
       }
 
       return { success: false, message: "Registration failed" };
@@ -97,7 +97,7 @@ export class AuthService implements IAuthService {
         return { success: true, message: "OTP already sent to this email" };
       }
 
-      return await this.generateAndSendOtp(email);
+      return await this._generateAndSendOtp(email);
     } catch (error) {
       console.error("Error in resendOtp:", error);
       throw new Error("Failed to resend OTP");
@@ -172,14 +172,14 @@ export class AuthService implements IAuthService {
         }
 
         if (existingUser.isGoogleUser) {
-          return this.generateAuthResponse(existingUser);
+          return this._generateAuthResponse(existingUser);
         } else {
           const updateUser = await this.userRepository.findUserAndUpdate(
             existingUser.email,
             { isGoogleUser: true, googleId: googleId, profile_image: image }
           );
           if (updateUser) {
-            return this.generateAuthResponse(updateUser);
+            return this._generateAuthResponse(updateUser);
           }
         }
       } else {
@@ -192,7 +192,7 @@ export class AuthService implements IAuthService {
           isVerified: true,
         });
         if (createUser) {
-          return this.generateAuthResponse(createUser);
+          return this._generateAuthResponse(createUser);
         }
       }
 
@@ -242,7 +242,7 @@ export class AuthService implements IAuthService {
     }
   }
 
-  private async generateAndSendOtp(email: string): Promise<AuthResult> {
+  private async _generateAndSendOtp(email: string): Promise<AuthResult> {
     const otp = generateOTP();
     console.log(otp);
     
@@ -252,7 +252,7 @@ export class AuthService implements IAuthService {
     return { success: true, message: "OTP sent to email. Please verify." };
   }
 
-  private generateAuthResponse(user: any): AuthResult {
+  private _generateAuthResponse(user: any): AuthResult {
     return {
       success: true,
       user: user,

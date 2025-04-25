@@ -19,7 +19,7 @@ export class ServiceController implements IServiceController {
             const { name, categoryId, description } = req.body;
             
             if (!name?.trim() || !categoryId?.trim() || !description?.trim()) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     message: "All fields are required"
                 }, HttpStatus.BAD_REQUEST);
@@ -27,7 +27,7 @@ export class ServiceController implements IServiceController {
             }
 
             if (!req.file) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     message: "Image is required"
                 }, HttpStatus.BAD_REQUEST);
@@ -41,18 +41,18 @@ export class ServiceController implements IServiceController {
                 req.file
             );
 
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error: any) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
     async getAllServices(req: Request, res: Response): Promise<void> {
         try {
             const response = await this.serviceService.getAllServices();
-            this.sendResponse(res, response, HttpStatus.OK);
+            this._sendResponse(res, response, HttpStatus.OK);
         } catch (error: any) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -60,9 +60,9 @@ export class ServiceController implements IServiceController {
         try {
             const { id } = req.params;
             const response = await this.serviceService.getServiceById(id);
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
         } catch (error: any) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -70,9 +70,9 @@ export class ServiceController implements IServiceController {
         try {
             const { categoryId } = req.params;
             const response = await this.serviceService.getServicesByCategory(categoryId);
-            this.sendResponse(res, response, HttpStatus.OK);
+            this._sendResponse(res, response, HttpStatus.OK);
         } catch (error: any) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -84,9 +84,9 @@ export class ServiceController implements IServiceController {
                 req.body,
                 req.file
             );
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error: any) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -94,9 +94,9 @@ export class ServiceController implements IServiceController {
         try {
             const { id } = req.params;
             const response = await this.serviceService.changeStatus(id);
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (err: any) {
-            this.sendErrorResponse(res, err);
+            this._sendErrorResponse(res, err);
         }
     }
 
@@ -110,7 +110,7 @@ export class ServiceController implements IServiceController {
                 : "";
 
             if (!categoryId) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     error: "Category ID is required"
                 }, HttpStatus.BAD_REQUEST);
                 return;
@@ -123,14 +123,14 @@ export class ServiceController implements IServiceController {
                 search
             );
 
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success: true,
                 services,
                 currentPage: page,
                 totalPages: Math.ceil(totalServices / limit),
             }, HttpStatus.OK);
         } catch (error: any) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -144,22 +144,22 @@ export class ServiceController implements IServiceController {
 
             const { services, totalServices } = await this.serviceService.getServicesToMange(page, limit, search);
 
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success: true,
                 services,
                 currentPage: page,
                 totalPage: Math.ceil(totalServices / limit)
             }, HttpStatus.OK);
         } catch (error: any) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
-    private sendResponse(res: Response, data: any, status: HttpStatus): void {
+    private _sendResponse(res: Response, data: any, status: HttpStatus): void {
         res.status(status).json(data);
     }
 
-    private sendErrorResponse(res: Response, error: any): void {
+    private _sendErrorResponse(res: Response, error: any): void {
         console.error("Error:", error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             success: false,

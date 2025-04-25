@@ -17,7 +17,7 @@ export class ExpertController implements IExpertController {
     async createExpert(req: AuthRequest, res: Response): Promise<void> {
         try {
             if (!req.file) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     error: "Certificate file is required!"
                 }, HttpStatus.BAD_REQUEST);
@@ -30,13 +30,13 @@ export class ExpertController implements IExpertController {
                 req.user.userId
             );
             
-            this.sendResponse(res, {
+            this._sendResponse(res, {
                 success: true,
                 message: "Expert created successfully",
                 expert,
             }, HttpStatus.CREATED);
         } catch (error: any) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -54,9 +54,9 @@ export class ExpertController implements IExpertController {
                 search
             );
             
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -67,7 +67,7 @@ export class ExpertController implements IExpertController {
             const validActions = ["approved", "rejected"];
             
             if (!validActions.includes(action)) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     message: "Invalid action"
                 }, HttpStatus.BAD_REQUEST);
@@ -75,7 +75,7 @@ export class ExpertController implements IExpertController {
             }
             
             if (!id || !action) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     message: "Missing required parameters"
                 }, HttpStatus.BAD_REQUEST);
@@ -83,9 +83,9 @@ export class ExpertController implements IExpertController {
             }
             
             const response = await this.expertService.actionChange(id, action,reason);
-            this.sendResponse(res, response, response?.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response?.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -95,7 +95,7 @@ export class ExpertController implements IExpertController {
             const { active } = req.body;
             
             if (!id || typeof active !== 'boolean') {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     message: "Missing or invalid parameters"
                 }, HttpStatus.BAD_REQUEST);
@@ -103,9 +103,9 @@ export class ExpertController implements IExpertController {
             }
             
             const response = await this.expertService.block_unblock(id, active);
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -114,9 +114,9 @@ export class ExpertController implements IExpertController {
             console.log('test')
             const { id } = req.params;
             const response = await this.expertService.getExpertData(id);
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -124,7 +124,7 @@ export class ExpertController implements IExpertController {
         try {
             const userId = req.user?.userId;
             if (!userId) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     message: "User not found"
                 }, HttpStatus.BAD_REQUEST);
@@ -134,13 +134,13 @@ export class ExpertController implements IExpertController {
             const response = await this.expertService.switch_expert(userId);
             if (response.success && response.accessToken && response.refreshToken) {
                 await setAuthCookies(res, response.accessToken, response.refreshToken);
-                this.sendResponse(res, response, HttpStatus.OK);
+                this._sendResponse(res, response, HttpStatus.OK);
                 return;
             }
             
-            this.sendResponse(res, response, HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this.sendErrorResponse(res, error);
+            this._sendErrorResponse(res, error);
         }
     }
 
@@ -148,7 +148,7 @@ export class ExpertController implements IExpertController {
         try {
             const expertId = req?.expert?.expertId;
             if (!expertId) {
-                this.sendResponse(res, {
+                this._sendResponse(res, {
                     success: false,
                     message: "Expert not found"
                 }, HttpStatus.BAD_REQUEST);
@@ -159,26 +159,26 @@ export class ExpertController implements IExpertController {
             if (response.success && response.accessToken && response.refreshToken) {
                 await setAuthCookies(res, response.accessToken, response.refreshToken);
             }
-            this.sendResponse(res, response, HttpStatus.OK);
+            this._sendResponse(res, response, HttpStatus.OK);
         } catch (err) {
-            this.sendErrorResponse(res, err);
+            this._sendErrorResponse(res, err);
         }
     }
     async getLatestExperts(req: AuthRequest, res: Response): Promise<void> {
         try {
             const {experts}=await this.expertService.getExpertBy_limit(1,3,"","")
-            this.sendResponse(res,experts,HttpStatus.OK)
+            this._sendResponse(res,experts,HttpStatus.OK)
         } catch (error) {
-            this.sendErrorResponse(res,error)
+            this._sendErrorResponse(res,error)
             
         }
     }
 
-    private sendResponse(res: Response, data: any, status: HttpStatus): void {
+    private _sendResponse(res: Response, data: any, status: HttpStatus): void {
         res.status(status).json(data);
     }
 
-    private sendErrorResponse(res: Response, error: any): void {
+    private _sendErrorResponse(res: Response, error: any): void {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: error.message || "Internal server error" 

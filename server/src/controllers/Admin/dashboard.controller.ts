@@ -27,7 +27,7 @@ export class DashboardController implements IDashboardController{
                 adminEarnings:data.totalEarnings
             }})
         } catch (error) {
-            
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({message:"Internal server error"})
         }
 
     }

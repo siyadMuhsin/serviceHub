@@ -35,9 +35,9 @@ export class SlotController implements ISlotController {
     try {
       const expertId= req?.expert?.expertId
       const response=await this.slotService.getExpertSlots(expertId)
-      this.sendResponse(res,response,HttpStatus.OK)
+      this._sendResponse(res,response,HttpStatus.OK)
     } catch (error:any) {
-      this.sendResponse(res,{message:error.message||"Internal server error"},HttpStatus.INTERNAL_SERVER_ERROR)
+      this._sendResponse(res,{message:error.message||"Internal server error"},HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
   async deleteSlot(req: AuthRequest, res: Response): Promise<void> {
@@ -49,10 +49,10 @@ export class SlotController implements ISlotController {
         return;
       }
       const result = await this.slotService.deleteSlot(expertId, slotId);
-     this.sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+     this._sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
     } catch (error) {
       console.error("Error deleting slot:", error);
-      this.sendResponse(res,{ success: false, message: "Internal server error" },HttpStatus.INTERNAL_SERVER_ERROR)
+      this._sendResponse(res,{ success: false, message: "Internal server error" },HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
   async getSlotToUser(req: Request, res: Response): Promise<void> {
@@ -60,16 +60,16 @@ export class SlotController implements ISlotController {
     try {
       const {expertId}=req.params
       if(!expertId){
-        this.sendResponse(res,{success:false,message:"Expert ID is missing"},HttpStatus.BAD_REQUEST)
+        this._sendResponse(res,{success:false,message:"Expert ID is missing"},HttpStatus.BAD_REQUEST)
         return
       }
       const result= await this.slotService.getExpertSlots(expertId)
-      this.sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+      this._sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
     } catch (error) {
-      this.sendResponse(res,{message:"Internal server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
+      this._sendResponse(res,{message:"Internal server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
-    private sendResponse(res: Response, data: any, status: HttpStatus): void {
+    private _sendResponse(res: Response, data: any, status: HttpStatus): void {
           res.status(status).json(data);
       }
   

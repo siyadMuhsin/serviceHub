@@ -15,7 +15,7 @@ export class BookingController implements IBookingController {
     try {
       const userId = req.user?.userId;
       if (!userId) {
-        this.sendResponse(res, { 
+        this._sendResponse(res, { 
           success: false, 
           message: "Authentication required" 
         }, HttpStatus.UNAUTHORIZED);
@@ -26,32 +26,32 @@ export class BookingController implements IBookingController {
   
       // Validate required fields
       if (!expertId || !slotId || !time || !notes ||!address) {
-        this.sendResponse(res, { success: false, message: "All fields (expertId, slotId, time, notes) are required" }, HttpStatus.BAD_REQUEST);
+        this._sendResponse(res, { success: false, message: "All fields (expertId, slotId, time, notes) are required" }, HttpStatus.BAD_REQUEST);
         return;
       }
 const coordinates=JSON.parse(location)
 if(coordinates.length<0){
-  this.sendResponse(res,{message:"invalid location"},HttpStatus.BAD_REQUEST)
+  this._sendResponse(res,{message:"invalid location"},HttpStatus.BAD_REQUEST)
   return
 }
       // Create the booking using the service
       const result = await this.bookingService.createBooking(userId, expertId, slotId, time, notes, coordinates,address,files);
       if (!result.success) {
-        this.sendResponse(res, result, HttpStatus.BAD_REQUEST);
+        this._sendResponse(res, result, HttpStatus.BAD_REQUEST);
         return;
       }
       
-      this.sendResponse(res, result, HttpStatus.CREATED);
+      this._sendResponse(res, result, HttpStatus.CREATED);
     } catch (error) {
       console.error("Error creating booking:", error);
-      this.sendResponse(res, { success: false, message: "Internal server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
+      this._sendResponse(res, { success: false, message: "Internal server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
   async getBookingToExpert(req: AuthRequest, res: Response): Promise<void> {
     try {
       const expertId = req.expert.expertId;
       if (!expertId) {
-        this.sendResponse(res, { message: "Expert Id not found" }, HttpStatus.BAD_REQUEST);
+        this._sendResponse(res, { message: "Expert Id not found" }, HttpStatus.BAD_REQUEST);
         return;
       }
   
@@ -65,13 +65,13 @@ if(coordinates.length<0){
         limit, 
         status
       );
-      this.sendResponse(
+      this._sendResponse(
         res,
         result,
         result.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST
       );
     } catch (error) {
-      this.sendResponse(
+      this._sendResponse(
         res,
         { message: "Internal Server Error" },
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -82,9 +82,9 @@ if(coordinates.length<0){
     try {
       const expertId=req.expert.expertId
       const result=await this.bookingService.allBookings(expertId)
-      this.sendResponse(res,result,HttpStatus.OK)
+      this._sendResponse(res,result,HttpStatus.OK)
     } catch (error) {
-      this.sendResponse(res,{message:"Intervel server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
+      this._sendResponse(res,{message:"Intervel server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
   async bookingStatusChange(req: AuthRequest, res: Response): Promise<void> {
@@ -95,18 +95,18 @@ if(coordinates.length<0){
       
   
       if (!expertId || !bookingId || !status) {
-        this.sendResponse(res, { message: "Missing required fields." }, HttpStatus.BAD_REQUEST);
+        this._sendResponse(res, { message: "Missing required fields." }, HttpStatus.BAD_REQUEST);
         return;
       }
   
       const result = await this.bookingService.changeStatus(expertId, bookingId, status,reason);
   
       if (!result.success) {
-        this.sendResponse(res, { message: result.message }, HttpStatus.BAD_REQUEST);
+        this._sendResponse(res, { message: result.message }, HttpStatus.BAD_REQUEST);
         return;
       }
   
-      this.sendResponse(res, {
+      this._sendResponse(res, {
         success: true,
         message: "Booking status updated successfully",
         status: result.status,
@@ -114,7 +114,7 @@ if(coordinates.length<0){
   
     } catch (error: any) {
       console.error("Status change error:", error.message);
-      this.sendResponse(res, { message: "Internal server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
+      this._sendResponse(res, { message: "Internal server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -125,9 +125,9 @@ if(coordinates.length<0){
       const limit = parseInt(req.query.limit as string) || 8;
       
       const result = await this.bookingService.userBookings(userId, page, limit);
-      this.sendResponse(res, result, result.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+      this._sendResponse(res, result, result.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     } catch (error:any) {
-      this.sendResponse(res, {
+      this._sendResponse(res, {
         success: false,
         message: error.message || 'Failed to fetch bookings'
       }, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -138,19 +138,19 @@ if(coordinates.length<0){
       const { bookingId } = req.params;
       const userId = req.user.userId;
       const result = await this.bookingService.userCancelBooking(bookingId, userId);
-      this.sendResponse(
+      this._sendResponse(
         res,
         result,
         result.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST
       );
     } catch (error:any) {
-      this.sendResponse(
+      this._sendResponse(
         res,{success: false,message: error.message || 'Failed to cancel booking'},
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
-  private sendResponse(res: Response, data: any, status: HttpStatus): void {
+  private _sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }
 }

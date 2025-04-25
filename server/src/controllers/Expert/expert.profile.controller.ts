@@ -18,15 +18,15 @@ export class ExpertProfileController implements IExpertProfileController {
         try {
             const expertId = req.expert?.expertId; 
             if (!expertId) {
-                this.sendErrorResponse(res, 'Expert ID is missing', HttpStatus.BAD_REQUEST);
+                this._sendErrorResponse(res, 'Expert ID is missing', HttpStatus.BAD_REQUEST);
                 return;
             }
 
             const response = await this.expertService.getExpertData(expertId);
-            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
             console.error('Error fetching expert data:', error);
-            this.sendErrorResponse(res, 'Internal server error');
+            this._sendErrorResponse(res, 'Internal server error');
         }
     }
 
@@ -36,16 +36,16 @@ export class ExpertProfileController implements IExpertProfileController {
             const expertId=req.expert.expertId
             const {lat,lng}= req.body.data
             if (!lat || !lng) {
-                return this.sendResponse(
+                return this._sendResponse(
                   res,
                   { success: false, message: "Latitude or longitude is missing!" },
                   HttpStatus.BAD_REQUEST
                 );
               }
             const response= await this.expertProfileService.updateExpertLocation({lat,lng},expertId)
-            this.sendResponse(res,response,response.success?HttpStatus.CREATED:HttpStatus.BAD_REQUEST)
+            this._sendResponse(res,response,response.success?HttpStatus.CREATED:HttpStatus.BAD_REQUEST)
         } catch (error) {
-            this.sendErrorResponse(res,'Ineternal server error')
+            this._sendErrorResponse(res,'Ineternal server error')
         }
     }
     
@@ -56,14 +56,14 @@ async imagesUpload(req: AuthRequest, res: Response): Promise<void> {
         const file= req.file
         if(!expertId)return;
         if(!file){
-            this.sendResponse(res,{message:"Image file not exists"},HttpStatus.BAD_REQUEST)
+            this._sendResponse(res,{message:"Image file not exists"},HttpStatus.BAD_REQUEST)
             return
         }
 
         const response= await this.expertProfileService.uploadImage(expertId,file)
-    this.sendResponse(res,response,response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+    this._sendResponse(res,response,response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
     } catch (error:any) {
-        this.sendErrorResponse(res,error.message)
+        this._sendErrorResponse(res,error.message)
     }
 }
 
@@ -73,22 +73,22 @@ async deleteImage(req: AuthRequest, res: Response): Promise<void> {
       const { imageUrl } = req.body;
   
       if (!imageUrl || !expertId) {
-        this.sendResponse(res, { message: "Image URL or Expert ID missing" }, HttpStatus.BAD_REQUEST);
+        this._sendResponse(res, { message: "Image URL or Expert ID missing" }, HttpStatus.BAD_REQUEST);
         return;
       }
   
       const response = await this.expertProfileService.deleteImageFromGallery(expertId, imageUrl);
-      this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+      this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     } catch (error: any) {
-      this.sendErrorResponse(res, error.message);
+      this._sendErrorResponse(res, error.message);
     }
   }
   
-    private sendResponse(res: Response, data: any, status: HttpStatus): void {
+    private _sendResponse(res: Response, data: any, status: HttpStatus): void {
         res.status(status).json(data);
     }
 
-    private sendErrorResponse(res: Response, message: string, status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR): void {
+    private _sendErrorResponse(res: Response, message: string, status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR): void {
         res.status(status).json({ 
             success: false, 
             message 

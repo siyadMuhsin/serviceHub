@@ -20,12 +20,12 @@ export class UsersController implements IUsersController {
             const response = await this.userService.getUsers(page, limit, search);
             
             if (response.success) {
-                this.sendResponse(res, response, HttpStatus.OK);
+                this._sendResponse(res, response, HttpStatus.OK);
             } else {
-                this.sendResponse(res, response, HttpStatus.BAD_REQUEST);
+                this._sendResponse(res, response, HttpStatus.BAD_REQUEST);
             }
         } catch (error) {
-            this.handleError(res, "Failed to fetch users", error);
+            this._handleError(res, "Failed to fetch users", error);
         }
     }
 
@@ -35,7 +35,7 @@ export class UsersController implements IUsersController {
             const { block } = req.body;
 
             if (typeof block !== "boolean") {
-                this.sendResponse(
+                this._sendResponse(
                     res, 
                     { success: false, message: "Invalid status value" }, 
                     HttpStatus.BAD_REQUEST
@@ -44,14 +44,14 @@ export class UsersController implements IUsersController {
             }
 
             const response = await this.userService.blockUnblockUser(id, block);
-            this.sendResponse(
+            this._sendResponse(
                 res, 
                 response, 
                 HttpStatus.OK, 
                 HttpStatus.BAD_REQUEST
             );
         } catch (error) {
-            this.handleError(res, "Failed to update user status", error);
+            this._handleError(res, "Failed to update user status", error);
         }
     }
     async getLatestUsers(req: AuthRequest, res: Response): Promise<void> {
@@ -59,11 +59,11 @@ export class UsersController implements IUsersController {
             const {users}=await this.userService.getUsers(1,3,"")
             res.status(HttpStatus.OK).json(users)
         } catch (error) {
-            this.sendResponse(res,{message:"Interval server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
+            this._sendResponse(res,{message:"Interval server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    private sendResponse(
+    private _sendResponse(
         res: Response,
         data: any,
         successStatus: HttpStatus,
@@ -73,7 +73,7 @@ export class UsersController implements IUsersController {
         res.status(status).json(data);
     }
 
-    private handleError(res: Response, message: string, error: unknown): void {
+    private _handleError(res: Response, message: string, error: unknown): void {
         console.error(message, error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
             success: false, 

@@ -17,21 +17,21 @@ async planPurchase(req: AuthRequest, res: Response): Promise<void> {
         const {planId}=req.params
         const expertId= req.expert.expertId
         if(!planId){
-            this.sendResponse(res,{message:"The planId is Missing"},HttpStatus.BAD_REQUEST)
+            this._sendResponse(res,{message:"The planId is Missing"},HttpStatus.BAD_REQUEST)
         return; 
         }
         const response= await this.paymentService.planPurchase(expertId,planId)
         if (!response.success) {
-            this.sendResponse(res, { message: response.message }, HttpStatus.BAD_REQUEST);
+            this._sendResponse(res, { message: response.message }, HttpStatus.BAD_REQUEST);
             return;
         }
 
-        this.sendResponse(res, {
+        this._sendResponse(res, {
             clientSecret: response.clientSecret,
             message: "Payment intent created successfully"
         }, HttpStatus.OK);
     } catch (error) {
-        this.sendResponse(res, { 
+        this._sendResponse(res, { 
             message: "Failed to process subscription" 
         }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -44,7 +44,7 @@ async verifyPayment(req: AuthRequest, res: Response): Promise<void> {
       const expertId = req.expert.expertId;
   
       if (!paymentIntentId || !planId) {
-        this.sendResponse(
+        this._sendResponse(
           res,
           { message: "Missing paymentIntentId or planId" },
           HttpStatus.BAD_REQUEST
@@ -55,14 +55,14 @@ async verifyPayment(req: AuthRequest, res: Response): Promise<void> {
       const response = await this.paymentService.paymentVerify(expertId, paymentIntentId, planId);
   
       if (!response.success) {
-        this.sendResponse(res, response, HttpStatus.BAD_REQUEST);
+        this._sendResponse(res, response, HttpStatus.BAD_REQUEST);
         return;
       }
   
-      this.sendResponse(res, response, HttpStatus.OK);
+      this._sendResponse(res, response, HttpStatus.OK);
     } catch (error) {
       console.error(error);
-      this.sendResponse(res, { message: "Server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
+      this._sendResponse(res, { message: "Server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
   async getAllEarnings(req: AuthRequest, res: Response): Promise<void> {
@@ -81,7 +81,7 @@ async verifyPayment(req: AuthRequest, res: Response): Promise<void> {
       });
     }
   }
-  private sendResponse(res: Response, data: any, status: HttpStatus): void {
+  private _sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }
 }

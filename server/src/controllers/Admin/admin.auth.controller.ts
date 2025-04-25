@@ -17,7 +17,7 @@ export class AdminAuthController implements IAdminAuthController {
             const { email, password } = req.body;
             const response = await this.adminService.loginAdmin(email, password);
             if (response.success && response.accessToken && response.refreshToken) {
-                this.setAuthCookies(res, response.accessToken, response.refreshToken);
+                this._setAuthCookies(res, response.accessToken, response.refreshToken);
                 res.status(HttpStatus.OK).json({ 
                     success: true, 
                     message: "Login successful" 
@@ -55,7 +55,7 @@ export class AdminAuthController implements IAdminAuthController {
         }
     }
 
-    private setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
+    private _setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
         res.cookie("accessToken", accessToken, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === "production" 

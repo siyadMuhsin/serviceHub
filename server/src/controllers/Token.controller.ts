@@ -16,22 +16,22 @@ export class TokenController implements ITokenController {
         try {
             const oldToken = req.cookies.refreshToken;
             if (!oldToken) {
-                this.sendErrorResponse(res, HttpStatus.BAD_REQUEST, "Unauthorized: No refresh token");
+                this._sendErrorResponse(res, HttpStatus.BAD_REQUEST, "Unauthorized: No refresh token");
                 return;
             }
     
             const decoded: any = await TokenVerify(oldToken, this.refreshTokenSecret);
     
             if (!decoded.userId || !decoded.role) {
-                this.sendErrorResponse(res, HttpStatus.BAD_REQUEST, "Invalid token payload");
+                this._sendErrorResponse(res, HttpStatus.BAD_REQUEST, "Invalid token payload");
                 return;
             }
             // ✅ Generate new tokens
             const newAccessToken = generateAccessToken(decoded.userId, decoded.role, decoded.expertId);
             const newRefreshToken = generateRefreshToken(decoded.userId, decoded.role, decoded.expertId);
             // ✅ Set both cookies
-            this.setAccessTokenCookie(res, newAccessToken);
-            this.setRefreshTokenCookie(res, newRefreshToken);
+            this._setAccessTokenCookie(res, newAccessToken);
+            this._setRefreshTokenCookie(res, newRefreshToken);
     
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -39,12 +39,12 @@ export class TokenController implements ITokenController {
             });
     
         } catch (err) {
-            this.sendErrorResponse(res, HttpStatus.FORBIDDEN, "Invalid refresh token");
+            this._sendErrorResponse(res, HttpStatus.FORBIDDEN, "Invalid refresh token");
         }
     }
     
 
-    private setAccessTokenCookie(res: Response, token: string): void {
+    private _setAccessTokenCookie(res: Response, token: string): void {
         res.cookie("accessToken", token, {
             httpOnly: false,
             secure: this.isProduction,
@@ -52,7 +52,7 @@ export class TokenController implements ITokenController {
             maxAge: 15 * 60 * 1000, // 15 minutes
         });
     }
-    private setRefreshTokenCookie(res: Response, token: string): void {
+    private _setRefreshTokenCookie(res: Response, token: string): void {
         res.cookie("refreshToken", token, {
             httpOnly: true,
             secure: this.isProduction,
@@ -60,7 +60,7 @@ export class TokenController implements ITokenController {
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
     }
-    private sendErrorResponse(res: Response, status: HttpStatus, message: string): void {
+    private _sendErrorResponse(res: Response, status: HttpStatus, message: string): void {
         res.status(status).json({
             success: false,
             message
