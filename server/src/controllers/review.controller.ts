@@ -8,7 +8,7 @@ import { HttpStatus } from "../types/httpStatus";
 @injectable()
 export class ReviewController implements IReviewController{
 constructor(
-    @inject(TYPES.ReviewService) private reviewService:IReviewService
+    @inject(TYPES.ReviewService) private _reviewService:IReviewService
 ){}
 
 async reviewSubmit(req: AuthRequest, res: Response): Promise<void> {
@@ -17,18 +17,18 @@ async reviewSubmit(req: AuthRequest, res: Response): Promise<void> {
         const userId= req.user.userId
         // Validate required fields
         if(typeof reviewText =='string' && !reviewText.trim()){
-
-              this._sendResponse(res,{success:false,message:"Review Content is requered"},HttpStatus.BAD_REQUEST)
-    return
+    this.sendResponse(res,{success:false,message:"Review Content is requered"},HttpStatus.BAD_REQUEST)
+        return
         }
   if (!rating || !reviewText || !expertId || !userId) {
-    this._sendResponse(res,{success:false,message:"Missing required Field"},HttpStatus.BAD_REQUEST)
+    this.sendResponse(res,{success:false,message:"Missing required Field"},HttpStatus.BAD_REQUEST)
     return
   }
-        const result = await this.reviewService.submitReview(rating,reviewText,expertId,userId)
-        this._sendResponse(res,result,result.success?HttpStatus.CREATED:HttpStatus.BAD_REQUEST)
+        const result = await this._reviewService.submitReview(rating,reviewText,expertId,userId)
+        this.sendResponse(res,result,result.success?HttpStatus.CREATED:HttpStatus.BAD_REQUEST)
     } catch (error) {
-this._sendResponse(res,{success:false,message:"Internal server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
+        const err= error as Error
+this.sendResponse(res,{success:false,message:err.message||"Internal server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
         
     }
     
@@ -40,13 +40,14 @@ async getReviewsForUser(req: AuthRequest, res: Response): Promise<void> {
         const {expertId}= req.params
         const userId= req.user?.userId
         if(!userId || !expertId){
-            this._sendResponse(res,{success:false,message:"ExpertId Not valid"},HttpStatus.BAD_REQUEST)
+            this.sendResponse(res,{success:false,message:"ExpertId Not valid"},HttpStatus.BAD_REQUEST)
     return
         }
-        const result= await this.reviewService.getReviewsToUser(expertId,page,limit)
-        this._sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+        const result= await this._reviewService.getReviewsToUser(expertId,page,limit)
+        this.sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
     } catch (error) {
-this._sendResponse(res,{success:false,message:"Internal server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
+        const err= error as Error
+this.sendResponse(res,{success:false,message:err.message||"Internal server Error"},HttpStatus.INTERNAL_SERVER_ERROR)
         
     }
 }
@@ -56,13 +57,14 @@ async getReviewsForExpert(req: AuthRequest, res: Response): Promise<void> {
         const expertId= req.expert?.expertId
         const page=parseInt(req.query.page as string)||1
         const limit= parseInt(req.query.limit as string) || 5
-        const result= await this.reviewService.getReviewsToUser(expertId,page,limit)
-        this._sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+        const result= await this._reviewService.getReviewsToUser(expertId,page,limit)
+        this.sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
     } catch (error) {
-        this._sendResponse(res,{success:false,message:"Internal server Error"},HttpStatus.INTERNAL_SERVER_ERROR)  
+        const err= error as Error
+        this.sendResponse(res,{success:false,message:err.message||"Internal server Error"},HttpStatus.INTERNAL_SERVER_ERROR)  
     }
 }
- private _sendResponse(res: Response, data: any, status: HttpStatus): void {
+ private sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }
 

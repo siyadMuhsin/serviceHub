@@ -13,15 +13,15 @@ dotenv.config()
 export class PaymentService implements IPaymentService{
     private stripe:Stripe
     constructor(
-        @inject(TYPES.PlanRepository) private planRepository:IPlanRespository,
-        @inject(TYPES.ExpertRepository) private expertRepository:IExpertRepository,
-        @inject(TYPES.PaymentRepository) private paymentRepository:IPaymentRepository
+        @inject(TYPES.PlanRepository) private _planRepository:IPlanRespository,
+        @inject(TYPES.ExpertRepository) private _expertRepository:IExpertRepository,
+        @inject(TYPES.PaymentRepository) private _paymentRepository:IPaymentRepository
     ){
         this.stripe=new Stripe(process.env.STRIPE_SECRET_KEY!)
     }
     async planPurchase(expertId: string, planId: string) {
         try {
-            const existingPlan=await this.planRepository.findById(planId)
+            const existingPlan=await this._planRepository.findById(planId)
             if(!existingPlan ){
                 return {success:false,message:"No available Plan"}
             }
@@ -37,8 +37,9 @@ export class PaymentService implements IPaymentService{
                 clientSecret: paymentIntent.client_secret
             };
 
-        } catch (error:any) {
-            throw new Error(error.message || 'Payment processing failed');
+        } catch (error) {
+            const err= error as Error
+            throw new Error(err.message || 'Payment processing failed');
         }
     }
     async paymentVerify(expertId: string, paymentIntentId: string,planId:string): Promise<any> {
@@ -48,7 +49,7 @@ export class PaymentService implements IPaymentService{
             if(paymentDetails.status !== 'succeeded'){
                 return {success:false,message:"Payment not successful"}
             }
-            const selectedPlan= await this.planRepository.findById(planId)
+            const selectedPlan= await this._planRepository.findById(planId)
             if(!selectedPlan){
                 return {success:false,message:"The Plan is not fount"}
             }
@@ -62,32 +63,33 @@ export class PaymentService implements IPaymentService{
                 endDate,
                 isActive:true
             }
-            const updateExpert= await this.expertRepository.findByIdAndUpdate(expertId,{subscription})
+            const updateExpert= await this._expertRepository.findByIdAndUpdate(expertId,{subscription})
             const paymentData={
                 expertId: new Types.ObjectId(expertId),
                 planId: new Types.ObjectId(planId),
                 amount: paymentDetails.amount / 100,
                 paymentIntentId: paymentDetails.id,
             }
-            const createdPayment= await this.paymentRepository.create(paymentData)
+            const createdPayment= await this._paymentRepository.create(paymentData)
             return {
                 success: true,
                 message: "Payment verified and subscription activated",
                 paymentDetails: createdPayment,
               };
 
-        } catch (error:any) {
+        } catch (error) {
+            const err= error as Error
             console.error("Payment verification failed:", error);
-            return { success: false, message: error.message ||"Internal server error" };
+            return { success: false, message: err.message ||"Internal server error" };
         }
     }
 
     async getAllEarnings(plan: string, page: number, limit: number) {
         try {
           const filter = plan ? { plan } : {};
-          const { data, total,totalEarningsAgg } = await this.paymentRepository.findAll(filter, page, limit);
+          const { data, total,totalEarningsAgg } = await this._paymentRepository.findAll(filter, page, limit);
           const totalPages = Math.ceil(total / limit);
-      const plans= await this.planRepository.findAll()
+      const plans= await this._planRepository.findAll()
           return {
             success: true,
             message: 'Earnings fetched successfully',
@@ -103,9 +105,10 @@ export class PaymentService implements IPaymentService{
               }
             }
           };
-        } catch (error:any) {
-          console.error('Service error:', error);
-        throw new Error(error.message)
+        } catch (error) {
+            const err= error as Error
+          console.error('Service error:', err);
+        throw new Error(err.message)
         }
       }
 }

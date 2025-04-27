@@ -10,9 +10,9 @@ import mongoose, { mongo } from "mongoose";
 @injectable()
 export class ReviewService implements IReviewService {
   constructor(
-    @inject(TYPES.ReviewRepository) private reviewRepository: IReviewRepository,
+    @inject(TYPES.ReviewRepository) private _reviewRepository: IReviewRepository,
     @inject(TYPES.UserRepository) private userRepository: IUserRepository,
-    @inject(TYPES.ExpertRepository) private expertRepository: IExpertRepository
+    @inject(TYPES.ExpertRepository) private _expertRepository: IExpertRepository
   ) {}
   async submitReview(
     rating: number,
@@ -21,20 +21,20 @@ export class ReviewService implements IReviewService {
     userId: string
   ): Promise<{ success: boolean; message: string; review?: IReview }> {
     try {
-      const expert = await this.expertRepository.findById(expertId);
+      const expert = await this._expertRepository.findById(expertId);
       if (!expert) {
         return { success: false, message: "Expert not found" };
       }
       const expertObjectId = new mongoose.Types.ObjectId(expertId);
       const userObjectid = new mongoose.Types.ObjectId(userId);
-      const existingReview = await this.reviewRepository.findOne({expertId: expertObjectId,userId: userObjectid,});
+      const existingReview = await this._reviewRepository.findOne({expertId: expertObjectId,userId: userObjectid,});
       if (existingReview) {
         return {
           success: false,
           message: "You have already reviewed this expert",
         };
       }
-      const newReview = await this.reviewRepository.create({
+      const newReview = await this._reviewRepository.create({
         rating,
         reviewText,
         expertId:expertObjectId,
@@ -42,8 +42,9 @@ export class ReviewService implements IReviewService {
         createdAt: new Date()
       });
       return { success: true, message: "Review submitted successfully", review: newReview };
-    } catch (error: any) {
-      throw new Error(error.message);
+    } catch (error) {
+      const err= error as Error
+      throw new Error(err.message);
     }
   }
   async getReviewsToUser(expertId: string, page: number, limit: number): Promise<{
@@ -57,11 +58,11 @@ export class ReviewService implements IReviewService {
 
   }> {
     try {
-      const expert = await this.expertRepository.findById(expertId);
+      const expert = await this._expertRepository.findById(expertId);
       if (!expert) {
         return { success: false, message: "Expert not found" };
       } 
-      const { reviews, total ,avgRating,totalRating} = await this.reviewRepository.findByExpertId(expertId, page, limit);
+      const { reviews, total ,avgRating,totalRating} = await this._reviewRepository.findByExpertId(expertId, page, limit);
       const totalPages = Math.ceil(total / limit);
       return {
         success: true,
@@ -72,8 +73,9 @@ export class ReviewService implements IReviewService {
         avgRating,
         total
       };
-    } catch (error: any) {
-      throw new Error(error.message);
+    } catch (error) {
+      const err= error as Error
+      throw new Error(err.message);
     }
   }
 }

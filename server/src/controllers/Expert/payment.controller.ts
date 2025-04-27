@@ -10,29 +10,30 @@ import { ReturnDocument } from "mongodb";
 @injectable()
 export class PaymentController implements IPaymentController{
     constructor(
-        @inject(TYPES.PaymentService) private paymentService:IPaymentService
+        @inject(TYPES.PaymentService) private _paymentService:IPaymentService
     ){}
 async planPurchase(req: AuthRequest, res: Response): Promise<void> {
     try {
         const {planId}=req.params
         const expertId= req.expert.expertId
         if(!planId){
-            this._sendResponse(res,{message:"The planId is Missing"},HttpStatus.BAD_REQUEST)
+            this.sendResponse(res,{message:"The planId is Missing"},HttpStatus.BAD_REQUEST)
         return; 
         }
-        const response= await this.paymentService.planPurchase(expertId,planId)
+        const response= await this._paymentService.planPurchase(expertId,planId)
         if (!response.success) {
-            this._sendResponse(res, { message: response.message }, HttpStatus.BAD_REQUEST);
+            this.sendResponse(res, { message: response.message }, HttpStatus.BAD_REQUEST);
             return;
         }
 
-        this._sendResponse(res, {
+        this.sendResponse(res, {
             clientSecret: response.clientSecret,
             message: "Payment intent created successfully"
         }, HttpStatus.OK);
     } catch (error) {
-        this._sendResponse(res, { 
-            message: "Failed to process subscription" 
+      const err= error as Error
+        this.sendResponse(res, { 
+            message: err .message || "Failed to process subscription" 
         }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
@@ -44,7 +45,7 @@ async verifyPayment(req: AuthRequest, res: Response): Promise<void> {
       const expertId = req.expert.expertId;
   
       if (!paymentIntentId || !planId) {
-        this._sendResponse(
+        this.sendResponse(
           res,
           { message: "Missing paymentIntentId or planId" },
           HttpStatus.BAD_REQUEST
@@ -52,17 +53,18 @@ async verifyPayment(req: AuthRequest, res: Response): Promise<void> {
         return;
       }
   
-      const response = await this.paymentService.paymentVerify(expertId, paymentIntentId, planId);
+      const response = await this._paymentService.paymentVerify(expertId, paymentIntentId, planId);
   
       if (!response.success) {
-        this._sendResponse(res, response, HttpStatus.BAD_REQUEST);
+        this.sendResponse(res, response, HttpStatus.BAD_REQUEST);
         return;
       }
   
-      this._sendResponse(res, response, HttpStatus.OK);
+      this.sendResponse(res, response, HttpStatus.OK);
     } catch (error) {
+      const err= error as Error
       console.error(error);
-      this._sendResponse(res, { message: "Server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.sendResponse(res, { message:err.message|| "Internal Server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
   async getAllEarnings(req: AuthRequest, res: Response): Promise<void> {
@@ -70,18 +72,19 @@ async verifyPayment(req: AuthRequest, res: Response): Promise<void> {
       const plan = req.query.plan as string || '';
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const result = await this.paymentService.getAllEarnings(plan, page, limit);
+      const result = await this._paymentService.getAllEarnings(plan, page, limit);
       res.status(result.success ? 200 : 400).json(result);
     } catch (error) {
-      console.error('Controller error:', error);
+      const err= error as Error
+      console.error('Controller error:', err);
       res.status(500).json({
         success: false,
-        message: 'Internal server error',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        message: err.message || 'Internal server error',
+        error: error instanceof Error ? err.message : 'Unknown error'
       });
     }
   }
-  private _sendResponse(res: Response, data: any, status: HttpStatus): void {
+  private sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }
 }

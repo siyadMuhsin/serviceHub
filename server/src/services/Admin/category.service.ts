@@ -8,22 +8,20 @@ import { TYPES } from "../../di/types";
 @injectable()
 export class CategoryService implements ICategoryService {
     constructor(
-        @inject(TYPES.CategoryRepository) private categoryRepository: ICategoryRepository
+        @inject(TYPES.CategoryRepository) private _categoryRepository: ICategoryRepository
     ) {}
-
     async createCategory(name: string, description: string, file: Express.Multer.File) {
         try {
-            const existingCategory = await this.categoryRepository.getCategoryByName(name);
+            const existingCategory = await this._categoryRepository.getCategoryByName(name);
             if (existingCategory) {
                 return { success: false, message: "Category name is already in use" };
             }
-
             const imageUrl = await CloudinaryService.uploadImage(file);
             if (!imageUrl) {
                 return { success: false, message: "Cloudinary upload failed" };
             }
 
-            const category = await this.categoryRepository.create({
+            const category = await this._categoryRepository.create({
                 name,
                 description,
                 image: imageUrl,
@@ -33,33 +31,35 @@ export class CategoryService implements ICategoryService {
                 message: "Category created successfully",
                 category,
             };
-        } catch (error: any) {
-            console.error("Error in createCategory Service:", error);
+        } catch (error) {
+            const err= error as Error
+            console.error("Error in createCategory Service:", err);
             return {
                 success: false,
-                message: "Something went wrong. Please try again.",
+                message:err.message|| "Something went wrong. Please try again.",
             };
         }
     }
 
     async getAllCategories() {
         try {
-            const categories = await this.categoryRepository.findAll();
+            const categories = await this._categoryRepository.findAll();
             return { success: true, categories };
-        } catch (error: any) {
-            console.error("Error in getAllCategories:", error);
-            return { success: false, message: "Failed to fetch categories" };
+        } catch (error) {
+            const err= error as Error
+            console.error("Error in getAllCategories:", err);
+            return { success: false, message:err.message|| "Failed to fetch categories" };
         }
     }
 
     async changeStatus(id: string) {
         try {
-            const category = await this.categoryRepository.findById(id);
+            const category = await this._categoryRepository.findById(id);
             if (!category) {
                 return { success: false, message: "Category not found" };
             }
             const updateStatus = !category.isActive;
-            const updatedCategory = await this.categoryRepository.updateById(id, { isActive: updateStatus });
+            const updatedCategory = await this._categoryRepository.updateById(id, { isActive: updateStatus });
             if(updatedCategory){
               return { 
                 success: true,
@@ -70,22 +70,24 @@ export class CategoryService implements ICategoryService {
               return {success:false,message:"update category not found"}
             }
             
-        } catch (err: any) {
+        } catch (error) {
+            const err=error as Error
             return { success: false, message: err.message };
         }
     }
 
     async getCategoryById(id: string) {
         try {
-            const category = await this.categoryRepository.findById(id);
+            const category = await this._categoryRepository.findById(id);
             if (!category) {
                 return { success: false, message: "Category not found" };
             }
 
             return { success: true, category };
-        } catch (error: any) {
-            console.error("Error in getCategoryById:", error);
-            return { success: false, message: "Failed to fetch category" };
+        } catch (error) {
+            const err= error as Error
+            console.error("Error in getCategoryById:", err);
+            return { success: false, message:err.message|| "Failed to fetch category" };
         }
     }
 
@@ -98,7 +100,7 @@ export class CategoryService implements ICategoryService {
                     return { success: false, message: "Cloudinary upload failed" };
                 }
             }
-            const existingCategory = await this.categoryRepository.findById(id);
+            const existingCategory = await this._categoryRepository.findById(id);
             if (!existingCategory) {
                 return { success: false, message: "Category not found" };
             }
@@ -112,7 +114,7 @@ export class CategoryService implements ICategoryService {
                 updatedData.image = existingCategory.image;
             }
     
-            const updatedCategory = await this.categoryRepository.updateById(id, updatedData);
+            const updatedCategory = await this._categoryRepository.updateById(id, updatedData);
             if (!updatedCategory) {
                 return { success: false, message: "Failed to update category" };
             }
@@ -121,23 +123,25 @@ export class CategoryService implements ICategoryService {
                 message: "Category updated successfully",
                 updatedCategory,
             };
-        } catch (error: any) {
-            console.error("Error in updateCategory:", error);
-            return { success: false, message: "Failed to update category" };
+        } catch (error) {
+            const err= error as Error
+            console.error("Error in updateCategory:", err);
+            return { success: false, message:err.message|| "Failed to update category" };
         }
     }
     async getCategoriesByLimit(page: number, limit: number, search: string) {
-        const result = await this.categoryRepository.getCategoriesByLimit(page, limit, search);
+        const result = await this._categoryRepository.getCategoriesByLimit(page, limit, search);
         return result;
     }
     async getCategoryToMange(page: number, limit: number, search: string) {
         try {
             const isAdmin = true;
-            const result = await this.categoryRepository.getCategoriesByLimit(page, limit, search, isAdmin);
+            const result = await this._categoryRepository.getCategoriesByLimit(page, limit, search, isAdmin);
             return { success: true, message: "category get in success", result };
         } catch (error) {
-            console.error("Error in getCategoryToMange:", error);
-            return { success: false, message: "Failed to get categories" };
+            const err= error as Error
+            console.error("Error in getCategoryToMange:", err);
+            return { success: false, message:err.message|| "Failed to get categories" };
         }
     }
 }

@@ -8,12 +8,16 @@ import { HttpStatus } from "../types/httpStatus";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../di/types";
 import { IMessageService } from "../core/interfaces/services/IMessageService";
+import { IUserService } from "../core/interfaces/services/IUserService";
+import { IExpertService } from "../core/interfaces/services/IExpertService";
 
 @injectable()
 // private readonly messageService: MessageService
 export class MessageController implements IMessageController {
     constructor(
-        @inject(TYPES.MessageService) private messageService:IMessageService
+        @inject(TYPES.MessageService) private _messageService:IMessageService,
+        @inject(TYPES.UserService) private _userService:IUserService,
+        @inject(TYPES.ExpertService) private _expertService:IExpertService
 ) {}
 
 handleConnection(io: Server, socket: Socket) {
@@ -40,24 +44,28 @@ handleConnection(io: Server, socket: Socket) {
         ) {
           throw new Error('Missing required message fields');
         }
-
         if (!['User', 'Expert'].includes(data.senderModel) || !['User', 'Expert'].includes(data.receiverModel)) {
           throw new Error('Invalid senderModel or receiverModel');
         }
-
-        const savedMessage = await this.messageService.sendMessage(data);
-        console.log('Saved message:', savedMessage);
-
-        // Emit to both sender and receiver rooms
+        let isBlocked:boolean|{ success: boolean; message: string } = false;
+        if (data.senderModel === 'User') {
+          isBlocked = await this._userService.checkBlocked((data.sender).toString());
+        } else if (data.senderModel === 'Expert') {
+          isBlocked = await this._expertService.checkBlocked((data.sender).toString());
+        }
+        if (isBlocked) {
+          socket.emit('messageError', { error: 'You are blocked and cannot send messages.' });
+          return;
+        }
+        const savedMessage = await this._messageService.sendMessage(data);
         io.to(data.receiver.toString()).emit('receiveMessage', savedMessage);
         io.to(data.sender.toString()).emit('receiveMessage', savedMessage);
-
-        // Confirm to sender
         socket.emit('messageSent', savedMessage);
       } catch (error) {
+        const err= error as Error
         console.error('Failed to send message:', error);
         socket.emit('messageError', {
-          error: error instanceof Error ? error.message : 'Failed to send message',
+          error: err instanceof Error ? err.message : 'Failed to send message',
         });
       }
     });
@@ -74,20 +82,22 @@ handleConnection(io: Server, socket: Socket) {
           if (!senderId || !receiverId) {
            res.status(HttpStatus.BAD_REQUEST).json({ message: "Invalid request" });
           }
-          const messages = await this.messageService.fetchConversation(senderId, receiverId);
+          const messages = await this._messageService.fetchConversation(senderId, receiverId);
           res.status(HttpStatus.OK).json(messages);
         } catch (error) {
-          console.error("Error fetching conversation:", error);
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch conversation" });
+          const err= error as Error
+          console.error("Error fetching conversation:",err);
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: err.message||"Failed to fetch conversation" });
         }
       }
       async getChatUsers(req: AuthRequest, res: Response): Promise<void> {
         try {
             const expertId = req?.expert?.expertId; 
-            const users = await this.messageService.getChatUsers(expertId);
+            const users = await this._messageService.getChatUsers(expertId);
             res.status(HttpStatus.OK).json(users);
           } catch (error) {
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to fetch chat users', error });
+            const err= error as Error
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message:err.message|| 'Failed to fetch chat users', error });
           }
           
       }

@@ -68,8 +68,9 @@ export class BookingRepository extends BaseRepository<IBooking> implements IBook
             bookings,
             totalCount
           };
-        } catch (error:any) {
-          throw new Error(`Failed to fetch user bookings: ${error.message}`);
+        } catch (error) {
+          const err= error as Error
+          throw new Error(`Failed to fetch user bookings: ${err.message}`);
         }
       }
 }

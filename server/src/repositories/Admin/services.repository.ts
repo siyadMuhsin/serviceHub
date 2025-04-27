@@ -55,7 +55,6 @@ return this.create(data)
             if (search) {
                 query.name = { $regex: search, $options: 'i' };
             }
-
             const services = await Services.find(query)
                 .skip(skip)
                 .limit(limit)
@@ -63,8 +62,9 @@ return this.create(data)
                 
             const totalServices = await Services.countDocuments(query);
             return { services, totalServices };
-        } catch (error: any) {
-            throw new Error(`Error fetching services: ${error.message}`);
+        } catch (error) {
+            const err= error as Error
+            throw new Error(`Error fetching services: ${err.message}`);
         }
     }
 
@@ -82,8 +82,9 @@ return this.create(data)
                 .exec();
             const totalServices = await Services.countDocuments(query);
             return { services, totalServices };
-        } catch (error: any) {
-            throw new Error(`Error fetching services: ${error.message}`);
+        } catch (error) {
+            const err= error as Error
+            throw new Error(`Error fetching services: ${err.message}`);
         }
     }
 }

@@ -6,7 +6,7 @@ export interface IServiceController {
     getServiceById(req: Request, res: Response): Promise<void>;
     getServicesByCategory(req: Request, res: Response): Promise<void>;
     updateService(req: Request, res: Response): Promise<void>;
-    ist_and_unlist(req: Request, res: Response): Promise<void>;
+    list_and_unlist(req: Request, res: Response): Promise<void>;
     getServicesByCategory_limit(req: Request, res: Response): Promise<void>;
     getServicesToMange(req: Request, res: Response): Promise<void>;
 }

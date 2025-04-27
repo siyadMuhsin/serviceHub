@@ -9,15 +9,15 @@ import { TYPES } from "../../di/types";
 @injectable()
 export class AdminAuthController implements IAdminAuthController {
     constructor(
-        @inject(TYPES.AdminService) private adminService: IAdminService
+        @inject(TYPES.AdminService) private _adminService: IAdminService
     ) {}
 
     async login(req: Request, res: Response): Promise<void> {
         try {
             const { email, password } = req.body;
-            const response = await this.adminService.loginAdmin(email, password);
+            const response = await this._adminService.loginAdmin(email, password);
             if (response.success && response.accessToken && response.refreshToken) {
-                this._setAuthCookies(res, response.accessToken, response.refreshToken);
+                this.setAuthCookies(res, response.accessToken, response.refreshToken);
                 res.status(HttpStatus.OK).json({ 
                     success: true, 
                     message: "Login successful" 
@@ -25,10 +25,11 @@ export class AdminAuthController implements IAdminAuthController {
             } else {
                 res.status(HttpStatus.UNAUTHORIZED).json(response);
             }
-        } catch (error: any) {
+        } catch (error) {
+            const err= error as Error
             res.status(HttpStatus.BAD_REQUEST).json({ 
                 success: false, 
-                message: error.message 
+                message: err.message 
             });
         }
     }
@@ -47,7 +48,8 @@ export class AdminAuthController implements IAdminAuthController {
             }
             res.status(HttpStatus.OK).json({ success: true, admin: req.admin });
         } catch (error) {
-            console.error("Error checking admin:", error);
+            const err= error as Error
+            console.error("Error checking admin:", err);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
                 success: false, 
                 message: "Internal server error" 
@@ -55,7 +57,7 @@ export class AdminAuthController implements IAdminAuthController {
         }
     }
 
-    private _setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
+    private setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
         res.cookie("accessToken", accessToken, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === "production" 

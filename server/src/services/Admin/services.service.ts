@@ -9,12 +9,12 @@ import mongoose, { ObjectId, Types } from 'mongoose';
 @injectable()
 export class ServiceService implements IServiceService {
     constructor(
-        @inject(TYPES.ServiceRepository) private serviceRepository: IServiceRepository
+        @inject(TYPES.ServiceRepository) private _serviceRepository: IServiceRepository
     ) {}
 
     async createService(name: string, categoryId: any, description: string, image: Express.Multer.File) {
         try {
-            const existingService = await this.serviceRepository.getServiceByName(name);
+            const existingService = await this._serviceRepository.getServiceByName(name);
             if (existingService) {
                 return { success: false, message: 'Service name already used' };
             }
@@ -24,53 +24,56 @@ export class ServiceService implements IServiceService {
                 return { success: false, message: 'Cloudinary upload failed' };
             }
 
-            const service = await this.serviceRepository.create({ 
+            const service = await this._serviceRepository.create({ 
                 name, 
                 categoryId, 
                 description, 
                 image: imageUrl 
             });
             
-            const populatedService = await this.serviceRepository.getServiceById(service._id);
+            const populatedService = await this._serviceRepository.getServiceById(service._id);
             return { 
                 success: true, 
                 message: "Service created successfully", 
                 service: populatedService 
             };
         } catch (error) {
-            console.error("Error creating service:", error);
+            const err= error as Error
+            console.error("Error creating service:", err);
             return { 
                 success: false, 
-                message: "Error creating service" 
+                message:err.message|| "Error creating service" 
             };
         }
     }
 
     async getAllServices() {
         try {
-            const services = await this.serviceRepository.getAllServices();
+            const services = await this._serviceRepository.getAllServices();
             return { success: true, services };
         } catch (error) {
-            console.error("Error fetching services:", error);
+            const err= error as Error
+            console.error("Error fetching services:", err);
             return { 
                 success: false, 
-                message: "Error fetching services" 
+                message:err.message|| "Error fetching services" 
             };
         }
     }
 
     async getServiceById(serviceId: string) {
         try {
-            const service = await this.serviceRepository.getServiceById(serviceId);
+            const service = await this._serviceRepository.getServiceById(serviceId);
             if (!service) {
                 return { success: false, message: "Service not found" };
             }
             return { success: true, service };
         } catch (error) {
-            console.error("Error fetching service:", error);
+            const err= error as Error
+            console.error("Error fetching service:", err);
             return { 
                 success: false, 
-                message: "Error fetching service" 
+                message:err.message|| "Error fetching service" 
             };
         }
     }
@@ -78,13 +81,14 @@ export class ServiceService implements IServiceService {
     async getServicesByCategory(categoryId: string) {
         try {
             const categoryIdObjectId= new mongoose.Schema.Types.ObjectId(categoryId)
-            const services = await this.serviceRepository.findMany({categoryId:categoryIdObjectId});
+            const services = await this._serviceRepository.findMany({categoryId:categoryIdObjectId});
             return { success: true, services };
         } catch (error) {
-            console.error("Error fetching services by category:", error);
+            const err= error as Error
+            console.error("Error fetching services by category:", err);
             return { 
                 success: false, 
-                message: "Error fetching services by category" 
+                message:err.message|| "Error fetching services by category" 
             };
         }
     }
@@ -92,7 +96,6 @@ export class ServiceService implements IServiceService {
     async updateService(serviceId: string, data: Partial<IServices>, file?: Express.Multer.File) {
         try {
             let imageUrl: string | null = null;
-
             if (file) {
                 imageUrl = await CloudinaryService.uploadImage(file);
                 if (!imageUrl) {
@@ -101,7 +104,7 @@ export class ServiceService implements IServiceService {
                 data.image = imageUrl;
             }
 
-            const existingService = await this.serviceRepository.getServiceById(serviceId);
+            const existingService = await this._serviceRepository.getServiceById(serviceId);
             if (!existingService) {
                 return { success: false, message: "Service not found" };
             }
@@ -112,7 +115,7 @@ export class ServiceService implements IServiceService {
             if (data.categoryId) updatedData.categoryId = data.categoryId;
             updatedData.image = imageUrl || existingService.image;
 
-            const updatedService = await this.serviceRepository.updateService(serviceId, updatedData);
+            const updatedService = await this._serviceRepository.updateService(serviceId, updatedData);
             if (!updatedService) {
                 return { success: false, message: "Service update failed" };
             }
@@ -123,23 +126,24 @@ export class ServiceService implements IServiceService {
                 service: updatedService,
             };
         } catch (error) {
-            console.error("Error updating service:", error);
+            const err= error as Error
+            console.error("Error updating service:", err);
             return { 
                 success: false, 
-                message: "Error updating service" 
+                message:err.message|| "Error updating service" 
             };
         }
     }
 
     async changeStatus(id: string) {
         try {
-            const service = await this.serviceRepository.getServiceById(id);
+            const service = await this._serviceRepository.getServiceById(id);
             if (!service) {
                 return { success: false, message: "Service not found" };
             }
 
             const updateStatus = !service.isActive;
-            const updatedService = await this.serviceRepository.updateService(id, { isActive: updateStatus });
+            const updatedService = await this._serviceRepository.updateService(id, { isActive: updateStatus });
 
             if(updatedService){
               return {
@@ -151,7 +155,8 @@ export class ServiceService implements IServiceService {
               return {success:false,message:"updated service not found"}
             }
             
-        } catch (err: any) {
+        } catch (error) {
+            const err= error as Error
             console.error("Error changing service status:", err);
             return {
                 success: false,
@@ -162,7 +167,7 @@ export class ServiceService implements IServiceService {
 
     async getServicesByCategory_limit(categoryId: string, page: number, limit: number, search: string) {
         try {
-            const response = await this.serviceRepository.getServicesByCategoryLimit(
+            const response = await this._serviceRepository.getServicesByCategoryLimit(
                 categoryId,
                 limit,
                 page,
@@ -170,18 +175,20 @@ export class ServiceService implements IServiceService {
             );
             return response;
         } catch (error) {
-            console.error("Error fetching services by category limit:", error);
-            throw error;
+            const err= error as Error
+            console.error("Error fetching services by category limit:", err);
+            throw err.message;
         }
     }
 
     async getServicesToMange(page: number, limit: number, search: string) {
         try {
-            const response = await this.serviceRepository.getAllServicesByLimit(page, limit, search);
+            const response = await this._serviceRepository.getAllServicesByLimit(page, limit, search);
             return response;
-        } catch (error: any) {
+        } catch (error) {
+            const err= error as Error
             console.error("Error fetching services to manage:", error);
-            throw new Error(`Error fetching services: ${error.message}`);
+            throw new Error(`Error fetching services: ${err.message}`);
         }
     }
 }

@@ -11,21 +11,21 @@ import { TYPES } from "../../di/types";
 @injectable()
 export class ExpertService implements IExpertService {
     constructor(
-        @inject(TYPES.ExpertRepository) private expertRepository: IExpertRepository,
-        @inject(TYPES.UserRepository) private userRepository: IUserRepository
+        @inject(TYPES.ExpertRepository) private _expertRepository: IExpertRepository,
+        @inject(TYPES.UserRepository) private _userRepository: IUserRepository
     ) {}
 
     async createExpert(data: Partial<IExpert>, file: Express.Multer.File, userId: string): Promise<IExpert |null> {
-        const existingName = await this.expertRepository.findOne({ accountName: data.accountName });
+        const existingName = await this._expertRepository.findOne({ accountName: data.accountName });
         if (existingName && existingName.userId._id.toString() !== userId) {
             throw new Error("The Account Name is already used by another expert");
         }
-        const user = await this.userRepository.findById(userId);
+        const user = await this._userRepository.findById(userId);
         if (!user) {
             throw new Error("User not found");
         }
         if (user.expertStatus === 'rejected') {
-            await this.userRepository.updateById(userId, { 
+            await this._userRepository.updateById(userId, { 
                 expertStatus: 'pending',
             });
         }
@@ -51,9 +51,9 @@ export class ExpertService implements IExpertService {
         }
         const url = result.secure_url;
         let response;
-        const existingExpert = await this.expertRepository.findOne({ userId: userId });
+        const existingExpert = await this._expertRepository.findOne({ userId: userId });
         if (existingExpert) {
-            response = await this.expertRepository.findByIdAndUpdate(
+            response = await this._expertRepository.findByIdAndUpdate(
                 existingExpert._id,
                 { 
                     ...data, 
@@ -62,19 +62,19 @@ export class ExpertService implements IExpertService {
                 }
             );
         } else {
-            response = await this.expertRepository.createExpert({ 
+            response = await this._expertRepository.createExpert({ 
                 ...data, 
                 certificateUrl: url,
                 status: 'pending'
             }, userId);
         }
-        await this.userRepository.updateById(userId, { 
+        await this._userRepository.updateById(userId, { 
             expertStatus: "pending",
         });
         return response;
     }
     async getExperts(): Promise<IExpert[]> {
-        return await this.expertRepository.getExperts();
+        return await this._expertRepository.getExperts();
     }
     async getExpertBy_limit(page: number, limit: number, filter: string, search: string) {
         try {
@@ -85,7 +85,7 @@ export class ExpertService implements IExpertService {
             if (search) {   
                 query.accountName = { $regex: search, $options: "i" };
             }
-            const { experts, totalRecords } = await this.expertRepository.getExpertBy_limit(page, limit, query);
+            const { experts, totalRecords } = await this._expertRepository.getExpertBy_limit(page, limit, query);
             const totalPages = Math.ceil(totalRecords / limit);
             return { 
                 success: true, 
@@ -94,38 +94,40 @@ export class ExpertService implements IExpertService {
                 totalPages 
             };
         } catch (error) {
-            console.error('Error fetching experts:', error);
-            return { success: false, message: 'Failed to fetch experts.' };
+            const err= error as Error
+            console.error('Error fetching experts:', err);
+            return { success: false, message: err.message||'Failed to fetch experts.' };
         }
     }
 
      async checkBlocked(id: string):Promise<boolean|{success:boolean,message:string}> {
         try {
-            const expert = await this.expertRepository.findById(id);
+            const expert = await this._expertRepository.findById(id);
             
             return expert?.isBlocked ?true:false;
         } catch (error) {
-            console.error("Error checking user block status:", error);
+            const err= error as Error
+            console.error("Error checking user block status:", err);
             return { 
                 success: false, 
-                message: "Failed to check user status" 
+                message:err.message||"Failed to check user status" 
             };
         }
     }
     async actionChange(id: string, action: string,reason?:string) {
         try {
-            const existingExpert = await this.expertRepository.findById(id);
+            const existingExpert = await this._expertRepository.findById(id);
             if (!existingExpert) {
                 return { success: false, message: 'Expert does not exist' };
             }
             
-            const updatedExpert = await this.expertRepository.findByIdAndUpdate(id, { status: action });
+            const updatedExpert = await this._expertRepository.findByIdAndUpdate(id, { status: action });
             if (!updatedExpert) {
                 return { success: false, message: 'Failed to update expert status' };
             }
           
             const userId: string = updatedExpert.userId.toString();
-            await this.userRepository.updateById(userId, {
+            await this._userRepository.updateById(userId, {
                 role: action === 'approved' ? 'expert' : 'user',
                 expertStatus: action === "approved" ? "approved" : "rejected",
                 rejectReason:action==='rejected'?reason:undefined
@@ -134,22 +136,22 @@ export class ExpertService implements IExpertService {
             await sendExpertStatusUpdate(existingExpert.userId.email, action,reason);
             return { success: true, data: updatedExpert };
         } catch (error) {
-            console.error('Error in actionChange:', error);
-            throw new Error('Error updating expert status');
+            const err= error as Error
+            console.error('Error in actionChange:', err);
+            throw new Error(err.message||'Error updating expert status');
         }
     }
 
     async block_unblock(id: string, active: boolean) {
-        console.log('block expert')
         try {
-            const expert = await this.expertRepository.findById(id);
+            const expert = await this._expertRepository.findById(id);
             if (!expert) {
                 return { success: false, message: 'Expert does not exist' };
             }
             const query: any = {};
             console.log(active)
             query.isBlocked = active;
-            const updatedExpert = await this.expertRepository.findByIdAndUpdate(id, query);
+            const updatedExpert = await this._expertRepository.findByIdAndUpdate(id, query);
             if (!updatedExpert) {
                 return { success: false, message: 'Failed to update expert status' };
             }
@@ -159,28 +161,29 @@ export class ExpertService implements IExpertService {
                 data: updatedExpert 
             };
         } catch (error) {
-            console.error('Error in block_unblock:', error);
-            throw new Error('Error updating expert status');
+            const err= error as Error
+            console.error('Error in block_unblock:', err);
+            throw new Error(err.message||'Error updating expert status');
         }
     }
 
     async getExpertData(id: string) {
         try {
-            const expert = await this.expertRepository.findById(id);
+            const expert = await this._expertRepository.findById(id);
             if (expert) {
                 return { success: true, expert };
             }
             return { success: false, message: "Expert not found" };
         } catch (error) {
-            console.log(error);
-            throw new Error('Error finding expert data');
+            const err= error as Error
+            throw new Error(err.message||'Error finding expert data');
         }
     }
 
     async switch_expert(userId: string) {
         try {
             console.log('switch to expert')
-            const expert = await this.expertRepository.findOne({ userId: userId });
+            const expert = await this._expertRepository.findOne({ userId: userId });
             if (!expert) {
                 return { success: false, message: "Cannot switch to expert account: User not found" };
             }
@@ -199,14 +202,15 @@ export class ExpertService implements IExpertService {
                 refreshToken 
             };
         } catch (error) {
-            console.error("Error in switch_expert service:", error);
-            throw error;
+            const err= error as Error
+            console.error("Error in switch_expert service:", err);
+            throw err.message;
         }
     }
 
     async switch_user(expertId: string) {
         try {
-            const expert = await this.expertRepository.findById(expertId);
+            const expert = await this._expertRepository.findById(expertId);
             if (!expert) {
                 return { success: false, message: "Cannot switch to expert account: User not found" };
             }
@@ -221,16 +225,18 @@ export class ExpertService implements IExpertService {
                 refreshToken 
             };
         } catch (error) {
-            console.error("Error in switch_user service:", error);
-            throw error;
+            const err= error as Error
+            console.error("Error in switch_user service:", err);
+            throw err.message;
         }
     }
     async getTotalExpertCount(): Promise<{ totalExperts: number; }> {
         try {
-            const total= await this.expertRepository.count({})
+            const total= await this._expertRepository.count({})
 return {totalExperts:total}
-        } catch (error:any) {
-            throw new Error(error.message)
+        } catch (error) {
+            const err= error as Error
+            throw new Error(err.message)
         }
     }
 }

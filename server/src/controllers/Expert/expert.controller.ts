@@ -11,32 +11,32 @@ import { AuthRequest } from '../../types/User';
 @injectable()
 export class ExpertController implements IExpertController {
     constructor(
-        @inject(TYPES.ExpertService) private expertService: IExpertService
+        @inject(TYPES.ExpertService) private _expertService: IExpertService
     ) {}
-
     async createExpert(req: AuthRequest, res: Response): Promise<void> {
         try {
             if (!req.file) {
-                this._sendResponse(res, {
+                this.sendResponse(res, {
                     success: false,
                     error: "Certificate file is required!"
                 }, HttpStatus.BAD_REQUEST);
                 return;
             }
 
-            const expert = await this.expertService.createExpert(
+            const expert = await this._expertService.createExpert(
                 req.body,
                 req.file,
                 req.user.userId
             );
             
-            this._sendResponse(res, {
+            this.sendResponse(res, {
                 success: true,
                 message: "Expert created successfully",
                 expert,
             }, HttpStatus.CREATED);
-        } catch (error: any) {
-            this._sendErrorResponse(res, error);
+        } catch (error) {
+            const err= error as Error
+            this.sendErrorResponse(res, err);
         }
     }
 
@@ -46,17 +46,17 @@ export class ExpertController implements IExpertController {
             const limit = parseInt(req.query.limit as string) || 10;
             const filter = req.query.filter as string;
             const search = req.query.search as string;
-            
-            const response = await this.expertService.getExpertBy_limit(
+            const response = await this._expertService.getExpertBy_limit(
                 page,
                 limit,
                 filter,
                 search
             );
             
-            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this._sendErrorResponse(res, error);
+            const err= error as Error
+            this.sendErrorResponse(res, err);
         }
     }
 
@@ -65,27 +65,26 @@ export class ExpertController implements IExpertController {
             const { id } = req.params;
             const { action ,reason} = req.body;
             const validActions = ["approved", "rejected"];
-            
             if (!validActions.includes(action)) {
-                this._sendResponse(res, {
+                this.sendResponse(res, {
                     success: false,
                     message: "Invalid action"
                 }, HttpStatus.BAD_REQUEST);
                 return;
             }
-            
             if (!id || !action) {
-                this._sendResponse(res, {
+                this.sendResponse(res, {
                     success: false,
                     message: "Missing required parameters"
                 }, HttpStatus.BAD_REQUEST);
                 return;
             }
             
-            const response = await this.expertService.actionChange(id, action,reason);
-            this._sendResponse(res, response, response?.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            const response = await this._expertService.actionChange(id, action,reason);
+            this.sendResponse(res, response, response?.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this._sendErrorResponse(res, error);
+            const err= error as Error
+            this.sendErrorResponse(res, err);
         }
     }
 
@@ -95,28 +94,29 @@ export class ExpertController implements IExpertController {
             const { active } = req.body;
             
             if (!id || typeof active !== 'boolean') {
-                this._sendResponse(res, {
+                this.sendResponse(res, {
                     success: false,
                     message: "Missing or invalid parameters"
                 }, HttpStatus.BAD_REQUEST);
                 return;
             }
             
-            const response = await this.expertService.block_unblock(id, active);
-            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            const response = await this._expertService.block_unblock(id, active);
+            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this._sendErrorResponse(res, error);
+            const err= error as Error
+            this.sendErrorResponse(res, err);
         }
     }
 
     async getExpertData(req: Request, res: Response): Promise<void> {
         try {
-            console.log('test')
             const { id } = req.params;
-            const response = await this.expertService.getExpertData(id);
-            this._sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            const response = await this._expertService.getExpertData(id);
+            this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this._sendErrorResponse(res, error);
+            const err= error as Error
+            this.sendErrorResponse(res, err);
         }
     }
 
@@ -124,23 +124,24 @@ export class ExpertController implements IExpertController {
         try {
             const userId = req.user?.userId;
             if (!userId) {
-                this._sendResponse(res, {
+                this.sendResponse(res, {
                     success: false,
                     message: "User not found"
                 }, HttpStatus.BAD_REQUEST);
                 return;
             }
             
-            const response = await this.expertService.switch_expert(userId);
+            const response = await this._expertService.switch_expert(userId);
             if (response.success && response.accessToken && response.refreshToken) {
                 await setAuthCookies(res, response.accessToken, response.refreshToken);
-                this._sendResponse(res, response, HttpStatus.OK);
+                this.sendResponse(res, response, HttpStatus.OK);
                 return;
             }
             
-            this._sendResponse(res, response, HttpStatus.BAD_REQUEST);
+            this.sendResponse(res, response, HttpStatus.BAD_REQUEST);
         } catch (error) {
-            this._sendErrorResponse(res, error);
+            const err= error as Error
+            this.sendErrorResponse(res, err);
         }
     }
 
@@ -148,37 +149,38 @@ export class ExpertController implements IExpertController {
         try {
             const expertId = req?.expert?.expertId;
             if (!expertId) {
-                this._sendResponse(res, {
+                this.sendResponse(res, {
                     success: false,
                     message: "Expert not found"
                 }, HttpStatus.BAD_REQUEST);
                 return;
             }
             
-            const response = await this.expertService.switch_user(expertId);
+            const response = await this._expertService.switch_user(expertId);
             if (response.success && response.accessToken && response.refreshToken) {
                 await setAuthCookies(res, response.accessToken, response.refreshToken);
             }
-            this._sendResponse(res, response, HttpStatus.OK);
-        } catch (err) {
-            this._sendErrorResponse(res, err);
+            this.sendResponse(res, response, HttpStatus.OK);
+        } catch (error) {
+            const err= error as Error
+            this.sendErrorResponse(res, err);
         }
     }
     async getLatestExperts(req: AuthRequest, res: Response): Promise<void> {
         try {
-            const {experts}=await this.expertService.getExpertBy_limit(1,3,"","")
-            this._sendResponse(res,experts,HttpStatus.OK)
+            const {experts}=await this._expertService.getExpertBy_limit(1,3,"","")
+            this.sendResponse(res,experts,HttpStatus.OK)
         } catch (error) {
-            this._sendErrorResponse(res,error)
-            
+            const err= error as Error
+            this.sendErrorResponse(res,err)
         }
     }
 
-    private _sendResponse(res: Response, data: any, status: HttpStatus): void {
+    private sendResponse(res: Response, data: any, status: HttpStatus): void {
         res.status(status).json(data);
     }
 
-    private _sendErrorResponse(res: Response, error: any): void {
+    private sendErrorResponse(res: Response, error: Error): void {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: error.message || "Internal server error" 

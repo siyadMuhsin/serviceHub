@@ -2,7 +2,7 @@ import { injectable } from 'inversify';
 import OTP, { IOtp } from '../models/otp.model';
 import { IOtpRepository } from '../core/interfaces/repositories/IOtpRepository';
 import { BaseRepository } from './BaseRepository';
-import { LeanDocument } from 'mongoose';
+
 
 @injectable()
 export class OtpRepository extends BaseRepository<IOtp> implements IOtpRepository {
@@ -16,8 +16,9 @@ export class OtpRepository extends BaseRepository<IOtp> implements IOtpRepositor
             const record = await OTP.findOne({ email, otp }).lean();
             return record;
         } catch (error) {
-            console.error(`Error finding OTP for ${email}:`, error);
-            throw new Error('Failed to find OTP');
+            const err= error as Error
+            console.error(`Error finding OTP for ${email}:`, err);
+            throw new Error(err.message||'Failed to find OTP');
         }
     }
 
@@ -26,8 +27,9 @@ export class OtpRepository extends BaseRepository<IOtp> implements IOtpRepositor
             const result = await OTP.deleteOne({ email });
             return result.deletedCount > 0;
         } catch (error) {
-            console.error(`Error deleting OTP for ${email}:`, error);
-            throw new Error('Failed to delete OTP');
+            const err= error as Error
+            console.error(`Error deleting OTP for ${email}:`, err);
+            throw new Error(err.message||'Failed to delete OTP');
         }
     }
 

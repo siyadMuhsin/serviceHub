@@ -19,8 +19,9 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
             }}
             return await this.create(newData)
         } catch (error) {
-            console.error("Error creating user:", error);
-            throw new Error("Failed to create user");
+          const err= error as Error
+            console.error("Error creating user:", err);
+            throw new Error(err.message||"Failed to create user");
         }
     }
 
@@ -32,8 +33,9 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
                 { new: true }
             ).lean();
         } catch (error) {
-            console.error(`Error updating user by email (${email}):`, error);
-            throw new Error("Failed to update user");
+          const err= error as Error
+            console.error(`Error updating user by email (${email}):`, err);
+            throw new Error(err.message||"Failed to update user");
         }
     }
 
@@ -44,8 +46,9 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
                 resetPasswordExpires: { $gt: new Date() }
             }).lean();
         } catch (error) {
-            console.error("Error finding user by token:", error);
-            throw new Error("Failed to find user by token");
+          const err= error as Error
+            console.error("Error finding user by token:", err);
+            throw new Error(err.message||"Failed to find user by token");
         }
     }
     async findByIdClearToken(id: string, password: string): Promise<IUser | null> {
@@ -59,15 +62,17 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
                 { new: true }
             );
         } catch (error) {
-            console.error("Error clearing reset token:", error);
-            throw new Error("Failed to reset password");
+          const err= error as Error
+            console.error("Error clearing reset token:", err);
+            throw new Error(err.message||"Failed to reset password");
         }
     }
     async getExpertByUserId(id:string){
         try {
            return await Expert.findOne({userId:id}).populate('categoryId','_id name').populate('serviceId','_id name')
         } catch (error) {
-            throw new Error("failed to get expert by userId")
+          const err= error as Error
+            throw new Error(err.message||"failed to get expert by userId")
         }
     }
     async addToSavedServices(userId: string, serviceId: string): Promise<void> {

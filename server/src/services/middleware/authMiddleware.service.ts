@@ -8,25 +8,25 @@ import { IExpertService } from '../../core/interfaces/services/IExpertService';
 @injectable()
 export class AuthMiddlewareService {
     constructor(
-        @inject(TYPES.UserService) private userService: IUserService,
-        @inject(TYPES.ExpertService) private expertService:IExpertService,
-        private readonly accessSecret: string
+        @inject(TYPES.UserService) private _userService: IUserService,
+        @inject(TYPES.ExpertService) private _expertService:IExpertService,
+        private readonly _accessSecret: string
     ) {
-        if (!this.accessSecret) {
+        if (!this._accessSecret) {
             throw new Error("ACCESS_SECRET environment variable is not set");
         }
     }
 
     async verifyToken(token: string): Promise<any> {
-        return await TokenVerify(token, this.accessSecret);
+        return await TokenVerify(token, this._accessSecret);
     }
 
     async checkUserBlocked(userId: string): Promise<boolean> {
-        const response = await this.userService.checkBlocked(userId);
+        const response = await this._userService.checkBlocked(userId);
         return typeof response === 'boolean' ? response : false;
     }
     async checkExpertBlocked(expertId:string):Promise<boolean>{
-        const response= await this.expertService.checkBlocked(expertId)
+        const response= await this._expertService.checkBlocked(expertId)
         return typeof response==='boolean' ? response :false
  
     }

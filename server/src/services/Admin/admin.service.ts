@@ -8,12 +8,12 @@ import { TYPES } from '../../di/types';
 @injectable()
 export class AdminService implements IAdminService {
     constructor(
-        @inject(TYPES.AdminRepository) private adminRepository: IAdminRepository
+        @inject(TYPES.AdminRepository) private _adminRepository: IAdminRepository
     ) {}
 
     async loginAdmin(email: string, password: string): Promise<AuthResult> {
         try {
-            const admin = await this.adminRepository.findByEmail(email);
+            const admin = await this._adminRepository.findByEmail(email);
             if (!admin) {
                 return { success: false, message: "Admin not found" };
             }

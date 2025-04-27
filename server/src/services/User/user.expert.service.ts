@@ -10,10 +10,10 @@ import { IReviewRepository } from "../../core/interfaces/repositories/IReviewRep
 @injectable()
 export class UserExpertService implements IUserExpertService{
     constructor(
-        @inject(TYPES.ExpertRepository) private expertResposity :IExpertRepository,
-        @inject(TYPES.UserRepository) private userRepository :IUserRepository,
-        @inject(TYPES.ServiceRepository) private serviceRepository:IServiceRepository,
-        @inject(TYPES.ReviewRepository) private reviewRepository:IReviewRepository
+        @inject(TYPES.ExpertRepository) private _expertResposity :IExpertRepository,
+        @inject(TYPES.UserRepository) private _userRepository :IUserRepository,
+        @inject(TYPES.ServiceRepository) private _serviceRepository:IServiceRepository,
+        @inject(TYPES.ReviewRepository) private _reviewRepository:IReviewRepository
     ){}
     async getExpertsByService(serviceId: string, userId: string): Promise<{ 
         success: boolean; 
@@ -21,23 +21,23 @@ export class UserExpertService implements IUserExpertService{
         experts: ExpertListing[] | null; 
       }> {
         try {
-          const service = await this.serviceRepository.getServiceById(serviceId);
+          const service = await this._serviceRepository.getServiceById(serviceId);
           if (!service) {
             return { success: false, message: "Invalid ServiceId", experts: [] };
           }
       
-          const user = await this.userRepository.findById(userId);
+          const user = await this._userRepository.findById(userId);
           if (!user) {
             return { success: false, message: "User not Found", experts: [] };
           }
       
           if (user.location?.coordinates) {
             const [userLng, userLat] = user.location.coordinates;
-            const experts = await this.expertResposity.findNearbyExperts(userLat, userLng, 25, serviceId)||[];
+            const experts = await this._expertResposity.findNearbyExperts(userLat, userLng, 25, serviceId)||[];
             
             // Get average ratings for all experts in one query
             const expertIds = experts.map(expert => expert._id);
-            const averageRatings = await this.reviewRepository.getAverageRatingsByExpertIds(expertIds);
+            const averageRatings = await this._reviewRepository.getAverageRatingsByExpertIds(expertIds);
             
             const result = experts.map((item) => {
               const expertRating = averageRatings.find(r => r.expertId.equals(item._id));
@@ -61,21 +61,23 @@ export class UserExpertService implements IUserExpertService{
             };
           }
           return { success: false, message: "Fetching failed", experts: [] };
-        } catch (error: any) {
-          throw new Error(error.message);
+        } catch (error) {
+          const err= error as Error
+          throw new Error(err.message);
         }
       }
     async getExpertDetails(userId: string, experId: string){
         try {
-            const user=await this.userRepository.findById(userId)
+            const user=await this._userRepository.findById(userId)
             if(!user||!user.location){
                 return {success:false,message:"your location not added"}
             }
             const {coordinates}=user.location
-            const data= await this.expertResposity.getExpertDataToUser(coordinates[1],coordinates[0],25,experId)
+            const data= await this._expertResposity.getExpertDataToUser(coordinates[1],coordinates[0],25,experId)
 return{success:true,message:'Data found successFully',expert:data}
-        } catch (error:any) {
-            throw new Error(error.message)
+        } catch (error) {
+          const err= error as Error
+            throw new Error(err.message)
         }
         
     }

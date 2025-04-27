@@ -6,7 +6,8 @@ export class MessageRepository implements IMessageRepository{
         try {
             return await Message.create(data);
         } catch (error) {
-            throw new Error(`Failed to create message: ${error instanceof Error ? error.message : String(error)}`);
+            const err= error as Error
+            throw new Error(`Failed to create message: ${err instanceof Error ? err.message : String(error)}`);
         }
     }
 

@@ -36,7 +36,7 @@ router.patch('/category/:id/status', verifyAdmin, categoryController.list_and_un
 const servicesController = container.get<IServiceController>(TYPES.ServiceController);
 router.post('/service', upload.single('image'), verifyAdmin, servicesController.createService.bind(servicesController));
 router.get('/services', verifyAdmin, servicesController.getServicesToMange.bind(servicesController));
-router.patch('/service/:id/status', verifyAdmin, servicesController.ist_and_unlist.bind(servicesController));
+router.patch('/service/:id/status', verifyAdmin, servicesController.list_and_unlist.bind(servicesController));
 router.get('/services/:id', verifyAdmin, servicesController.getServiceById.bind(servicesController));
 router.get('/services/category/:categoryId', verifyAdmin, servicesController.getServicesByCategory.bind(servicesController));
 router.put('/service/:id', upload.single('image'), verifyAdmin, servicesController.updateService.bind(servicesController));

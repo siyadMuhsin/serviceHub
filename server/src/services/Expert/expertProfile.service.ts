@@ -7,7 +7,7 @@ import { extractPublicId } from "../../utils/extraFunctions";
 @injectable()
 export class ExpertProfileService implements IExpertProfileService{
     constructor(
-        @inject(TYPES.ExpertRepository) private expertRepository:IExpertRepository
+        @inject(TYPES.ExpertRepository) private _expertRepository:IExpertRepository
     ){}
 async updateExpertLocation(
   location: { lat: number; lng: number },
@@ -19,7 +19,7 @@ async updateExpertLocation(
       coordinates: [location.lng, location.lat], // Note: [lng, lat]
     };
 
-    const updateExpert = await this.expertRepository.findByIdAndUpdate(
+    const updateExpert = await this._expertRepository.findByIdAndUpdate(
       expertId,
       { location: geoLocation }
     );
@@ -29,13 +29,14 @@ async updateExpertLocation(
     }
 
     return { success: true, message: "Location updated successfully" };
-  } catch (error: any) {
-    throw new Error(error.message || "Error in updateLocation");
+  } catch (error) {
+    const err= error as Error
+    throw new Error(err.message || "Error in updateLocation");
   }
 }
     async uploadImage(experId: string, file: Express.Multer.File) {
         try {
-            const existingExpert= await this.expertRepository.findById(experId)
+            const existingExpert= await this._expertRepository.findById(experId)
             if(!existingExpert){
                 return {success:false,message:"ExpertId not match"}
             }
@@ -43,17 +44,18 @@ async updateExpertLocation(
             if(!imageUrl){
                 return {success:false,message:"Cloudnary upload failed"}
             }
-            await this.expertRepository.pushToField(experId,"gallery",imageUrl)
+            await this._expertRepository.pushToField(experId,"gallery",imageUrl)
             
             return {success:true,message:'Image uploaded successfully',imageUrl:imageUrl}
-        } catch (error:any) {
-            throw new Error(error)
+        } catch (error) {
+          const err= error as Error
+            throw new Error(err.message)
         }
     }
 
     async deleteImageFromGallery(expertId: string, imageUrl: string) {
         try {
-        const expert = await this.expertRepository.findById(expertId);
+        const expert = await this._expertRepository.findById(expertId);
         if (!expert) {
           return { success: false, message: "Expert not found" };
         }
@@ -65,14 +67,15 @@ async updateExpertLocation(
         if (!isInGallery) {
           return { success: false, message: "Image not found in gallery" };
         }
-        await this.expertRepository.pullFromField(expertId, "gallery", imageUrl);
+        await this._expertRepository.pullFromField(expertId, "gallery", imageUrl);
       const public_Id=extractPublicId(imageUrl)
 
         await CloudinaryService.deleteImage(public_Id)
 
         return { success: true, message: "Image deleted from gallery" };
-    } catch (error:any) {
-     throw new Error(error.message)       
+    } catch (error) {
+      const err= error as Error
+     throw new Error(err.message)       
     }
       }
       

@@ -6,13 +6,13 @@ import { TYPES } from '../../di/types';
 @injectable()
 export class UserService implements IUserService {
     constructor(
-        @inject(TYPES.UserRepository) private userRepository: IUserRepository
+        @inject(TYPES.UserRepository) private _userRepository: IUserRepository
     ) {}
 
     async getUsers(page: number, limit: number, search: string = "") {
         try {
             const { users, total, totalPages, currentPage } = 
-                await this.userRepository.findUsersByPagination(page, limit, search);
+                await this._userRepository.findUsersByPagination(page, limit, search);
             return { 
                 success: true, 
                 users,
@@ -21,17 +21,18 @@ export class UserService implements IUserService {
                 currentPage
             };
         } catch (error) {
-            console.error("Error fetching users:", error);
+            const err= error as Error
+            console.error("Error fetching users:", err);
             return { 
                 success: false, 
-                message: "Failed to fetch users" 
+                message:err.message|| "Failed to fetch users" 
             };
         }
     }
 
     async blockUnblockUser(id: string, block: boolean) {
         try {
-            const user = await this.userRepository.findById(id);
+            const user = await this._userRepository.findById(id);
             if (!user) {
                 return { 
                     success: false, 
@@ -40,7 +41,7 @@ export class UserService implements IUserService {
             }
 
             const newStatus = !user.isBlocked;
-            const updatedUser = await this.userRepository.updateById(id, { 
+            const updatedUser = await this._userRepository.updateById(id, { 
                 isBlocked: newStatus 
             });
 
@@ -50,33 +51,36 @@ export class UserService implements IUserService {
                 updatedUser 
             };
         } catch (error) {
-            console.error("Error updating user status:", error);
+            const err= error as Error
+            console.error("Error updating user status:", err);
             return { 
                 success: false, 
-                message: "Failed to update user status" 
+                message:err.message|| "Failed to update user status" 
             };
         }
     }
 
     async checkBlocked(id: string) {
         try {
-            const user = await this.userRepository.findById(id);
+            const user = await this._userRepository.findById(id);
             
             return user?.isBlocked ?true:false;
         } catch (error) {
-            console.error("Error checking user block status:", error);
+            const err= error as Error
+            console.error("Error checking user block status:", err);
             return { 
                 success: false, 
-                message: "Failed to check user status" 
+                message:err.message|| "Failed to check user status" 
             };
         }
     }
    async getTotalUserCount(): Promise<{ totalUsers: number; }> {
        try {
-        const result= await this.userRepository.count({})
+        const result= await this._userRepository.count({})
         return {totalUsers:result}
-       } catch (error:any) {
-        throw new Error(error.message)
+       } catch (error) {
+        const err= error as Error
+        throw new Error(err.message)
        }
    }
 }

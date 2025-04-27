@@ -25,8 +25,9 @@ export class ExpertRepository extends BaseRepository<IExpert> implements IExpert
         };
             // const expert = new Expert(newData);
             return await this.create(newData)
-        } catch (error: any) {
-            throw new Error(`Error in ExpertRepository: ${error.message}`);
+        } catch (error) {
+          const err= error as Error
+            throw new Error(`Error in ExpertRepository: ${err.message}`);
         }
     }
 
@@ -73,8 +74,9 @@ export class ExpertRepository extends BaseRepository<IExpert> implements IExpert
                 { $push: {[field]:value} },
                 { new: true }
             );
-        } catch (error: any) {
-            throw new Error(`Error pushing image to gallery: ${error.message}`);
+        } catch (error) {
+          const err= error as Error
+            throw new Error(`Error pushing image to gallery: ${err.message}`);
         }
     }
     async pullFromField(expertId: string, field: keyof IExpert, value: any) {
@@ -145,8 +147,9 @@ export class ExpertRepository extends BaseRepository<IExpert> implements IExpert
           ]);
       
           return results;
-        } catch (error: any) {
-          throw new Error(error.message || "Failed to fetch nearby experts");
+        } catch (error) {
+          const err= error as Error
+          throw new Error(err.message || "Failed to fetch nearby experts");
         }
       }
       

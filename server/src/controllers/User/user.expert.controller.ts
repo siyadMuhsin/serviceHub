@@ -10,8 +10,7 @@ import { HttpStatus } from "../../types/httpStatus";
 @injectable()
 export class UserExpertController implements IUserExpertController {
   constructor(
-    @inject(TYPES.UserExpertService)
-    private userExpertService: IUserExpertService
+    @inject(TYPES.UserExpertService) private _userExpertService: IUserExpertService
   ) {}
   async getExpertSpecificService(
     req: AuthRequest,
@@ -22,34 +21,35 @@ export class UserExpertController implements IUserExpertController {
       const { serviceId } = req.params;
       const check = mongoose.Types.ObjectId.isValid;
       if (!check(userId) || !check(serviceId)) {
-        this._sendResponse(res,{ message: "The userId or ServiceId not valid" },HttpStatus.BAD_REQUEST);
+        this.sendResponse(res,{ message: "The userId or ServiceId not valid" },HttpStatus.BAD_REQUEST);
         return;
       }
-      const response= await this.userExpertService.getExpertsByService(serviceId,userId)
-      this._sendResponse(res,response,response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+      const response= await this._userExpertService.getExpertsByService(serviceId,userId)
+      this.sendResponse(res,response,response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
     
     } catch (error) {
-        this._sendResponse(res,error||"Internal server Error",HttpStatus.INTERNAL_SERVER_ERROR)
+      const err= error as Error
+        this.sendResponse(res,err,HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
   async getExpertDetails(req: AuthRequest, res: Response): Promise<void> {
       try {
-        console.log('expert profiledetails')
         const {expertId}=req.params
         const userId=req.user.userId
         const check = mongoose.Types.ObjectId.isValid;
         if (!check(userId) || !check(expertId)) {
-          this._sendResponse(res,{ message: "The userId or ServiceId not valid" },HttpStatus.BAD_REQUEST);
+          this.sendResponse(res,{ message: "The userId or ServiceId not valid" },HttpStatus.BAD_REQUEST);
           return;
         }
-        const response= await this.userExpertService.getExpertDetails(userId,expertId)
-        this._sendResponse(res,response,response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
+        const response= await this._userExpertService.getExpertDetails(userId,expertId)
+        this.sendResponse(res,response,response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
       } catch (error) {
-        console.error(error)
-        this._sendResponse(res,error,HttpStatus.INTERNAL_SERVER_ERROR)
+        const err= error as Error
+        console.error(err)
+        this.sendResponse(res,error,HttpStatus.INTERNAL_SERVER_ERROR)
       }
   } 
-  private _sendResponse(res: Response, data: any, status: HttpStatus): void {
+  private sendResponse(res: Response, data: any, status: HttpStatus): void {
     res.status(status).json(data);
   }
 }

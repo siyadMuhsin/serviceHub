@@ -12,8 +12,8 @@ import { IServices } from "../../types/Admin";
 @injectable()
 export class ProfileService implements IProfileService {
     constructor(
-        @inject(TYPES.UserRepository) private userRepositry :IUserRepository,
-        @inject(TYPES.ServiceRepository) private serviceRepository:IServiceRepository
+        @inject(TYPES.UserRepository) private _userRepositry :IUserRepository,
+        @inject(TYPES.ServiceRepository) private _serviceRepository:IServiceRepository
      ){}
 
    
@@ -23,7 +23,7 @@ export class ProfileService implements IProfileService {
                 type: "Point",
                 coordinates: [lng, lat]  // GeoJSON requires [longitude, latitude]
             };
-            const user = await this.userRepositry.updateById(
+            const user = await this._userRepositry.updateById(
                 userId,
                 { location },
             );
@@ -38,10 +38,11 @@ export class ProfileService implements IProfileService {
                 message: "Location updated successfully",
             };
         } catch (error) {
-            console.error("Error in addLocation:", error);
+          const err= error as Error
+            console.error("Error in addLocation:", err);
             return {
                 success: false,
-                message: "Failed to update location"
+                message:err.message|| "Failed to update location"
             };
         }
     }
@@ -49,13 +50,14 @@ export class ProfileService implements IProfileService {
 
     async getExpertData(id:string){
         try {
-            const expertData= await this.userRepositry.getExpertByUserId(id)
+            const expertData= await this._userRepositry.getExpertByUserId(id)
             if(expertData){
                 return {success:true,message:'Expert data fetched successfully',expert:expertData}
             }
             return {success:false,message:"Expert data not found"}
-        } catch (error:any) {
-            return {success:false,message: error.message ||'something error in getExpert data'}
+        } catch (error) {
+          const err= error as Error
+            return {success:false,message: err.message ||'something error in getExpert data'}
         }
 
     }
@@ -63,12 +65,13 @@ export class ProfileService implements IProfileService {
         try {
             const profileImageUrl= await CloudinaryService.uploadImage(file)
             if(profileImageUrl){
-                await this.userRepositry.updateById(userId,{profile_image:profileImageUrl})
+                await this._userRepositry.updateById(userId,{profile_image:profileImageUrl})
                 return {success:true,message:'Profile updated successFully',profileImageUrl}
             }
             return {success:false,message:"failed to upload cloudnary"}
-        } catch (error:any) {
-            return {success:false,message:error.message|| 'failed to upload profile'}
+        } catch (error) {
+          const err= error as Error
+            return {success:false,message:err.message|| 'failed to upload profile'}
         }
     }
     async profileUpdate(
@@ -84,22 +87,23 @@ export class ProfileService implements IProfileService {
             };
           }
           console.log(updateData)
-          await this.userRepositry.updateById(userId, updateData);
+          await this._userRepositry.updateById(userId, updateData);
           return {
             success: true,
             message: 'Profile updated successfully',
           };
-        } catch (error: any) {
+        } catch (error) {
+          const err= error as Error
           return {
             success: false,
-            message: error.message || 'Failed to update profile',
+            message: err.message || 'Failed to update profile',
           };
         }
       }
       
     async changePassword(userId: string, oldPassword: string, newPassword: string) {
         try {
-          const user = await this.userRepositry.findById(userId);
+          const user = await this._userRepositry.findById(userId);
           if (!user) {
             return { success: false, message: 'User not found' };
           }
@@ -108,65 +112,66 @@ export class ProfileService implements IProfileService {
             return { success: false, message: 'Current password is incorrect' };
           }
           const hashedPassword = await bcrypt.hash(newPassword, 10);
-          await this.userRepositry.updateById(userId, { password: hashedPassword });
+          await this._userRepositry.updateById(userId, { password: hashedPassword });
           return { success: true, message: 'Password changed successfully' };
         } catch (error) {
-          console.error("Change password error:", error); // optional: for debugging
-          return { success: false, message: 'Failed to change password' };
+          const err= error as Error
+          console.error("Change password error:", err); // optional: for debugging
+          return { success: false, message:err.message|| 'Failed to change password' };
         }
       }
 
       async saveService(userId: string, serviceId: string): Promise<{ success: boolean; message: string }> {
         try {
-          const user = await this.userRepositry.findById(userId);
+          const user = await this._userRepositry.findById(userId);
           if (!user) {
             return { success: false, message: "User not found" };
           }
-          const service = await this.serviceRepository.getServiceById(serviceId);
+          const service = await this._serviceRepository.getServiceById(serviceId);
           if (!service) {
             return { success: false, message: "Service not found" };
           }
           // Add serviceId to savedServices using repository method
-          await this.userRepositry.addToSavedServices(userId, serviceId);
+          await this._userRepositry.addToSavedServices(userId, serviceId);
       
           return { success: true, message: "Service saved successfully" };
         } catch (error) {
-          console.error("Error saving service:", error);
-          return { success: false, message: "Failed to save service" };
+          const err= error as Error
+          console.error("Error saving service:", err);
+          return { success: false, message: err.message||"Failed to save service" };
         }
       }
       async unsaveService(userId: string, serviceId: string): Promise<{ success: boolean; message: string }> {
         try {
-          const user = await this.userRepositry.findById(userId);
+          const user = await this._userRepositry.findById(userId);
           if (!user) {
             return { success: false, message: "User not found" };
           }
-          const service = await this.serviceRepository.getServiceById(serviceId);
+          const service = await this._serviceRepository.getServiceById(serviceId);
           if (!service) {
             return { success: false, message: "Service not found" };
           }
       
-          await this.userRepositry.removeFromSavedServices(userId, serviceId);
+          await this._userRepositry.removeFromSavedServices(userId, serviceId);
       
           return { success: true, message: "Service unsaved successfully" };
         } catch (error) {
-          console.error("Error unsaving service:", error);
-          return { success: false, message: "Failed to unsave service" };
+          const err= error as Error
+          console.error("Error unsaving service:", err);
+          return { success: false, message:err.message|| "Failed to unsave service" };
         }
       }
       async getSavedServices(userId: string): Promise<{ success: boolean;  message: string,services?: any[]; }> {
         try {
-          const user = await this.userRepositry.findUserWithSavedServices(userId);
+          const user = await this._userRepositry.findUserWithSavedServices(userId);
           if (!user) {
             return { success: false, message: "User not found" };
           }
-      
-          console.log(user.savedServices);
-          
           return { success: true,message:"saved survice get in success", services: user.savedServices };
         } catch (error) {
-          console.error("Error fetching saved services:", error);
-          return { success: false, message: "Failed to fetch saved services" };
+          const err= error as Error
+          console.error("Error fetching saved services:", err);
+          return { success: false, message: err.message||"Failed to fetch saved services" };
         }
       }
 }

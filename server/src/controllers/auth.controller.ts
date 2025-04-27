@@ -9,18 +9,19 @@ import { TYPES } from "../di/types";
 @injectable()
 export class AuthController implements IAuthController {
   constructor(
-    @inject(TYPES.AuthService) private authService: IAuthService
+    @inject(TYPES.AuthService) private _authService: IAuthService
   ) {}
 
   async register(req: Request, res: Response): Promise<void> {
     try {
       const { name, email, password } = req.body;
-      const response = await this.authService.registerUser(name, email, password);
-      this._sendResponse(res, response, HttpStatus.CREATED, HttpStatus.BAD_REQUEST);
-    } catch (error: any) {
+      const response = await this._authService.registerUser(name, email, password);
+      this.sendResponse(res, response, HttpStatus.CREATED, HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      const err= error as Error
       res.status(HttpStatus.BAD_REQUEST).json({ 
         success: false, 
-        message: error.message 
+        message: err.message 
       });
     }
   }
@@ -28,9 +29,10 @@ export class AuthController implements IAuthController {
   async verifyOtp(req: Request, res: Response): Promise<void> {
     try {
       const { email, otp } = req.body;
-      const response = await this.authService.verifyOtp(email, otp);
-      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
-    } catch (err: any) {
+      const response = await this._authService.verifyOtp(email, otp);
+      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      const err=error as Error
       res.status(HttpStatus.BAD_REQUEST).json({ 
         success: false, 
         message: err.message 
@@ -41,10 +43,10 @@ export class AuthController implements IAuthController {
   async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      const response = await this.authService.loginUser(email, password);
+      const response = await this._authService.loginUser(email, password);
 
       if (response.success && response.accessToken && response.refreshToken) {
-        this._setAuthCookies(res, response.accessToken, response.refreshToken);
+        this.setAuthCookies(res, response.accessToken, response.refreshToken);
         res.status(HttpStatus.OK).json({ 
           success: true, 
           user: response.user 
@@ -53,7 +55,8 @@ export class AuthController implements IAuthController {
         res.status(response.message === "Password is incorrect" ? HttpStatus.UNAUTHORIZED : HttpStatus.BAD_REQUEST)
            .json(response);
       }
-    } catch (err: any) {
+    } catch (error) {
+      const err=error as Error
       res.status(HttpStatus.BAD_REQUEST).json({ 
         success: false,
         message: err.message 
@@ -64,9 +67,10 @@ export class AuthController implements IAuthController {
   async resendOtp(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
-      const response = await this.authService.resendOtp(email);
-      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
-    } catch (err: any) {
+      const response = await this._authService.resendOtp(email);
+      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      const err=error as Error
       res.status(HttpStatus.BAD_REQUEST).json({ 
         success: false, 
         message: err.message 
@@ -83,13 +87,13 @@ export class AuthController implements IAuthController {
       return;
     }
     try {
-      const response = await this.authService.findUser(userId);
-      console.log(response)
-      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.INTERNAL_SERVER_ERROR);
-    } catch (err: any) {
+      const response = await this._authService.findUser(userId);
+      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error) {
+      const err=error as Error
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
         success: false, 
-        message: "Internal Server Error" 
+        message: err.message || "Internal Server Error" 
       });
     }
   }
@@ -102,7 +106,8 @@ export class AuthController implements IAuthController {
         success: true, 
         message: "Logged out successfully" 
       });
-    } catch (err: any) {
+    } catch (error) {
+      const err= error as Error
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
         success: false,
         message: err.message 
@@ -113,10 +118,10 @@ export class AuthController implements IAuthController {
   async googleSignIn(req: Request, res: Response): Promise<void> {
     try {
       const { id, email, name, picture } = req.body.data;
-      const response = await this.authService.saveGoogleUser(id, email, name, picture);
+      const response = await this._authService.saveGoogleUser(id, email, name, picture);
 
       if (response?.success && response.accessToken && response.refreshToken) {
-        this._setAuthCookies(res, response.accessToken, response.refreshToken);
+        this.setAuthCookies(res, response.accessToken, response.refreshToken);
         res.status(HttpStatus.OK).json({ 
           success: true, 
           user: response.user 
@@ -124,10 +129,11 @@ export class AuthController implements IAuthController {
       } else {
         res.status(HttpStatus.BAD_REQUEST).json(response);
       }
-    } catch (err: any) {
+    } catch (error) {
+      const err= error as Error
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: "Google sign-in failed"
+        message:err.message ||  "Google sign-in failed"
       });
     }
   }
@@ -135,9 +141,10 @@ export class AuthController implements IAuthController {
   async forgetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
-      const response = await this.authService.forgetPassword(email);
-      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
-    } catch (err: any) {
+      const response = await this._authService.forgetPassword(email);
+      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      const err= error as Error
       res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message: err.message
@@ -148,9 +155,10 @@ export class AuthController implements IAuthController {
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { token, newPassword } = req.body;
-      const response = await this.authService.resetPassword(token, newPassword);
-      this._sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
-    } catch (err: any) {
+      const response = await this._authService.resetPassword(token, newPassword);
+      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
+    } catch (error) {
+      const err= error as Error
       res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message: err.message
@@ -158,7 +166,7 @@ export class AuthController implements IAuthController {
     }
   }
 
-  private _sendResponse(
+  private sendResponse(
     res: Response, 
     response: any, 
     successStatus: number, 
@@ -171,7 +179,7 @@ export class AuthController implements IAuthController {
     }
   }
 
-  private _setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
+  private setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
