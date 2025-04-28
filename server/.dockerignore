@@ -1,0 +1,26 @@
+# Ignore node_modules because Docker installs fresh dependencies
+/node_modules
+
+# Ignore build outputs (optional if you build inside Docker)
+/dist
+build
+
+# Ignore Git files
+.git
+.gitignore
+
+# Ignore Docker files themselves
+Dockerfile
+.dockerignore
+
+# Ignore environment variables (important for security)
+.env
+
+# Ignore logs
+*.log
+logs
+npm-debug.log*
+
+# Ignore system files
+.DS_Store
+Thumbs.db
