@@ -13,7 +13,7 @@ import { Server } from "socket.io";
 import { initializeSocketHandler } from "./sockets/socketHandler";
 const app=express()
 const allowedOrigins = [
-  "https://service-hub-snowy.vercel.app/", 
+  "https://service-hub-snowy.vercel.app", 
   "http://localhost:5173"       
 ];
 const corsOptions: cors.CorsOptions = {
