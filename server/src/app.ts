@@ -17,9 +17,8 @@ const allowedOrigins = [
   "http://localhost:5173"       
 ];
 const corsOptions: cors.CorsOptions = {
-    origin: allowedOrigins, 
+    origin:"https://service-hub-snowy.vercel.app", 
     credentials: true, 
-   
 };
 
 
