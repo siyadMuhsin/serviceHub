@@ -9,7 +9,7 @@ const ImageCropper = ({ imageSrc, setCroppedFile }) => {
     height: (50 * 2) / 3, // Initial height based on 3:2 aspect ratio
     x: 25, // Initial x position
     y: 25, // Initial y position
-    aspect: 3 / 2, // Fixed aspect ratio (3:2)
+
   });
 
   const imgRef = useRef<HTMLImageElement | null>(null);

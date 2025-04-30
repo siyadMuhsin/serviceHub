@@ -5,7 +5,8 @@ import Dashboard from '@/pages/Expert/Dashboard';
 import ProtectedExpertRoute from './Protect.routes';
 import SubscriptionPage from '@/pages/Expert/SubscriptionPage';
 import ExpertProfile from '@/pages/Expert/ExpertProfile';
-import ExpertSlot from '@/components/Expert/ExpertSLot';
+
+import ExpertSlot from '@/components/Expert/Expert.slot';
 
 import BookingMangement from '@/pages/Expert/BookingManagement';
 import ReviewsManagement from '@/pages/Expert/ReviewsManagement';

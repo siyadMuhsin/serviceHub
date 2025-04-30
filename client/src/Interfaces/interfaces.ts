@@ -2,10 +2,10 @@
 
 export interface ExpertData {
     accountName: string;
-    dob: string;
-    gender: string;
+    dob: Date;
+    gender:  "Male" | "Female" | "Other";
     contact: string;
-    experience: string;
+    experience: number;
     service: string;
     category: string;
     certificate: File | FileList | null;
@@ -17,6 +17,7 @@ export interface Category {
 }
 
 export interface Service {
+  _id:string,
     id: string;
     name: string;
     categoryId: { _id: string };

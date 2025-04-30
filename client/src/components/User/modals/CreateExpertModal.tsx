@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expertSchemaValidation } from "../../../validations/expertValidation";
 import { Category, Service, ExpertData } from "../../../Interfaces/interfaces";
@@ -19,6 +19,7 @@ const CreateExpertModal: React.FC<CreateExpertModalProps> = ({
   onCreate,
   existingData,
 }) => {
+  const resolver = yupResolver(expertSchemaValidation) as Resolver<ExpertData>;
   const {
     register,
     handleSubmit,
@@ -26,7 +27,7 @@ const CreateExpertModal: React.FC<CreateExpertModalProps> = ({
     setValue,
     formState: { errors },
   } = useForm<ExpertData>({
-    resolver: yupResolver(expertSchemaValidation),
+    resolver,
     defaultValues: existingData || {},
   });
 

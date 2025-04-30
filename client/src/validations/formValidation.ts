@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 
 const validation = (formData: any) => {
   for (const [key, value] of Object.entries(formData)) {
-    if (key !== "age" && !value.trim()) {
+    if (key !== "age" && typeof value === "string" && !value.trim()) {
       toast.error(`${key.charAt(0).toUpperCase() + key.slice(1)} is required.`);
       return false;
     }

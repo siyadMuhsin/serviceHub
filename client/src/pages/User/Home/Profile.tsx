@@ -94,10 +94,10 @@ export const ProfilePage: React.FC = () => {
     try {
       const formData = new FormData();
       formData.append("accountName", expertData.accountName);
-      formData.append("dob", expertData.dob);
+      formData.append("dob", expertData.dob.toISOString());
       formData.append("gender", expertData.gender);
       formData.append("contact", expertData.contact);
-      formData.append("experience", expertData.experience);
+      formData.append("experience", expertData.experience.toString());
       formData.append("serviceId", expertData.service);
       formData.append("categoryId", expertData.category);
 

@@ -23,7 +23,7 @@ import {
   CreditCard
 } from 'lucide-react'
 import { fetchLocationFromCoordinates } from '@/components/Location/FethLocation'
-import ExpertSLot from '@/components/Expert/ExpertSLot'
+import ExpertSLot from '@/components/Expert/Expert.slot'
 
 function ExpertProfile() {
   const [expertData, setExpertData] = useState<IExpert | null>(null)

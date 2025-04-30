@@ -28,9 +28,9 @@ export const expertSchemaValidation = yup.object().shape({
     .typeError("Experience must be a number")
     .min(0, "Experience cannot be negative")
     .required("Experience is required"),
-  certificate: yup
-    .mixed()
+    certificate: yup.mixed<File | FileList | null>()
+    .required("Certificate is required")
     .test("fileRequired", "Certificate is required", (value) => {
-      return value instanceof File;
+      return value instanceof File || (value instanceof FileList && value.length > 0);
     }),
 });

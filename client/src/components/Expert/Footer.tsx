@@ -50,27 +50,27 @@ export function Footer() {
           <div>
             <p>
               Copyright ©{" "}
-              <Link href="/" className="text-teal-300 hover:underline">
+              <Link to="/" className="text-teal-300 hover:underline">
                 ServiceHub
               </Link>{" "}
               | Designed by{" "}
-              <Link href="/" className="text-teal-300 hover:underline">
+              <Link to="/" className="text-teal-300 hover:underline">
                 Siyad
               </Link>
             </p>
           </div>
           <div className="flex space-x-4">
             <p className="mr-2">Follow :</p>
-            <Link href="/" aria-label="Instagram">
+            <Link to="/" aria-label="Instagram">
               <Instagram className="h-5 w-5 hover:text-teal-300" />
             </Link>
-            <Link href="/" aria-label="Facebook">
+            <Link to="/" aria-label="Facebook">
               <Facebook className="h-5 w-5 hover:text-teal-300" />
             </Link>
-            <Link href="/" aria-label="Twitter">
+            <Link to="/" aria-label="Twitter">
               <Twitter className="h-5 w-5 hover:text-teal-300" />
             </Link>
-            <Link href="/" aria-label="Pinterest">
+            <Link to="/" aria-label="Pinterest">
               <Pinterest className="h-5 w-5 hover:text-teal-300" />
             </Link>
           </div>
