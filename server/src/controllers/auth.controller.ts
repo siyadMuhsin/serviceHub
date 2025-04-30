@@ -183,7 +183,7 @@ export class AuthController implements IAuthController {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict" as const,
+      sameSite: "none" as const ,
     };
 
     res.cookie("accessToken", accessToken, {
