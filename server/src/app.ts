@@ -11,6 +11,7 @@ import http from 'http'
 import cors from 'cors'
 import { Server } from "socket.io";
 import { initializeSocketHandler } from "./sockets/socketHandler";
+dotenv.config()
 const app=express()
 const clientApi=process.env.CLIENT_API
 const corsOptions: cors.CorsOptions = {
