@@ -26,6 +26,8 @@ export default function ChatPage() {
 
   useEffect(() => {
     const { id, role } = getUserIdAndRole();
+    console.log(id,role);
+    
     setUserId(id);
     setUserRole(role === 'expert' ? 'Expert' : 'User');
 

@@ -7,9 +7,12 @@ interface DecodedToken {
 }
 export const getUserIdAndRole = () => {
   const token = Cookies.get("accessToken");
+  console.log("accessToken frontend",token);
+  
   if (!token) return null;
 
   const decoded = jwtDecode<DecodedToken>(token);
+console.log("token decode",decoded);
 
   return {
     id: decoded.role === "user" ? decoded.userId : decoded.expertId,
