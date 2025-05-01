@@ -12,12 +12,9 @@ import cors from 'cors'
 import { Server } from "socket.io";
 import { initializeSocketHandler } from "./sockets/socketHandler";
 const app=express()
-const allowedOrigins = [
-  "https://service-hub-snowy.vercel.app", 
-  "http://localhost:5173"       
-];
+const clientApi=process.env.CLIENT_API
 const corsOptions: cors.CorsOptions = {
-    origin:"https://service-hub-snowy.vercel.app", 
+    origin:clientApi, 
     credentials: true, 
 };
 
@@ -25,7 +22,7 @@ const corsOptions: cors.CorsOptions = {
 const server= http.createServer(app)
 const io = new Server(server, {
     cors: {
-      origin: allowedOrigins,
+      origin: clientApi,
       methods: ["GET", "POST"]
     }
   });
