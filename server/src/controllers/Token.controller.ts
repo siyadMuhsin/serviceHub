@@ -49,16 +49,16 @@ export class TokenController implements ITokenController {
     private setAccessTokenCookie(res: Response, token: string): void {
         res.cookie("accessToken", token, {
             httpOnly: false,
-            secure: true,
-            sameSite: "none",
+            secure: false,
+            sameSite: "lax",
             maxAge: 15 * 60 * 1000, // 15 minutes
         });
     }
     private setRefreshTokenCookie(res: Response, token: string): void {
         res.cookie("refreshToken", token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            secure: false,
+            sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
     }
