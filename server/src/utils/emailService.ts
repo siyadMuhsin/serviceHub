@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer'
 import crypto from 'crypto';
-
+import dotenv from 'dotenv'
+dotenv.config()
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
@@ -10,6 +11,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.SMTP_PASS
     }
 });
+const clientApi=process.env.CLIENT_API
 export const generateOTP = () => {
     return crypto.randomInt(1000, 9999).toString(); // 6-digit OTP
 };
@@ -33,7 +35,7 @@ export const generateResetToken=()=>{
 }
 
 export const sendResetMail=async(email:string,token:string)=>{
-    const resetUrl =`http://localhost:5173/reset-password/${token}`
+    const resetUrl =`${clientApi}/${token}`
     const mailOptions={
         from: process.env.EMAIL_USER,
         to: email,

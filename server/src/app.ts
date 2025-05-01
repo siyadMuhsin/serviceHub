@@ -14,6 +14,8 @@ import { initializeSocketHandler } from "./sockets/socketHandler";
 dotenv.config()
 const app=express()
 const clientApi=process.env.CLIENT_API
+console.log('cliend id',clientApi);
+
 const corsOptions: cors.CorsOptions = {
     origin:clientApi, 
     credentials: true, 
