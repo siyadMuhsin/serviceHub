@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { IMessage, IUser } from '@/Interfaces/interfaces';
 import { getConversationToUser, getChatUsers } from '@/services/chat.service';
-import { getUserIdAndRole } from '@/Utils/getUserIdAndRole';
+// import { getUserIdAndRole } from '@/Utils/getUserIdAndRole';
 import { baseUrl } from 'config/axiosConfig';
+import { get_expert } from '@/services/Expert/expert.service';
 
 export default function ExpertChatPage() {
   const [messages, setMessages] = useState<IMessage[]>([]);
@@ -15,21 +16,30 @@ export default function ExpertChatPage() {
   const [showSidebar, setShowSidebar] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
-
+  
   useEffect(() => {
-    const { id } = getUserIdAndRole();
-    setUserId(id);
-
-    socketRef.current = io(baseUrl, {
-      autoConnect: true,
-      reconnection: true,
-    });
-
+    const fetchExpertAndInitSocket = async () => {
+      try {
+        const response = await get_expert();
+        const id = response.expert._id;
+        setUserId(id);
+  
+        socketRef.current = io(baseUrl, {
+          autoConnect: true,
+          reconnection: true,
+        });
+      } catch (err) {
+        console.error("Failed to fetch expert or connect socket:", err);
+      }
+    };
+  
+    fetchExpertAndInitSocket();
+  
     return () => {
       socketRef.current?.disconnect();
     };
   }, []);
-
+  
   useEffect(() => {
     if (!socketRef.current || !userId) return;
 

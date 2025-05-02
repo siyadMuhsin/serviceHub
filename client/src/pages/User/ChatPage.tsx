@@ -4,7 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { IMessage } from '@/Interfaces/interfaces';
 import { getConversation } from '@/services/chat.service';
 import { useSelector } from 'react-redux';
-import { getUserIdAndRole } from '@/Utils/getUserIdAndRole';
+// import { getUserIdAndRole } from '@/Utils/getUserIdAndRole';
 import { baseUrl } from 'config/axiosConfig';
 import { RootState } from '@/store';
 
@@ -16,7 +16,7 @@ export default function ChatPage() {
   const [userId, setUserId] = useState('');
   const [userRole, setUserRole] = useState<'User' | 'Expert'>('User');
   const [error, setError] = useState<string | null>(null);
-
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -25,11 +25,11 @@ export default function ChatPage() {
   };
 
   useEffect(() => {
-    const { id, role } = getUserIdAndRole();
-    console.log(id,role);
+    const  id = user._id
+    // console.log(id,role);
     
     setUserId(id);
-    setUserRole(role === 'expert' ? 'Expert' : 'User');
+    setUserRole( 'User');
 
     // Initialize socket
     socketRef.current = io(baseUrl, {
