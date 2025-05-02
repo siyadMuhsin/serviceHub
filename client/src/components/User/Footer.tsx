@@ -1,192 +1,82 @@
 import React from "react";
-import {
-  AtSign,
-  Facebook,
-  Instagram,
-  Linkedin,
-  MapPin,
-  Phone,
-  Twitter,
-} from "lucide-react";
+import { AtSign, Facebook, Instagram, Linkedin, MapPin, Phone, Twitter } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-gray-100">
-      {/* Main Footer Content */}
-      <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="col-span-1 md:col-span-1">
-            <h3 className="text-xl font-bold mb-4">Company Name</h3>
-            <p className="mb-4 text-gray-400">
-              We create digital experiences that matter. Focused on quality,
-              innovation, and your success.
+    <footer className="bg-gray-800 text-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          
+          {/* Brand Info */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Service Hub</h3>
+            <p className="text-gray-400 text-sm">
+              Connecting you with trusted service professionals for all your needs.
             </p>
             <div className="flex space-x-4">
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <Facebook size={20} />
+              <a href="#" className="text-gray-400 hover:text-white transition">
+                <Facebook size={18} />
               </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <Twitter size={20} />
+              <a href="#" className="text-gray-400 hover:text-white transition">
+                <Twitter size={18} />
               </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <Instagram size={20} />
+              <a href="#" className="text-gray-400 hover:text-white transition">
+                <Instagram size={18} />
               </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                <Linkedin size={20} />
+              <a href="#" className="text-gray-400 hover:text-white transition">
+                <Linkedin size={18} />
               </a>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div className="col-span-1">
-            <h3 className="text-xl font-bold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Home
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Services
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Portfolio
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Contact
-                </a>
-              </li>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Quick Links</h3>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li><a href="#" className="hover:text-white transition">Home</a></li>
+              <li><a href="#" className="hover:text-white transition">Services</a></li>
+              <li><a href="#" className="hover:text-white transition">How It Works</a></li>
+              <li><a href="#" className="hover:text-white transition">Pricing</a></li>
+              <li><a href="#" className="hover:text-white transition">FAQ</a></li>
             </ul>
           </div>
 
-          {/* Resources */}
-          <div className="col-span-1">
-            <h3 className="text-xl font-bold mb-4">Resources</h3>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Help Center
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Terms of Service
-                </a>
-              </li>
+          {/* Company */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Company</h3>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li><a href="#" className="hover:text-white transition">About Us</a></li>
+              <li><a href="#" className="hover:text-white transition">Careers</a></li>
+              <li><a href="#" className="hover:text-white transition">Blog</a></li>
+              <li><a href="#" className="hover:text-white transition">Contact</a></li>
             </ul>
           </div>
 
-          {/* Contact Info */}
-          <div className="col-span-1">
-            <h3 className="text-xl font-bold mb-4">Contact Us</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start">
-                <MapPin
-                  className="mr-2 text-gray-400 flex-shrink-0 mt-1"
-                  size={18}
-                />
-                <span className="text-gray-400">
-                  123 Business Avenue, Suite 100, San Francisco, CA 94107
-                </span>
+          {/* Contact */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Contact Us</h3>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li className="flex items-start gap-2">
+                <MapPin size={16} className="mt-0.5 flex-shrink-0" />
+                <span>123 Service St, City, Country</span>
               </li>
-              <li className="flex items-center">
-                <Phone className="mr-2 text-gray-400" size={18} />
-                <a
-                  href="tel:+11234567890"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  +1 (123) 456-7890
-                </a>
+              <li className="flex items-center gap-2">
+                <Phone size={16} />
+                <a href="tel:+1234567890" className="hover:text-white transition">+1 (234) 567-890</a>
               </li>
-              <li className="flex items-center">
-                <AtSign className="mr-2 text-gray-400" size={18} />
-                <a
-                  href="mailto:info@company.com"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  info@company.com
-                </a>
+              <li className="flex items-center gap-2">
+                <AtSign size={16} />
+                <a href="mailto:info@servicehub.com" className="hover:text-white transition">info@servicehub.com</a>
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Copyright */}
+        <div className="border-t border-gray-700 mt-8 pt-6 text-center text-sm text-gray-400">
+          <p>© {currentYear} Service Hub. All rights reserved.</p>
         </div>
       </div>
     </footer>

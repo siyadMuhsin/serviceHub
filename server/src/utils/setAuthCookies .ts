@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 export const setAuthCookies = (res: Response, accessToken: string, refreshToken: string) => {
     res.cookie("accessToken", accessToken, {
-      httpOnly: false, 
+      httpOnly: true, 
       secure: true, 
       sameSite: 'none',
       maxAge: 15 * 60 * 1000, // 15 minutes

@@ -6,6 +6,7 @@ import { getExpertDetails, getReviewsByExpertId } from '@/services/User/expert.s
 import { toast } from 'react-toastify';
 import BookingModal from '@/components/User/modals/BookingModal';
 import RatingsReviews from '@/components/User/ReviewRating';
+import Loading from '@/components/Loading';
 
 export default function ExpertViewProfile() {
   const [expertData, setExpertData] = useState<IExpert | null>(null);
@@ -29,7 +30,7 @@ export default function ExpertViewProfile() {
   }, [expertId]);
 
   if (!expertData) {
-    return <div className="max-w-6xl mx-auto p-6 bg-white">Loading...</div>;
+    return <Loading/>
   }
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);

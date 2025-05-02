@@ -79,6 +79,8 @@ export class AuthController implements IAuthController {
   }
   async getCurrentUser(req: AuthRequest, res: Response): Promise<void> {
     const userId = req?.user?.userId;
+    
+    
     if (!userId) {
       res.status(HttpStatus.UNAUTHORIZED).json({ 
         success: false, 
@@ -88,7 +90,7 @@ export class AuthController implements IAuthController {
     }
     try {
       const response = await this._authService.findUser(userId);
-      this.sendResponse(res, response, HttpStatus.OK, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.sendResponse(res, {...response,role:req.user.role}, HttpStatus.OK, HttpStatus.INTERNAL_SERVER_ERROR);
     } catch (error) {
       const err=error as Error
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
@@ -187,7 +189,7 @@ export class AuthController implements IAuthController {
     };
 
     res.cookie("accessToken", accessToken, {
-      ...cookieOptions,httpOnly:false,
+      ...cookieOptions,
       maxAge: 15 * 60 * 1000 // 15 minutes
     });
 

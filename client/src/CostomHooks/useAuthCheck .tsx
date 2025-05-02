@@ -16,7 +16,7 @@ const useAuthCheck = () => {
           withCredentials: true,
         });
         if (response.data.success) {
-          let role = getRoleFromToken();
+          let role = response.data.role;
 
           if (role === "expert") {
             dispatch(changeRole("expert"));
