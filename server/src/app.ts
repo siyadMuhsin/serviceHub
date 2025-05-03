@@ -11,6 +11,7 @@ import http from 'http'
 import cors from 'cors'
 import { Server } from "socket.io";
 import { initializeSocketHandler } from "./sockets/socketHandler";
+import limiting from "./utils/ratelimitting";
 dotenv.config()
 const app=express()
 const clientApi=process.env.CLIENT_API
@@ -19,19 +20,22 @@ console.log('cliend id',clientApi);
 const corsOptions: cors.CorsOptions = {
     origin:clientApi, 
     credentials: true, 
+    exposedHeaders: ['retry-after', 'ratelimit-limit', 'ratelimit-remaining', 'ratelimit-reset']
 };
+
 
 
 const server= http.createServer(app)
 const io = new Server(server, {
-    cors: {
-      origin: clientApi,
-      methods: ["GET", "POST"]
-    }
-  });
+  cors: {
+    origin: clientApi,
+    methods: ["GET", "POST"]
+  }
+});
 
-  initializeSocketHandler(io);
 app.use(cors(corsOptions))
+app.use(limiting)
+initializeSocketHandler(io);
 app.use(cookieParser())
 dotenv.config()
 app.use(express.json())

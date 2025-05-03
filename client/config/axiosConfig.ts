@@ -3,6 +3,7 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import { store } from "../src/store";
 import { logout } from "../src/Slice/authSlice";
 import { adminLogout } from "../src/Slice/adminAuthSlice";
+import { toast } from "react-toastify";
 
 
 // Define the API response structure
@@ -35,13 +36,23 @@ userAPI.interceptors.response.use(
         if(error.config){
           return userAPI.request(error.config);
         }
-        
       } catch (refreshError) {
         store.dispatch(logout());
+      }
+    } 
+    if (error.response && error.response.status === 429) {
+      const retryAfter = error.response.headers["retry-after"];
+      const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : 900000; // Default to 15s if retry-after is not present
+      toast.warn(`Rate limit exceeded, retrying in ${waitTime / 1000} seconds...`)
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+      if (error.config) {
+        return userAPI.request(error.config);
       }
     }
     return Promise.reject(error);
   }
+  
+  
 );
 
 // Create an Axios instance for admin API
@@ -72,9 +83,19 @@ adminAPI.interceptors.response.use(
         store.dispatch(adminLogout());
       }
     }
+    if (error.response && error.response.status === 429) {
+      const retryAfter = error.response.headers["retry-after"];
+      const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : 900000; // Default to 15s if retry-after is not present
+      toast.warn(`Rate limit exceeded, retrying in ${waitTime / 1000} seconds...`)
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+      if (error.config) {
+        return userAPI.request(error.config);
+      }
+    }
     return Promise.reject(error);
   }
 );
+//expert api
 
 const expertAPI: AxiosInstance = axios.create({
   baseURL: `${baseUrl}/expert/`,
@@ -99,6 +120,15 @@ expertAPI.interceptors.response.use(
         console.error("Expert session expired, logging out...");
         store.dispatch(logout()); // Log out the expert
         window.location.href='/login'
+      }
+    }
+    if (error.response && error.response.status === 429) {
+      const retryAfter = error.response.headers["retry-after"];
+      const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : 900000; // Default to 15s if retry-after is not present
+      toast.warn(`Rate limit exceeded, retrying in ${waitTime / 1000} seconds...`)
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+      if (error.config) {
+        return userAPI.request(error.config);
       }
     }
     return Promise.reject(error);
