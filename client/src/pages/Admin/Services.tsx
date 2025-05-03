@@ -171,113 +171,164 @@ const handleSearch=debounce((value:string)=>{
       <Header />
       <div className="min-h-screen bg-[#171730] text-white transition-all">
         <Sidebar onToggle={(expanded: boolean) => setIsSidebarExpanded(expanded)} />
-        <main className={`transition-all duration-300 ${isSidebarExpanded ? "ml-64" : "ml-16"} pt-16 p-5`}>
-          <h3 className="text-2xl font-bold mb-5">Service Management</h3>
-
-          <div className="flex justify-between mb-5">
+        <main className={`transition-all duration-300 ${isSidebarExpanded ? "ml-64" : "ml-16"} pt-16 p-3 md:p-5`}>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-5">
+          <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-0">Service Management</h3>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <input
               type="text"
               placeholder="Search services..."
               defaultValue={filterText}
               onChange={(e) => handleSearch(e.target.value)}
-              className="p-2 rounded bg-[#2A2A3C] text-white placeholder-gray-400"
+              className="p-2 rounded bg-[#2A2A3C] text-white placeholder-gray-400 w-full"
             />
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-[#3F8CFF] text-white rounded hover:bg-[#2C6FD4]"
+              className="px-4 py-2 bg-[#3F8CFF] text-white rounded hover:bg-[#2C6FD4] whitespace-nowrap"
             >
               Add Service
             </button>
           </div>
+        </div>
 
-          <div className="overflow-auto max-h-[calc(100vh-200px)]">
-            <table className="min-w-full bg-[#2A2A3C] rounded-lg overflow-hidden">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Image</th>
-                  <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Description</th>
-                  <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-[#1E1E2F] divide-y divide-[#2A2A3C]">
-                {services.map((service: any) => (
-                  <tr key={service._id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="relative group inline-block">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-auto max-h-[calc(100vh-200px)]">
+          <table className="min-w-full bg-[#2A2A3C] rounded-lg overflow-hidden">
+            <thead>
+              <tr>
+                <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Image</th>
+                <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Description</th>
+                <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 bg-[#2A2A3C] text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-[#1E1E2F] divide-y divide-[#2A2A3C]">
+              {services.map((service: any) => (
+                <tr key={service._id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="relative group inline-block">
+                      <img
+                        src={service.image}
+                        alt={service.name}
+                        className="w-10 h-10 rounded-full transition-transform duration-200"
+                      />
+                      <div className="absolute left-0 top-0 w-32 h-32 hidden group-hover:flex justify-center items-center bg-white p-1 shadow-lg border rounded z-20">
                         <img
                           src={service.image}
                           alt={service.name}
-                          className="w-10 h-10 rounded-full transition-transform duration-200"
+                          className="w-full h-full object-cover rounded"
                         />
-                        <div className="absolute left-0 top-0 w-32 h-32 hidden group-hover:flex justify-center items-center bg-white p-1 shadow-lg border rounded z-20">
-                          <img
-                            src={service.image}
-                            alt={service.name}
-                            className="w-full h-full object-cover rounded"
-                          />
-                        </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{service.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{service.categoryId.name}</td>
-                    <td className="px-6 py-4 text-sm text-white">{service.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                      <span
-                        style={{ border: `1px solid ${service.isActive ? "#10b981" : "#ef4444"}` }}
-                        className={`px-2 py-1 rounded text-sm text-white`}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{service.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{service.categoryId.name}</td>
+                  <td className="px-6 py-4 text-sm text-white max-w-xs truncate">{service.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                    <span
+                      style={{ border: `1px solid ${service.isActive ? "#10b981" : "#ef4444"}` }}
+                      className={`px-2 py-1 rounded text-sm text-white`}
+                    >
+                      {service.isActive ? "Listed" : "Unlisted"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                    <div className="flex space-x-2">
+                      <button
+                        style={{ border: "2px solid #1e40af" }}
+                        onClick={() => handleEdit(service)}
+                        className="px-2 py-1 text-white rounded hover:bg-blue-600"
                       >
-                        {service.isActive ? "Listed" : "Unlisted"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                      <div className="flex space-x-2">
-                        <button
-                          style={{ border: "2px solid #1e40af" }}
-                          onClick={() => handleEdit(service)}
-                          className="px-2 py-1 text-white rounded hover:bg-blue-600"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          style={{ border: `1px solid ${service.isActive ? "#d97706" : "#10b981"}` }}
-                          onClick={() => showConfirmation(service, service.isActive ? 'unlist' : 'list')}
-                          className={`px-2 py-1 rounded text-white ${
-                            service.isActive ? "hover:bg-red-600" : "hover:bg-green-600"
-                          }`}
-                        >
-                          {service.isActive ? "Unlist" : "List"}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        Edit
+                      </button>
+                      <button
+                        style={{ border: `1px solid ${service.isActive ? "#d97706" : "#10b981"}` }}
+                        onClick={() => showConfirmation(service, service.isActive ? 'unlist' : 'list')}
+                        className={`px-2 py-1 rounded text-white ${
+                          service.isActive ? "hover:bg-red-600" : "hover:bg-green-600"
+                        }`}
+                      >
+                        {service.isActive ? "Unlist" : "List"}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-          <div className="mt-16 flex justify-center">
-            <Stack spacing={2}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-                size="large"
-                sx={{
-                  '& .MuiPaginationItem-root': {
-                    fontSize: '1rem',
-                  },
-                  '& .Mui-selected': {
-                    fontWeight: 'bold',
-                  },
-                }}
-              />
-            </Stack>
-          </div>
-        </main>
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-3">
+          {services.map((service: any) => (
+            <div key={service._id} className="bg-[#2A2A3C] rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="relative">
+                  <img
+                    src={service.image}
+                    alt={service.name}
+                    className="w-12 h-12 rounded-full"
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-bold text-white">{service.name}</h4>
+                    <span
+                      style={{ border: `1px solid ${service.isActive ? "#10b981" : "#ef4444"}` }}
+                      className={`px-2 py-1 rounded text-xs text-white`}
+                    >
+                      {service.isActive ? "Listed" : "Unlisted"}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-300 mt-1">{service.categoryId.name}</p>
+                  <p className="text-sm text-gray-400 mt-2 line-clamp-2">{service.description}</p>
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      style={{ border: "2px solid #1e40af" }}
+                      onClick={() => handleEdit(service)}
+                      className="px-3 py-1 text-xs text-white rounded hover:bg-blue-600"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      style={{ border: `1px solid ${service.isActive ? "#d97706" : "#10b981"}` }}
+                      onClick={() => showConfirmation(service, service.isActive ? 'unlist' : 'list')}
+                      className={`px-3 py-1 text-xs rounded text-white ${
+                        service.isActive ? "hover:bg-red-600" : "hover:bg-green-600"
+                      }`}
+                    >
+                      {service.isActive ? "Unlist" : "List"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 md:mt-16 flex justify-center">
+          <Stack spacing={2}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              size={window.innerWidth < 768 ? "small" : "large"}
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  color: 'white',
+                  fontSize: window.innerWidth < 768 ? '0.75rem' : '1rem',
+                },
+                '& .Mui-selected': {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
+          </Stack>
+        </div>
+      </main>
       </div>
 
       {isModalOpen && (

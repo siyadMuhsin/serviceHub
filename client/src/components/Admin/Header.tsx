@@ -62,7 +62,7 @@ const Header: React.FC = () => {
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3F8CFF] to-[#2A2A3C] flex items-center justify-center">
                 <FiUser className="text-white text-sm" />
               </div>
-              <span className="text-gray-300 group-hover:text-white hidden md:inline-block">Admin</span>
+              <span className="text-gray-300 group-hover:text-white hidden md:inline-block">Siyad</span>
             </button>
 
             {/* Profile Dropdown */}
@@ -73,8 +73,6 @@ const Header: React.FC = () => {
                 exit={{ opacity: 0, y: -10 }}
                 className="absolute right-0 mt-2 w-48 bg-[#2A2A3C] rounded-lg shadow-xl py-1 z-50 border border-[#3F8CFF]/10"
               >
-                <a href="#" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3F8CFF]/10 hover:text-white">Profile</a>
-                <a href="#" className="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3F8CFF]/10 hover:text-white">Settings</a>
                 <div className="border-t border-[#3F8CFF]/10 my-1"></div>
                 <button
                   onClick={() => setIsModalOpen(true)}
@@ -87,13 +85,13 @@ const Header: React.FC = () => {
           </div>
 
           {/* Logout Button - Visible when dropdown is hidden */}
-          <button
+          {/* <button
             onClick={() => setIsModalOpen(true)}
             className="hidden md:flex items-center space-x-1 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all border border-red-500/30 hover:border-red-500/50"
           >
             <FiLogOut className="text-sm" />
             <span>Logout</span>
-          </button>
+          </button> */}
         </div>
       </header>
     </>

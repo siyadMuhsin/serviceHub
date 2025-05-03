@@ -228,8 +228,9 @@ const EditProfile: React.FC<EditProfileProps> = ({
     <Card className="mb-6">
       <CardContent className="pt-6">
         <div>
-          <div className="flex items-start justify-between mb-6">
-            <div className="relative group">
+          {/* Avatar and Buttons */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div className="relative group self-center sm:self-auto">
               <Avatar className="h-20 w-20">
                 <AvatarImage
                   src={editedProfile.profile_image || "/default-avatar.png"}
@@ -242,10 +243,10 @@ const EditProfile: React.FC<EditProfileProps> = ({
               <label
                 htmlFor="profileImageUpload"
                 className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer ${
-                  loading.image ? 'cursor-not-allowed' : ''
+                  loading.image ? "cursor-not-allowed" : ""
                 }`}
               >
-                {loading.image ? 'Uploading...' : 'Change'}
+                {loading.image ? "Uploading..." : "Change"}
               </label>
               <input
                 id="profileImageUpload"
@@ -256,9 +257,13 @@ const EditProfile: React.FC<EditProfileProps> = ({
                 disabled={loading.image}
               />
             </div>
-            
-            <div className="flex space-x-2">
-              <Button variant="outline" onClick={onCancel} disabled={loading.profile}>
+  
+            <div className="flex flex-wrap gap-2 self-end sm:self-auto">
+              <Button
+                variant="outline"
+                onClick={onCancel}
+                disabled={loading.profile}
+              >
                 <X className="mr-2 h-4 w-4" /> Cancel
               </Button>
               <Button onClick={handleProfileUpdate} disabled={loading.profile}>
@@ -272,7 +277,8 @@ const EditProfile: React.FC<EditProfileProps> = ({
               </Button>
             </div>
           </div>
-
+  
+          {/* Profile Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block mb-2 text-sm font-medium">Full Name</label>
@@ -313,11 +319,11 @@ const EditProfile: React.FC<EditProfileProps> = ({
                 disabled={loading.profile}
               />
             </div>
-
+  
             <div>
               <label className="block mb-2 text-sm font-medium">Location</label>
               {isEditingLocation ? (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-stretch gap-2">
                   <Input
                     value={newLocation}
                     onChange={(e) => setNewLocation(e.target.value)}
@@ -325,22 +331,24 @@ const EditProfile: React.FC<EditProfileProps> = ({
                     disabled={loading.location}
                     className="flex-grow"
                   />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={fetchLocationCoordinates}
-                    disabled={loading.location}
-                  >
-                    {loading.location ? "..." : "Save"}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsEditingLocation(false)}
-                    disabled={loading.location}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={fetchLocationCoordinates}
+                      disabled={loading.location}
+                    >
+                      {loading.location ? "..." : "Save"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsEditingLocation(false)}
+                      disabled={loading.location}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center justify-between border p-2 rounded">
@@ -374,11 +382,12 @@ const EditProfile: React.FC<EditProfileProps> = ({
               )}
             </div>
           </div>
-          {isLoading && <Loading/>}
+  
+          {isLoading && <Loading />}
         </div>
       </CardContent>
-
-      {/* Save Changes Confirmation Modal */}
+  
+      {/* Confirmation Modals */}
       <ConfirmationModal
         isOpen={showSaveConfirmation}
         onClose={() => setShowSaveConfirmation(false)}
@@ -388,8 +397,6 @@ const EditProfile: React.FC<EditProfileProps> = ({
         confirmText="Save Changes"
         cancelText="Cancel"
       />
-
-      {/* Image Upload Confirmation Modal */}
       <ConfirmationModal
         isOpen={showImageUploadConfirmation}
         onClose={() => {
@@ -404,6 +411,7 @@ const EditProfile: React.FC<EditProfileProps> = ({
       />
     </Card>
   );
+  
 };
 
 export default EditProfile;

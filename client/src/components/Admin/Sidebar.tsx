@@ -6,7 +6,6 @@ import {
   FiGrid, 
   FiUsers, 
   FiTool, 
-  FiFolder, 
   FiSettings, 
   FiDollarSign,
   FiFileText

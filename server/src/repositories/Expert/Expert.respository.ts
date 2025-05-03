@@ -43,7 +43,8 @@ export class ExpertRepository extends BaseRepository<IExpert> implements IExpert
                 .populate('categoryId', 'name')
                 .populate('serviceId', 'name')
                 .skip(skip)
-                .limit(limit);
+                .limit(limit)
+                .sort({createdAt:-1});
 
             const totalRecords = await Expert.countDocuments(query);
 

@@ -90,53 +90,55 @@ const ExpertCard = ({
 }) => {
   return (
     <Card className="hover:shadow-md transition-shadow">
-    <CardContent className="p-4">
-      <div className="flex justify-between items-start gap-4">
-        {/* Left: Profile Image + Info */}
-        <div className="flex gap-4">
-          <img
-            src={expert.profile}
-            alt={expert.name}
-            className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
-          />
-          <div className="flex flex-col justify-between">
-            {/* Name & Service */}
-            <div>
-              <h3 className="font-bold text-lg">{expert.name}</h3>
-              <p className="text-sm text-gray-600">{expert.service} Specialist</p>
-            </div>
-
-            {/* Distance */}
-            <div className="flex items-center mt-1 text-sm text-blue-600 font-medium">
-              <MapPin className="w-4 h-4 mr-1 text-blue-500" />
-              <span>{expert.distanceInKm.toFixed(2)} km away</span>
-            </div>
-
-            {/* Rating & Reviews */}
-            <div className="mt-2">
-              <StarRating rating={expert.averageRating} />
-              <div className="flex items-center text-sm text-gray-500 mt-1">
-                <span>{expert.ratingCount} reviews</span>
+      <CardContent className="p-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          {/* Left: Profile Image + Info */}
+          <div className="flex gap-4 w-full sm:w-auto">
+            <img
+              src={expert.profile}
+              alt={expert.name}
+              className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
+            />
+            <div className="flex flex-col justify-between">
+              {/* Name & Service */}
+              <div>
+                <h3 className="font-bold text-lg">{expert.name}</h3>
+                <p className="text-sm text-gray-600">
+                  {expert.service} Specialist
+                </p>
+              </div>
+  
+              {/* Distance */}
+              <div className="flex items-center mt-1 text-sm text-blue-600 font-medium">
+                <MapPin className="w-4 h-4 mr-1 text-blue-500" />
+                <span>{expert.distanceInKm.toFixed(2)} km away</span>
+              </div>
+  
+              {/* Rating & Reviews */}
+              <div className="mt-2">
+                <StarRating rating={expert.averageRating} />
+                <div className="flex items-center text-sm text-gray-500 mt-1">
+                  <span>{expert.ratingCount} reviews</span>
+                </div>
               </div>
             </div>
           </div>
+  
+          {/* Right: Button */}
+          <div className="w-full sm:w-auto sm:self-start">
+            <Button
+              variant="default"
+              className="w-full sm:w-auto mt-2 sm:mt-1"
+              onClick={() => onViewProfile(expert._id)}
+            >
+              View Profile
+            </Button>
+          </div>
         </div>
-
-        {/* Right: Button */}
-        <div>
-          <Button
-            variant="default"
-            className="mt-1"
-            onClick={() => onViewProfile(expert._id)}
-          >
-            View Profile
-          </Button>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-
+      </CardContent>
+    </Card>
   );
+  
 };
 
 export default ExpertsPage;

@@ -125,13 +125,7 @@ const Navbar: React.FC = () => {
                   >
                     Profile
                   </Link>
-                  <Link
-                    to="/saved-services"
-                    className="block px-4 py-2 text-blue-700 hover:bg-teal-50 transition-colors"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Saved Services
-                  </Link>
+              
                   <Link
                     to={'/bookings'}
                     className="block px-4 py-2 text-blue-700 hover:bg-teal-50 transition-colors"
@@ -190,13 +184,7 @@ const Navbar: React.FC = () => {
               >
                 Profile
               </Link>
-              <Link
-                to="/saved-services"
-                className="block py-3 px-6 hover:bg-teal-500 border-b border-teal-500 text-white transition-colors"
-                onClick={() => setMenuOpen(false)}
-              >
-                Saved Services
-              </Link>
+            
               <Link 
                 to={'/bookings'}
                 className="block py-3 px-6 hover:bg-teal-500 border-b border-teal-500 text-white transition-colors"

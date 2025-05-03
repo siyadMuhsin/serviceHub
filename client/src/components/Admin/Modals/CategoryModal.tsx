@@ -101,7 +101,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
 
   return (
     isModalOpen && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
         <div className="bg-[#2A2A3C] p-6 rounded-lg shadow-lg text-white w-96 max-h-[80vh] overflow-y-auto">
           <h2 className="text-xl font-bold mb-4">{categoryToEdit ? "Edit Category" : "Add Category"}</h2>
           <form onSubmit={handleFormSubmit} className="flex flex-col space-y-3">

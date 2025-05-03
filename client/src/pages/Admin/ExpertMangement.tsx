@@ -32,7 +32,7 @@ interface Expert {
 }
 
 function ExpertManagement() {
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false); // Start with collapsed sidebar on mobile
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true); // Start with collapsed sidebar on mobile
   const [experts, setExperts] = useState<Expert[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);

@@ -134,14 +134,16 @@ const ExpertSlot: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 w-full max-w-4xl mx-auto">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6">Manage Your Availability</h3>
-
-      <div className="grid md:grid-cols-2 gap-8">
+    <div className="bg-white px-4 sm:px-6 py-6 rounded-xl shadow-md border border-gray-200 w-full max-w-4xl mx-auto">
+      <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6 text-center sm:text-left">
+        Manage Your Availability
+      </h3>
+  
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         {/* Create Slot Form */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h4 className="text-xl font-semibold text-gray-700 mb-4">Create New Slot</h4>
-          
+        <div className="bg-gray-50 p-4 sm:p-6 rounded-lg">
+          <h4 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">Create New Slot</h4>
+  
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-gray-600 font-medium mb-2">Date</label>
@@ -154,7 +156,7 @@ const ExpertSlot: React.FC = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
               />
             </div>
-
+  
             <div className="space-y-3">
               <label className="block text-gray-600 font-medium mb-2">Time Slots</label>
               {timeSlots.map((slot, index) => (
@@ -178,16 +180,16 @@ const ExpertSlot: React.FC = () => {
                   )}
                 </div>
               ))}
-
+  
               <button
                 type="button"
                 onClick={handleAddTimeSlot}
                 className="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center gap-1 mt-2"
               >
-                <span>+ Add another time slot</span>
+                + Add another time slot
               </button>
             </div>
-
+  
             <button
               type="submit"
               disabled={isLoading}
@@ -205,17 +207,17 @@ const ExpertSlot: React.FC = () => {
             </button>
           </form>
         </div>
-
+  
         {/* Existing Slots */}
         <div>
-          <h4 className="text-xl font-semibold text-gray-700 mb-4">Your Availability Slots</h4>
-          
+          <h4 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4">Your Availability Slots</h4>
+  
           {isFetching ? (
             <div className="flex justify-center items-center h-40">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
             </div>
           ) : createdSlots.length === 0 ? (
-            <div className="bg-gray-50 p-8 rounded-lg text-center">
+            <div className="bg-gray-50 p-6 sm:p-8 rounded-lg text-center">
               <p className="text-gray-500">No availability slots created yet</p>
               <p className="text-sm text-gray-400 mt-2">Create your first slot using the form</p>
             </div>
@@ -223,7 +225,7 @@ const ExpertSlot: React.FC = () => {
             <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
               {createdSlots.map((slot) => (
                 <div key={slot._id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition">
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start gap-3 flex-wrap">
                     <div>
                       <h5 className="font-medium text-gray-800">
                         {new Date(slot.date).toLocaleDateString('en-US', {
@@ -235,8 +237,8 @@ const ExpertSlot: React.FC = () => {
                       </h5>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {slot.timeSlots.map((time, i) => (
-                          <span 
-                            key={i} 
+                          <span
+                            key={i}
                             className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm flex items-center"
                           >
                             <span className="w-5">{time}</span>
@@ -264,17 +266,17 @@ const ExpertSlot: React.FC = () => {
           )}
         </div>
       </div>
-
+  
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={deleteModal.isOpen}
         message={deleteModal.message}
         onCancel={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-
       />
     </div>
   );
+  
 };
 
 export default ExpertSlot;

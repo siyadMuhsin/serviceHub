@@ -8,6 +8,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ["opencage-api-client"],
   },
+  
   plugins: [react(), tsconfigPaths()],
   resolve: {
     alias: {

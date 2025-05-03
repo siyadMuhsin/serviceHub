@@ -11,6 +11,7 @@ import ExpertSlot from '@/components/Expert/Expert.slot';
 import BookingMangement from '@/pages/Expert/BookingManagement';
 import ReviewsManagement from '@/pages/Expert/ReviewsManagement';
 import ExpertChatPage from '@/pages/Expert/ChatPage';
+import NotFound from '@/pages/User/NotFount';
 
 const ExpertRoutes = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -32,6 +33,7 @@ const ExpertRoutes = () => {
             <Route path='/booking-management' element={<BookingMangement/>} />
             <Route path='/reviews' element={<ReviewsManagement/>}/>
             <Route path='/messages' element={<ExpertChatPage/>}/>
+            <Route path="*" element={<NotFound />} />
             {/* Add more routes here as needed */}
           </Routes>
         </div>

@@ -117,117 +117,123 @@ const UserManagement: React.FC = () => {
         <Sidebar
           onToggle={(expanded: boolean) => setIsSidebarExpanded(expanded)}
         />
-        <main
-          className={`p-5 transition-all duration-300 ${
-            isSidebarExpanded ? "ml-64" : "ml-16"
-          }`}
-        >
-          <h2 className="text-2xl font-bold mb-5">User Management</h2>
-          <div className="flex justify-between mb-5">
-            <input
-              type="text"
-              placeholder="Search users..."
-              defaultValue={filterText}
-              onChange={(e)=>handleSearch(e.target.value)}
-              className="p-2 rounded bg-[#2A2A3C] text-white placeholder-gray-400 w-64"
-            />
-          </div>
-          
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <>
-              <div className="overflow-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-[#2A2A3C]">
-                      <th className="p-3 text-left">Profile</th>
-                      <th className="p-3 text-left">Name</th>
-                      <th className="p-3 text-left">Email</th>
-                      <th className="p-3 text-left">Google User</th>
-                      <th className="p-3 text-left">Status</th>
-                      <th className="p-3 text-left">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.length > 0 ? (
-                      users.map((user) => (
-                        <tr key={user._id} className="border-b border-[#2A2A3C] hover:bg-[#2A2A3C]">
-                          <td className="p-3">
-                            <img
-                              src={user.profile_image}
-                              alt={user.name}
-                              className="w-12 h-12 object-cover rounded-full"
-                            />
-                          </td>
-                          <td className="p-3">{user.name}</td>
-                          <td className="p-3">{user.email}</td>
-                          <td className="p-3">
-                            <span
-                              className={`px-2 py-1 rounded text-sm text-white ${
-                                user.isGoogleUser ? "bg-green-500" : "bg-red-500"
-                              }`}
-                            >
-                              {user.isGoogleUser ? "Yes" : "No"}
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            <span
-                              className={`px-2 py-1 rounded text-sm text-white ${
-                                user.isBlocked ? "bg-red-500" : "bg-green-500"
-                              }`}
-                            >
-                              {user.isBlocked ? "Blocked" : "Active"}
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            <button
-                              onClick={() => showConfirmation(user)}
-                              className={`px-4 py-2 rounded-md font-semibold ${
-                                user.isBlocked ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
-                              } text-white`}
-                            >
-                              {user.isBlocked ? "Unblock" : "Block"}
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={6} className="p-5 text-center">
-                          No users found
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              
-              {totalPages > 1 && (
-                <div className="mt-5 flex justify-center">
-                  <Stack spacing={2}>
-                    <Pagination
-                      count={totalPages}
-                      page={currentPage}
-                      onChange={handlePageChange}
-                      color="primary"
-                      size="large"
-                      sx={{
-                        '& .MuiPaginationItem-root': {
-                          color: 'white',
-                        },
-                        '& .MuiPaginationItem-page.Mui-selected': {
-                          backgroundColor: '#3b82f6',
-                          color: 'white',
-                        },
-                      }}
+  <main
+  className={`p-3 md:p-5 transition-all duration-300 ${
+    isSidebarExpanded ? "ml-16 md:ml-64" : "ml-16"
+  }`}
+>
+  <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-5">User Management</h2>
+  <div className="flex justify-between mb-4 md:mb-5">
+    <input
+      type="text"
+      placeholder="Search users..."
+      defaultValue={filterText}
+      onChange={(e) => handleSearch(e.target.value)}
+      className="p-2 rounded bg-[#2A2A3C] text-white placeholder-gray-400 w-full md:w-64"
+    />
+  </div>
+  
+  {isLoading ? (
+    <Loading />
+  ) : (
+    <>
+      <div className="overflow-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-[#2A2A3C]">
+              <th className="p-2 md:p-3 text-left hidden sm:table-cell">Profile</th>
+              <th className="p-2 md:p-3 text-left">Name</th>
+              <th className="p-2 md:p-3 text-left hidden md:table-cell">Email</th>
+              <th className="p-2 md:p-3 text-left hidden lg:table-cell">Google User</th>
+              <th className="p-2 md:p-3 text-left">Status</th>
+              <th className="p-2 md:p-3 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.length > 0 ? (
+              users.map((user) => (
+                <tr key={user._id} className="border-b border-[#2A2A3C] hover:bg-[#2A2A3C]">
+                  <td className="p-2 md:p-3 hidden sm:table-cell">
+                    <img
+                      src={user.profile_image}
+                      alt={user.name}
+                      className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-full"
                     />
-                  </Stack>
-                </div>
-              )}
-            </>
-          )}
-        </main>
+                  </td>
+                  <td className="p-2 md:p-3 truncate max-w-[100px] md:max-w-none">
+                    {user.name}
+                  </td>
+                  <td className="p-2 md:p-3 hidden md:table-cell truncate max-w-[150px] lg:max-w-none">
+                    {user.email}
+                  </td>
+                  <td className="p-2 md:p-3 hidden lg:table-cell">
+                    <span
+                      className={`px-2 py-1 rounded text-xs md:text-sm text-white ${
+                        user.isGoogleUser ? "bg-green-500" : "bg-red-500"
+                      }`}
+                    >
+                      {user.isGoogleUser ? "Yes" : "No"}
+                    </span>
+                  </td>
+                  <td className="p-2 md:p-3">
+                    <span
+                      className={`px-2 py-1 rounded text-xs md:text-sm text-white ${
+                        user.isBlocked ? "bg-red-500" : "bg-green-500"
+                      }`}
+                    >
+                      {user.isBlocked ? "Blocked" : "Active"}
+                    </span>
+                  </td>
+                  <td className="p-2 md:p-3">
+                    <button
+                      onClick={() => showConfirmation(user)}
+                      className={`px-3 py-1 md:px-4 md:py-2 rounded-md font-semibold text-xs md:text-base ${
+                        user.isBlocked 
+                          ? "bg-green-500 hover:bg-green-600" 
+                          : "bg-red-500 hover:bg-red-600"
+                      } text-white`}
+                    >
+                      {user.isBlocked ? "Unblock" : "Block"}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="p-4 text-center">
+                  No users found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      
+      {totalPages > 1 && (
+        <div className="mt-4 md:mt-5 flex justify-center">
+          <Stack spacing={2}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              size={window.innerWidth < 768 ? "small" : "large"}
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  color: 'white',
+                },
+                '& .MuiPaginationItem-page.Mui-selected': {
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                },
+              }}
+            />
+          </Stack>
+        </div>
+      )}
+    </>
+  )}
+</main>
       </div>
 
       {/* Confirmation Modal */}

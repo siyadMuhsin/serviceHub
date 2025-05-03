@@ -10,6 +10,7 @@ import ExpertMangement from "../pages/Admin/ExpertMangement";
 import ExpertDetailsPage from "../pages/Admin/ExpertDetailsPage";
 import Subscriptoin from "@/pages/Admin/Subscriptoin";
 import Earnings from "@/pages/Admin/Earnings";
+import NotFound from "@/pages/User/NotFount";
 
 const AdminRoute = () => {
   const loading = AdminAuthCheck();
@@ -40,6 +41,7 @@ const AdminRoute = () => {
         <Route path="/expert/:id" element={<ExpertDetailsPage />} />
         <Route path="/subscription" element={<Subscriptoin />} />
         <Route path="/earnings" element={<Earnings/>} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );
