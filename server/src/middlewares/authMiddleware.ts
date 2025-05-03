@@ -19,8 +19,6 @@ export class AuthMiddleware implements IAuthMiddleware {
                 this.sendErrorResponse(res, HttpStatus.UNAUTHORIZED, "Unauthorized: No token provided");
                 return;
             }
-
-            
             const decoded = await this.authMiddlewareService.verifyToken(token);
             if(decoded.role!=='user' && decoded.role !=='expert' && decoded.role!=='admin'){
                 this.sendErrorResponse(res,HttpStatus.FORBIDDEN,"Unauthorized")
@@ -30,8 +28,16 @@ export class AuthMiddleware implements IAuthMiddleware {
             const isBlocked = await this.authMiddlewareService.checkUserBlocked(decoded.userId);
           
             if (isBlocked) {
-              res.clearCookie('accessToken')
-              res.clearCookie('refreshToken')
+              res.clearCookie('accessToken',{
+                httpOnly:true,
+                secure:true,
+                sameSite:'none'
+              })
+              res.clearCookie('refreshToken',{
+                httpOnly:true,
+                secure:true,
+                sameSite:'none'
+              })
                 this.sendErrorResponse(res, HttpStatus.FORBIDDEN, "Your account has been blocked by the admin.");
                 return;
             }
@@ -57,8 +63,16 @@ export class AuthMiddleware implements IAuthMiddleware {
             }
             const isBlocked = await this.authMiddlewareService.checkExpertBlocked(decoded.expertId);
             if(isBlocked){
-                res.clearCookie('accessToken')
-                res.clearCookie('refreshToken')
+                res.clearCookie('accessToken',{
+                    httpOnly:true,
+                    secure:true,
+                    sameSite:'none'
+                  })
+                res.clearCookie('refreshToken',{
+                    httpOnly:true,
+                    secure:true,
+                    sameSite:'none'
+                  })
                   this.sendErrorResponse(res, HttpStatus.FORBIDDEN, "Your account has been blocked by the admin.");
                   return;
 

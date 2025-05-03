@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog";
 import { switchUser } from "@/services/User/ExpertAccount";
 import { motion, AnimatePresence } from "framer-motion";
+import { resetLocations } from "@/Slice/locationSlice";
 
 const ExpertSidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({ onToggle }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -34,9 +35,14 @@ const ExpertSidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({ on
     try {
       setLoading(true);
       const response = await LogoutUser();
+      console.log(response);
+      
       if (response.success) {
-        dispatch(logout());
-        navigate("/login");
+         navigate("/login");
+          dispatch(logout()); 
+        dispatch(resetLocations());
+        dispatch(changeRole('user'))
+       
       } else {
         toast.error(response.message || "Cannot log out now!");
       }

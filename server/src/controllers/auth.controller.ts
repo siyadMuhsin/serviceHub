@@ -102,8 +102,18 @@ export class AuthController implements IAuthController {
 
   async logoutUser(req: AuthRequest, res: Response): Promise<void> {
     try {
-      res.clearCookie('accessToken');
-      res.clearCookie('refreshToken');
+      console.log('logouting expert');
+      
+      res.clearCookie('accessToken',{
+        httpOnly:true,
+        secure:true,
+        sameSite:'none'
+      });
+      res.clearCookie('refreshToken',{
+        httpOnly:true,
+        secure:true,
+        sameSite:'none'
+      });
       res.status(HttpStatus.OK).json({ 
         success: true, 
         message: "Logged out successfully" 

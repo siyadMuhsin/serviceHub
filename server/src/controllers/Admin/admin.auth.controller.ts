@@ -35,8 +35,18 @@ export class AdminAuthController implements IAdminAuthController {
     }
 
     async logout(req: Request, res: Response): Promise<void> {
-        res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
+        console.log("logourt");
+        
+        res.clearCookie("accessToken",{
+            httpOnly:true,
+            secure:true,
+            sameSite:'none'
+        });
+        res.clearCookie("refreshToken",{
+            httpOnly:true,
+            secure:true,
+            sameSite:'none'
+        });
         res.json({ success: true, message: "Logged out successfully" });
     }
     

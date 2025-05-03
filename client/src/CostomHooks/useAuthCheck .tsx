@@ -17,6 +17,7 @@ const useAuthCheck = () => {
         });
         if (response.data.success) {
           let role = response.data.role;
+console.log('role :',response.data.role);
 
           if (role === "expert") {
             dispatch(changeRole("expert"));
