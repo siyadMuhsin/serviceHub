@@ -167,6 +167,14 @@ export class AuthController implements IAuthController {
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { token, newPassword } = req.body;
+      if(!newPassword ||typeof newPassword ==='string'&& !newPassword.trim()){
+res.status(HttpStatus.BAD_REQUEST).json({
+  success:false,
+  message:"Please Enter a valid password"
+})
+return
+      }
+      
       const response = await this._authService.resetPassword(token, newPassword);
       this.sendResponse(res, response, HttpStatus.OK, HttpStatus.BAD_REQUEST);
     } catch (error) {
