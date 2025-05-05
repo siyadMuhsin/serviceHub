@@ -17,7 +17,7 @@ export const addCategory = async (formData: FormData) => {
       },
     });
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     return error.response.data;
   }
 };
@@ -25,7 +25,7 @@ export const category_list_unlist = async (id: string, status: boolean) => {
   try {
     const response = await adminAPI.patch(`/category/${id}/status`);
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     return error.data;
   }
 };
@@ -38,7 +38,7 @@ export const edit_category = async (id: string, formData: FormData) => {
       },
     });
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     return error.data;
   }

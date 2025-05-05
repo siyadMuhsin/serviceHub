@@ -28,6 +28,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 interface LocationData {
   coordinates: { lat: number; lng: number };
@@ -65,7 +66,7 @@ export default function BookingModal({
     address: string;
     coordinates?: { lat: number; lng: number };
   } | null>(null);
-  const { userLocation } = useSelector((state: any) => state.location);
+  const { userLocation } = useSelector((state: RootState) => state.location);
   // Fetch available slots when modal opens
   useEffect(() => {
     const fetchSlots = async () => {
@@ -75,7 +76,7 @@ export default function BookingModal({
         if (res.slots.length > 0) {
           setSelectedDate(res.slots[0].date);
         }
-      } catch (error: any) {
+      } catch (error) {
         toast.error(error.message || "Failed to fetch available slots");
       }
     };
@@ -246,7 +247,7 @@ export default function BookingModal({
 
       toast.success("Booking created successfully!");
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Booking failed. Please try again.");
     } finally {
       setLoading(false);

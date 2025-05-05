@@ -16,7 +16,8 @@ import Loading from "../../components/Loading";
 import { ConfirmationModal } from "@/components/ConfirmModal";
 import { Pagination, Stack } from "@mui/material";
 import debounce from "@/Utils/debouce";
-
+import { IServices } from "@/Interfaces/interfaces";
+import { FpxBankElementProps } from "@stripe/react-stripe-js";
 
 const Services: React.FC = () => {
   const [services, setServices] = useState([]);
@@ -24,7 +25,7 @@ const Services: React.FC = () => {
   const [filterText, setFilterText] = useState("");
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [editService, setEditService] = useState<any>();
+  const [editService, setEditService] = useState<IServices>();
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
     open: false,
     message: "",
@@ -54,7 +55,7 @@ const Services: React.FC = () => {
       } else {
         setSnackbar({ open: true, message: response?.message || "Failed to fetch services", severity: "error" });
       }
-    } catch (error: any) {
+    } catch (error) {
       setSnackbar({ open: true, message: error.message || "Something went wrong. Please try again.", severity: "error" });
     } finally {
       setLoading(false);
@@ -65,7 +66,7 @@ const Services: React.FC = () => {
     fetchServices(currentPage, limit, filterText);
   }, [currentPage, limit, filterText]);
 
-  const showConfirmation = (service: any, action: string) => {
+  const showConfirmation = (service: IServices, action: string) => {
     setConfirmationModal({
       isOpen: true,
       title: action === 'list' ? 'List Service' : 'Unlist Service',
@@ -101,7 +102,7 @@ const Services: React.FC = () => {
           severity: "error" 
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       setSnackbar({ 
         open: true, 
         message: error.message || "Something went wrong", 
@@ -113,7 +114,7 @@ const Services: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: FormData) => {
     try {
       setLoading(true);
       let response;
@@ -138,14 +139,14 @@ const Services: React.FC = () => {
           setSnackbar({ open: true, message: response?.message || "Failed to add service.", severity: "error" });
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       setSnackbar({ open: true, message: error?.message || "An unexpected error occurred.", severity: "error" });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (data: any) => {
+  const handleEdit = (data: IServices) => {
     setEditService(data);
     setIsModalOpen(true);
   };
@@ -205,7 +206,7 @@ const handleSearch=debounce((value:string)=>{
               </tr>
             </thead>
             <tbody className="bg-[#1E1E2F] divide-y divide-[#2A2A3C]">
-              {services.map((service: any) => (
+              {services.map((service: IServices) => (
                 <tr key={service._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="relative group inline-block">
@@ -262,7 +263,7 @@ const handleSearch=debounce((value:string)=>{
 
         {/* Mobile Card View */}
         <div className="md:hidden space-y-3">
-          {services.map((service: any) => (
+          {services.map((service: IServices) => (
             <div key={service._id} className="bg-[#2A2A3C] rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <div className="relative">
@@ -347,7 +348,7 @@ const handleSearch=debounce((value:string)=>{
         title={confirmationModal.title}
         description={confirmationModal.description}
         confirmText={confirmationModal.action.charAt(0).toUpperCase() + confirmationModal.action.slice(1)}
-        variant={confirmationModal.variant}
+        variant={confirmationModal.variant as "default"}
       />
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: "top", horizontal: "right" }}>

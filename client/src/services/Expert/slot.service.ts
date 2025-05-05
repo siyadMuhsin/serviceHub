@@ -1,3 +1,4 @@
+import { ISlot } from "@/Interfaces/interfaces";
 import { expertAPI } from "config/axiosConfig";
 import { FaAws } from "react-icons/fa";
 
@@ -9,9 +10,8 @@ const getExpertSlot = async () => {
     throw new Error(error.response.data.message);
   }
 };
-const createSlot = async (data: any) => {
+const createSlot = async (data: Partial<ISlot>) => {
   try {
-    console.log(data);
     const response = await expertAPI.post("/slot", data);
     return response.data;
   } catch (error) {

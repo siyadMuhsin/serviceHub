@@ -14,26 +14,15 @@ import debounce from "../../Utils/debouce";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { updateUser } from "@/Slice/authSlice";
+
 import { ConfirmationModal } from "@/components/ConfirmModal";
 import { Pagination, Stack } from "@mui/material";
+import { IExpert } from "@/Interfaces/interfaces";
 
-interface Expert {
-  _id?: string;
-  accountName: string;
-  categoryId: { name: string };
-  serviceId?: { name: string };
-  userId: { name: string; email: string };
-  experience?: string;
-  subscription: any;
-  contact: string;
-  isBlocked: boolean;
-  status?: string;
-}
 
 function ExpertManagement() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true); // Start with collapsed sidebar on mobile
-  const [experts, setExperts] = useState<Expert[]>([]);
+  const [experts, setExperts] = useState<IExpert[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPage] = useState<number>(0);
@@ -41,13 +30,13 @@ function ExpertManagement() {
   const [searchQuary, setSearchQuery] = useState<string>('');
   const [rejectionReason, setRejectionReason] = useState<string>('');
   const [reasonModal, setReasonModal] = useState(false);
-  const [currentExpert, setCurrentExpert] = useState<Expert | null>(null);
+  const [currentExpert, setCurrentExpert] = useState<IExpert | null>(null);
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
     title: '',
     description: '',
     action: '',
-    variant: "default",
+    variant:"default"  ,
   });
   const dispatch = useDispatch();
   const itemsPerPage = 8;
@@ -83,7 +72,7 @@ function ExpertManagement() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const showConfirmation = (expert: Expert, action: string) => {
+  const showConfirmation = (expert: IExpert, action: string) => {
     setCurrentExpert(expert);
     let title = '';
     let description = '';
@@ -433,7 +422,7 @@ function ExpertManagement() {
         title={confirmationModal.title}
         description={confirmationModal.description}
         confirmText={confirmationModal.action.charAt(0).toUpperCase() + confirmationModal.action.slice(1)}
-        variant={confirmationModal.variant}
+        variant={confirmationModal.variant as "default"} 
       />
 
       {/* Rejection Reason Modal */}

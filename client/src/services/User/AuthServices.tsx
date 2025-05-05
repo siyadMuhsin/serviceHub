@@ -12,7 +12,7 @@ export const registerUser = async (formData: {
   try {
     const response = await userAPI.post(`/auth/register`, formData);
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(
       error.response?.data?.message || "An error occurred during registration"
     );
@@ -23,7 +23,7 @@ export const verifyOtp = async (otp: string, email: string) => {
   try {
     const response = await userAPI.post(`/auth/verify-otp`, { otp, email });
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     throw new Error(
       error.response?.data?.message ||
@@ -35,7 +35,7 @@ export const resendOtp = async (email: string) => {
   try {
     const response = await userAPI.post("/auth/resent-otp", { email });
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     throw new Error(
       error.response?.data?.message ||
@@ -59,7 +59,7 @@ export const LogoutUser = async () => {
     const response = await userAPI.post("/auth/logout");
     return response.data
   
-  } catch (err: any) {
+  } catch (err) {
     return {message:err.response.data}
   }
 };
@@ -82,7 +82,7 @@ export const googleSignIn = async (googleData: any) => {
     return saveData.data;
     }
     
-  } catch (err: any) {
+  } catch (err) {
    
     console.log(err);
     console.error("Google Sign-In Error:", err.response?.data || err.message);

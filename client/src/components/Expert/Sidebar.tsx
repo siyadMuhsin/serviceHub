@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogFooter } from "@/components/
 import { switchUser } from "@/services/User/ExpertAccount";
 import { motion, AnimatePresence } from "framer-motion";
 import { resetLocations } from "@/Slice/locationSlice";
+import { Role } from "@/types";
 
 const ExpertSidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({ onToggle }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -41,7 +42,7 @@ const ExpertSidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({ on
          navigate("/login");
           dispatch(logout()); 
         dispatch(resetLocations());
-        dispatch(changeRole('user'))
+        dispatch(changeRole(Role.USER))
        
       } else {
         toast.error(response.message || "Cannot log out now!");
@@ -59,7 +60,7 @@ const ExpertSidebar: React.FC<{ onToggle: (expanded: boolean) => void }> = ({ on
     try {
       const response = await switchUser();
       if (response.success) {
-        dispatch(changeRole("user"));
+        dispatch(changeRole(Role.USER));
         navigate('/');
       } else {
         toast.error(response.message);

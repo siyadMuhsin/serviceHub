@@ -117,7 +117,7 @@ const Login: React.FC = () => {
       } else {
         toast.error(response.message || "Failed to resend OTP");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "An error occurred while resending OTP");
     }
   };
@@ -190,7 +190,7 @@ const Login: React.FC = () => {
           dispatch(signUpFailure(response.message || "Sign-up failed"));
           toast.error(response.message || "Sign-up failed");
         }
-      } catch (error: any) {
+      } catch (error) {
         dispatch(signUpFailure(error.message || "An error occurred"));
         toast.error(error.message || "An error occurred during registration");
       }
@@ -210,7 +210,7 @@ const Login: React.FC = () => {
           dispatch(loginFailure(response.message || "Login failed")); 
           toast.error(response.message || "Login failed. Please try again.");
         }
-      } catch (err: any) {
+      } catch (err) {
         dispatch(loginFailure(err.message || "An error occurred"));
         toast.error(err.message || "An error occurred during login");
       }
@@ -234,7 +234,7 @@ const Login: React.FC = () => {
         );
         toast.error(response.message || "OTP verification failed");
       }
-    } catch (error: any) {
+    } catch (error) {
       dispatch(verifyOtpFailure(error.message || "An error occurred"));
       toast.error(error.message || "An error occurred during OTP verification");
     }

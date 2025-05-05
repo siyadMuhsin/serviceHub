@@ -10,7 +10,7 @@ const createPlan = async (data: IPlanRequest) => {
   try {
     const response = await adminAPI.post("/plan", data);
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(error?.response?.data?.message || "Failed to create plan");
   }
 };

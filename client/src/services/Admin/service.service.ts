@@ -20,7 +20,7 @@ export const add_service = async (formData: FormData) => {
     });
 
     return resonse.data;
-  } catch (err: any) {
+  } catch (err) {
     return err.response.data;
   }
 };
@@ -43,7 +43,7 @@ export const edit_service=async(id:string,formData:FormData)=>{
             }
         })
         return response.data
-    } catch (error:any) {
+    } catch (error) {
         return error.data
         
     }

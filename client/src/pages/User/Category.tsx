@@ -7,9 +7,10 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Pagination, Stack } from "@mui/material";
+import { Category as CategoryType } from "@/Interfaces/interfaces";
 
 const Category: React.FC = () => {
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<CategoryType[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);

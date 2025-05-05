@@ -12,18 +12,19 @@ import Logo from "./Logo";
 import LocationFetcher from "../Location/GeoLocation";
 import { fetchLocationFromCoordinates } from "@/Utils/locationUtils";
 import { resetLocations, setUserLocation } from "@/Slice/locationSlice";
+import { RootState } from "@/store";
 const Navbar: React.FC = () => {
-  const { user, isAuthenticated } = useSelector((state: any) => state.auth);
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [userr, setUser] = useState();
+  const [userr, setUser] = useState<any>();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [locationData, setLocationData] = useState<string | null>(null);
-  const { userLocation } = useSelector((state: any) => state.location);
+  const { userLocation } = useSelector((state: RootState) => state.location);
 
   useEffect(() => {
     const fn = async () => {

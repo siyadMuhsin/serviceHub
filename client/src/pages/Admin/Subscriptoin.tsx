@@ -81,7 +81,7 @@ const SubscriptionManagement = () => {
         setNewPlan({ name: "", duration: "", price: "" });
         toast.success("Plan added successfully!");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Something went wrong");
     }
   };

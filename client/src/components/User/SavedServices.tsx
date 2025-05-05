@@ -7,10 +7,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '@/Slice/authSlice';
 import { RootState } from '@/store';
 import { Link } from 'react-router-dom';
+import { IServices } from '@/Interfaces/interfaces';
 
 
 const SavedServices = () => {
-  const [services, setServices] = useState<any[]>([]);
+  const [services, setServices] = useState<IServices[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -25,7 +26,7 @@ const dispatch=useDispatch()
       setLoading(true);
       const response = await fetchSavedService();
       setServices(response.services || []);
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Failed to fetch saved services");
     } finally {
       setLoading(false);
@@ -47,7 +48,7 @@ const dispatch=useDispatch()
       dispatch(updateUser({ savedServices: updatedSavedServices }));
       setServices(prev => prev.filter(service => service._id !== selectedService));
 
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Failed to unsave service");
     } finally {
       setModalOpen(false);

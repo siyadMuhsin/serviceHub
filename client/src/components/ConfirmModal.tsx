@@ -19,7 +19,7 @@ interface ConfirmationModalProps {
   description?: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: any;
+  variant?: "default" | "destructive" ;
 }
 
 export function ConfirmationModal({

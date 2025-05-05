@@ -10,12 +10,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "@/Slice/authSlice";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
+import { RootState } from "@/store";
+import { IServices } from "@/Interfaces/interfaces";
 
 
 const Service: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useSelector((state: any) => state.auth);
-  const [services, setServices] = useState<any[]>([]);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [services, setServices] = useState<IServices[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");

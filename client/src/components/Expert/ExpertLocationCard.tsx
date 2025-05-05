@@ -6,12 +6,13 @@ import { fetchLocationFromCoordinates } from "@/Utils/locationUtils";
 import { MdLocationOn } from "react-icons/md";
 import { locationAdd } from "@/services/Expert/expert.profile.service";
 import { toast } from "react-toastify";
+import { RootState } from "@/store";
 
 const API_KEY = "173c9408b3a6422b810bccbc0d6f9d5c";
 
 const ExpertLocationCard = ({ expertData }) => {
   const dispatch = useDispatch();
-const {expertLocation}=useSelector((state:any)=>state.location)
+const {expertLocation}=useSelector((state:RootState)=>state.location)
   const [isEditing, setIsEditing] = useState(false);
   const [location, setLocation] = useState<string | null>(null);
   const [latitude, setLatitude] = useState<number | null>(null);

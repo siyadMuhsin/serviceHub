@@ -5,7 +5,7 @@ import { Lock, MapPin, Star } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getExpertsSpecificService, getReviewsByExpertId } from "@/services/User/expert.service";
 import { toast } from "react-toastify";
-import { IExpert } from "@/Interfaces/interfaces";
+import { IExpert, IExpertCard } from "@/Interfaces/interfaces";
 
 const ExpertsPage = () => {
   const [experts, setExperts] = useState<IExpert[]>([]);
@@ -85,7 +85,7 @@ const ExpertCard = ({
   expert, 
   onViewProfile 
 }: { 
-  expert: any; 
+  expert: Partial<IExpertCard>; 
   onViewProfile: (expertId: string) => void; 
 }) => {
   return (
@@ -111,7 +111,8 @@ const ExpertCard = ({
               {/* Distance */}
               <div className="flex items-center mt-1 text-sm text-blue-600 font-medium">
                 <MapPin className="w-4 h-4 mr-1 text-blue-500" />
-                <span>{expert.distanceInKm.toFixed(2)} km away</span>
+                <span>{Number(expert.distanceInKm).toFixed(2)} km away</span>
+                {/* <span>{expert.distanceInKm.toFixed(2)} km away</span> */}
               </div>
   
               {/* Rating & Reviews */}

@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 // Define the API response structure
 interface ApiResponse {
   success: boolean;
-  [key: string]: any;
+  
 }
 export const baseUrl = import.meta.env.VITE_SERVER_API;
 

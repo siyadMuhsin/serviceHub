@@ -36,13 +36,15 @@ import { setUserLocation } from "@/Slice/locationSlice";
 import ChangePassword from "@/components/User/ChangePassword";
 import { ConfirmationModal } from "@/components/ConfirmModal";
 import SavedServices from "@/components/User/SavedServices";
+import { Role } from "@/types";
+import { RootState } from "@/store";
 
 type ProfileViewType = "overview" | "edit" | "password" | "saved" |string;
 
 export const ProfilePage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated } = useSelector((state: any) => state.auth);
+  const { isAuthenticated } = useSelector((state:RootState) => state.auth);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const [user, setUser] = useState<IUser | null>(null);
@@ -81,7 +83,7 @@ export const ProfilePage: React.FC = () => {
         } else {
           toast.error(response.message);
         }
-      } catch (error: any) {
+      } catch (error) {
         toast.error(error.message || "User data fetching error");
       } finally {
         setIsLoading(false);
@@ -120,7 +122,7 @@ export const ProfilePage: React.FC = () => {
       } else {
         toast.error(response.message);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error uploading expert:", error);
       toast.error(error.message || "Error creating expert account");
     } finally {
@@ -133,13 +135,13 @@ export const ProfilePage: React.FC = () => {
       setIsLoading(true);
       const response = await switchExpert();
       if (response?.success) {
-        dispatch(changeRole("expert"));
+        dispatch(changeRole(Role.EXPERT));
         toast.success("Switched to Expert Account successfully");
         navigate("/expert");
       } else {
         toast.error(response.message || "Failed to switch to expert account");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error in handleSwitchAccount:", error);
       toast.error(
         error.message || "An unexpected error occurred. Please try again."
@@ -191,7 +193,7 @@ export const ProfilePage: React.FC = () => {
       }
       // toast.success("Profile updated successfully (demo)");
       // setCurrentView('overview');
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(error?.message || "Profile update failed");
     } finally {

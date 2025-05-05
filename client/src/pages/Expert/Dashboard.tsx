@@ -10,10 +10,11 @@ import { get_expert, get_expert_bookings, getBookingsToExpert } from "@/services
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import Loading from "@/components/Loading";
+import { IExpert } from "@/Interfaces/interfaces";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState<boolean>(true);
-  const [expert, setExpert] = useState<any>();
+  const [expert, setExpert] = useState<IExpert>();
   const [stats, setStats] = useState({
     totalRequests: 0,
     completedJobs: 0,

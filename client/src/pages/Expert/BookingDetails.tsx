@@ -7,9 +7,10 @@ import { updateBookingStatus } from "@/services/Expert/expert.service";
 import { ConfirmationModal } from "@/components/ConfirmModal";
 import { Badge } from "@/components/ui/badge";
 import { CancelReasonModal } from "@/components/CancelResonModal";
+import { IBooking } from "@/Interfaces/interfaces";
 
 interface BookingDetailsViewProps {
-  booking: any;
+  booking: IBooking;
   onBack: () => void;
 }
 
@@ -20,10 +21,10 @@ export default function BookingDetailsView({
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(booking.status);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<"pending" | "confirmed" | "cancelled"| "completed" | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const openConfirmation = (newStatus: string) => {
+  const openConfirmation = (newStatus: "pending" | "confirmed" | "cancelled"| "completed") => {
     setPendingStatus(newStatus);
     setIsModalOpen(true);
   };
@@ -44,7 +45,7 @@ export default function BookingDetailsView({
       } else {
         toast.error(response.message || "Failed to update status");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);
@@ -96,7 +97,7 @@ export default function BookingDetailsView({
       } else {
         toast.error(response.message || "Failed to update status");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);

@@ -16,6 +16,7 @@ import {
   verifyPayment,
 } from "@/services/Expert/expert.service";
 import { useLocation } from "react-router-dom";
+import { IExpert } from "@/Interfaces/interfaces";
 
 // Stripe initialization
 const stripePromise = loadStripe(
@@ -38,7 +39,7 @@ interface VerifyResponse {
 }
 
 interface CheckoutFormProps {
-  expert:any
+  expert:IExpert
   plan: Plan;
   onBack: () => void;
   onSuccess: (details?: any) => void;
@@ -62,7 +63,7 @@ const {expert}=location.state
       if (response.success && response.plans) {
         setPlans(response.plans);
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Failed to fetch plans");
     } finally {
       setLoading(false);
@@ -227,7 +228,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ expert,plan, onBack, onSucc
 
       toast.success("Subscription activated successfully!");
       onSuccess();
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Payment failed");
       toast.error("Payment failed. Please try again.");

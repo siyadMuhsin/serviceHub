@@ -3,10 +3,11 @@ import opencage from "opencage-api-client";
 import { addLocation } from "@/services/User/user.service";
 import { fetchLocationFromCoordinates } from "../../Utils/locationUtils";
 import { MdLocationOn } from "react-icons/md";
+import { IUser } from "@/Interfaces/interfaces";
 
 const API_KEY = "173c9408b3a6422b810bccbc0d6f9d5c"; // Replace with your real API key
 
-const LocationFetcher = ({ user, updateUserLocation }: { user: any; updateUserLocation: (location: any) => void }) => {
+const LocationFetcher = ({ user, updateUserLocation }: { user: IUser ; updateUserLocation: (location: any) => void }) => {
   const [location, setLocation] = useState<string | null>(null);
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);

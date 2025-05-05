@@ -4,7 +4,7 @@ export const adminLoginService = async (email: string, password: string) => {
     try {
       const response = await adminAPI.post("/login", { email, password });
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       return { success: false, message: error.response?.data?.message || "Login failed" };
     }
   };

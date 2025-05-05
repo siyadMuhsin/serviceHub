@@ -14,6 +14,8 @@ import Loading from "../../components/Loading";
 import { ConfirmationModal } from "@/components/ConfirmModal";
 import {  Pagination, Stack } from "@mui/material";
 import debounce from "@/Utils/debouce";
+import { Category as  CategoryType } from "@/Interfaces/interfaces";
+
 
 
 const Category: React.FC = () => {
@@ -22,7 +24,7 @@ const Category: React.FC = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [editingCategory, setEditCategory] = useState<any>();
+  const [editingCategory, setEditCategory] = useState<CategoryType>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [confirmationModal, setConfirmationModal] = useState({
@@ -95,7 +97,7 @@ const Category: React.FC = () => {
       } else {
         toast.error(response.message);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log("Error adding category:", error);
       toast.error(error.message);
     } finally {
@@ -103,7 +105,7 @@ const Category: React.FC = () => {
     }
   };
 
-  const showConfirmation = (category: any, action: string) => {
+  const showConfirmation = (category: CategoryType, action: string) => {
     setConfirmationModal({
       isOpen: true,
       title: action === 'list' ? 'List Category' : 'Unlist Category',
@@ -148,7 +150,7 @@ setFilterText(value)
   };
 
   const handleEditCategory = (id: string) => {
-    const selectedCategory = categories.find((a: any) => a._id == id);
+    const selectedCategory = categories.find((a: CategoryType) => a._id == id);
     setEditCategory(selectedCategory);
     setIsModalOpen(true);
   };
@@ -203,7 +205,7 @@ setFilterText(value)
         </tr>
       </thead>
       <tbody className="bg-[#1E1E2F] divide-y divide-[#2A2A3C]">
-        {categories.map((category: any) => (
+        {categories.map((category: CategoryType) => (
           <tr key={category._id}>
             <td className="px-6 py-4 whitespace-nowrap">
               <div className="relative group">
@@ -257,7 +259,7 @@ setFilterText(value)
 
   {/* Mobile Card View */}
   <div className="md:hidden space-y-3">
-    {categories.map((category: any) => (
+    {categories.map((category: CategoryType) => (
       <div key={category._id} className="bg-[#2A2A3C] rounded-lg p-4">
         <div className="flex items-start gap-3">
           <div className="relative">
@@ -339,7 +341,7 @@ setFilterText(value)
         title={confirmationModal.title}
         description={confirmationModal.description}
         confirmText={confirmationModal.action.charAt(0).toUpperCase() + confirmationModal.action.slice(1)}
-        variant={confirmationModal.variant}
+        variant={confirmationModal.variant as "default"}
       />
     </>
   );

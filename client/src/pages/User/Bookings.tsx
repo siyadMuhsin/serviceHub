@@ -10,13 +10,14 @@ import { toast } from "react-toastify";
 import { getUserBookings } from "@/services/User/expert.service";
 import { cancelBooking } from "@/services/User/booking.service";
 import { ConfirmationModal } from "@/components/ConfirmModal";
-import ReviewModal from "@/components/User/modals/AddReviewModal";
+
 import AddReviewModal from "@/components/User/modals/AddReviewModal";
 import { Pagination, Stack } from "@mui/material";
+import { IBooking } from "@/Interfaces/interfaces";
 
 
 export default function UserBookingsPage() {
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<IBooking[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -25,7 +26,7 @@ export default function UserBookingsPage() {
   const [bookingToCancel, setBookingToCancel] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-const [bookingToReview, setBookingToReview] = useState<any | null>(null);
+const [bookingToReview, setBookingToReview] = useState<IBooking | null>(null);
   const limit = 8;
 
   const fetchBookings = async (page: number) => {
@@ -39,7 +40,7 @@ const [bookingToReview, setBookingToReview] = useState<any | null>(null);
       } else {
         toast.error(response.message || "Failed to fetch bookings");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Failed to fetch bookings");
     } finally {
       setLoading(false);
@@ -78,7 +79,7 @@ const [bookingToReview, setBookingToReview] = useState<any | null>(null);
       } else {
         toast.error(response.message);
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Failed to cancel booking");
     } finally {
       setCancelling(false);
@@ -101,7 +102,7 @@ const [bookingToReview, setBookingToReview] = useState<any | null>(null);
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
-  const openReviewModal = (booking: any) => {
+  const openReviewModal = (booking: IBooking) => {
     setBookingToReview(booking);
     setIsReviewModalOpen(true);
   };
@@ -186,7 +187,7 @@ const [bookingToReview, setBookingToReview] = useState<any | null>(null);
                         variant="destructive" 
                         size="sm"
                         onClick={() => openCancelConfirmation(booking._id)}
-                        disabled={booking.status === 'cancelled'}
+                        
                       >
                         Cancel
                       </Button>

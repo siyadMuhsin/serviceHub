@@ -10,12 +10,13 @@ import { MapPin, Phone, CalendarDays, Clock, Loader2 } from "lucide-react";
 import BookingDetailsView from "./BookingDetails";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { IBooking } from "@/Interfaces/interfaces";
 
 export default function ManageBookings() {
   const [selectedStatus, setSelectedStatus] = useState("pending");
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<IBooking[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<IBooking | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   const fetchBookings = async () => {
@@ -27,7 +28,7 @@ export default function ManageBookings() {
       } else {
         toast.error(response.message || "Failed to fetch bookings");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Failed to fetch bookings");
     } finally {
       setLoading(false);
@@ -38,7 +39,7 @@ export default function ManageBookings() {
     fetchBookings();
   }, [selectedStatus]);
 
-  const handleViewDetails = (booking: any) => {
+  const handleViewDetails = (booking: IBooking) => {
     setSelectedBooking(booking);
     setDetailsOpen(true);
   };

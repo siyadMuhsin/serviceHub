@@ -8,12 +8,13 @@ import { ConfirmationModal } from "@/components/ConfirmModal";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import debounce from "@/Utils/debouce";
+import { IUser } from "@/Interfaces/interfaces";
 
 const UserManagement: React.FC = () => {
   const [filterText, setFilterText] = useState("");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<IUser[]>([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -55,7 +56,7 @@ const UserManagement: React.FC = () => {
     fetchUsers();
   }, [currentPage, filterText]);
 
-  const showConfirmation = (user: any) => {
+  const showConfirmation = (user: IUser) => {
     setConfirmationModal({
       isOpen: true,
       userId: user._id,
@@ -71,7 +72,7 @@ const UserManagement: React.FC = () => {
       const response = await user_block_unbloack(userId, isBlocked);
       
       if (response?.success) {
-        setUsers((prevUsers: any) =>
+        setUsers((prevUsers:IUser[]) =>
           prevUsers.map((user) =>
             user._id === userId ? { ...user, isBlocked } : user
           )

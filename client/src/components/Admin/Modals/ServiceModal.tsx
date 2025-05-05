@@ -1,66 +1,77 @@
 import React, { useState, useEffect } from "react";
 import ImageCropper from "../../../Utils/ImageCropper";
 import validation from "../../../validations/formValidation";
-import { useSelector } from "react-redux";
-import { RootState } from "@reduxjs/toolkit/query";
 import { toast } from "react-toastify";
 import { getAll_categories } from "@/services/category.service";
+import { Category, IServices } from "@/Interfaces/interfaces";
 
-const AddServiceModal: React.FC<any> = ({
+interface AddServiceModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (serviceData: FormData, isEdit: boolean) => void;
+  serviceToEdit?: IServices | null;
+}
+
+const AddServiceModal: React.FC<AddServiceModalProps> = ({
   isOpen,
   onClose,
   onSave,
   serviceToEdit,
 }) => {
-  const [service, setService] = useState({
-    _id:"",
+  const [service, setService] = useState<{
+    _id: string;
+    name: string;
+    description: string;
+    image: string | null;
+    categoryId: string;
+  }>({
+    _id: "",
     name: "",
     description: "",
-    image: "",
-    categoryId: "", // Ensure this is a string
+    image: null,
+    categoryId: "",
   });
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
   const [isNewImage, setIsNewImage] = useState(false);
-  const [categories,setCategories]=useState([])
-  // const { categories } = useSelector(
-  //   (state: RootState) => state.categoryService
-  // );
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     if (serviceToEdit) {
       setService({
-        ...serviceToEdit,
-        categoryId: serviceToEdit.categoryId._id, // Ensure categoryId is a string
+        _id: serviceToEdit._id || "",
+        name: serviceToEdit.name,
+        description: serviceToEdit.description,
+        image: typeof serviceToEdit.image === "string" ? serviceToEdit.image : null,
+        categoryId: serviceToEdit.categoryId._id,
       });
       if (typeof serviceToEdit.image === "string") {
         setImagePreview(serviceToEdit.image);
         setIsNewImage(false);
       }
     }
-    const fetchCategory=async()=>{
+
+    const fetchCategory = async () => {
       try {
-        const response= await getAll_categories()
-        if(response.success){
-          setCategories(response.categories)
+        const response = await getAll_categories();
+        if (response.success) {
+          setCategories(response.categories);
         }
-
       } catch (error) {
-        toast.error(error.message)
-        
+        toast.error(error.message || "Failed to fetch categories");
       }
+    };
 
-    }
-    fetchCategory()
+    fetchCategory();
   }, [serviceToEdit]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setService({ ...service, [name]: value });
+    setService((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,7 +84,7 @@ const AddServiceModal: React.FC<any> = ({
   };
 
   const removeImage = () => {
-    setService({ ...service, image: null });
+    setService((prev) => ({ ...prev, image: null }));
     setImagePreview(null);
     setCroppedFile(null);
     setIsNewImage(false);
@@ -81,11 +92,13 @@ const AddServiceModal: React.FC<any> = ({
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const valid = validation({
+
+    const isValid = validation({
       name: service.name,
       description: service.description,
     });
-    if (!valid) return;
+
+    if (!isValid) return;
 
     const formData = new FormData();
     formData.append("name", service.name);
@@ -95,7 +108,7 @@ const AddServiceModal: React.FC<any> = ({
     if (croppedFile) {
       formData.append("image", croppedFile);
     } else if (serviceToEdit?.image && !isNewImage) {
-      formData.append("image", serviceToEdit.image as string);
+      formData.append("image", serviceToEdit.image);
     } else {
       toast.error("Image is required");
       return;
@@ -106,7 +119,13 @@ const AddServiceModal: React.FC<any> = ({
   };
 
   const closeModal = () => {
-    setService({ _id:"",name: "", description: "", image: null, categoryId: "" });
+    setService({
+      _id: "",
+      name: "",
+      description: "",
+      image: null,
+      categoryId: "",
+    });
     setSelectedImage(null);
     setImagePreview(null);
     setCroppedFile(null);
@@ -150,12 +169,13 @@ const AddServiceModal: React.FC<any> = ({
             <option value="" disabled>
               Select a category
             </option>
-            {categories.map((category: any) => (
+            {categories.map((category) => (
               <option key={category._id} value={category._id}>
                 {category.name}
               </option>
             ))}
           </select>
+
           {imagePreview && !isNewImage && (
             <div className="relative">
               <img
@@ -172,6 +192,7 @@ const AddServiceModal: React.FC<any> = ({
               </button>
             </div>
           )}
+
           {!imagePreview && (
             <input
               type="file"
@@ -180,12 +201,14 @@ const AddServiceModal: React.FC<any> = ({
               className="w-full p-2 rounded bg-[#1E1E2F] text-white"
             />
           )}
+
           {isNewImage && imagePreview && (
             <ImageCropper
               imageSrc={imagePreview}
               setCroppedFile={setCroppedFile}
             />
           )}
+
           {croppedFile && (
             <div>
               <img
@@ -195,6 +218,7 @@ const AddServiceModal: React.FC<any> = ({
               />
             </div>
           )}
+
           <div className="flex justify-end space-x-3">
             <button
               type="button"

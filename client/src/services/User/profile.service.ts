@@ -1,5 +1,5 @@
+import { IUser } from "@/Interfaces/interfaces";
 import { userAPI } from "config/axiosConfig";
-import { profile } from "console";
 const uploadProfileImage=async(formData:FormData)=>{
     try {
         const response= await userAPI.post('/profile/image',formData,
@@ -12,12 +12,11 @@ const uploadProfileImage=async(formData:FormData)=>{
         throw new Error (error.response.data.message)  
     }
 }
-const updateUserProfile=async(profileData:any)=>{
+const updateUserProfile=async(profileData:IUser)=>{
     try {
         if(!profileData?.location?.lat || !profileData?.location?.lng){
             delete profileData.location
         }
-        console.log(profileData)
         const response= await userAPI.put('profile',profileData)
         return response.data
     } catch (error) {

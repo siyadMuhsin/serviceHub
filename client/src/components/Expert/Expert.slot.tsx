@@ -2,18 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { createSlot, deleteSlot, getExpertSlot } from '@/services/Expert/slot.service';
 import { toast } from 'react-toastify';
 import ConfirmModal from '@/Utils/Confirmation';
-
-interface Slot {
-  _id: string;
-  date: string;
-  timeSlots: string[];
-  createdAt: string;
-}
+import { AxiosError } from 'axios';
+import { ISlot } from '@/Interfaces/interfaces';
 
 const ExpertSlot: React.FC = () => {
   const [date, setDate] = useState('');
   const [timeSlots, setTimeSlots] = useState<string[]>(['']);
-  const [createdSlots, setCreatedSlots] = useState<Slot[]>([]);
+  const [createdSlots, setCreatedSlots] = useState<ISlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [deleteModal, setDeleteModal] = useState({
@@ -29,7 +24,7 @@ const ExpertSlot: React.FC = () => {
       try {
         const res = await getExpertSlot();
         setCreatedSlots(res.slots);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Failed to fetch slots', err);
         toast.error(err.response?.data?.message || 'Failed to fetch slots');
       } finally {
@@ -87,7 +82,7 @@ const ExpertSlot: React.FC = () => {
           ...prev
         ]);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || 'Failed to create slot');
     } finally {
@@ -112,7 +107,7 @@ const ExpertSlot: React.FC = () => {
       await deleteSlot(deleteModal.slotId);
       setCreatedSlots(prev => prev.filter(slot => slot._id !== deleteModal.slotId));
       toast.success('Slot deleted successfully');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to delete slot', err);
       toast.error(err?.message || 'Failed to delete slot');
     } finally {

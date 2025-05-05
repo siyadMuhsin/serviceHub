@@ -4,7 +4,7 @@ export const user_block_unbloack = async (id: string, status: boolean) => {
   try {
     const response = await adminAPI.patch(`/user/${id}`, { block: status });
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     return {
       success: false,
       message: error.response?.data?.message || "Something went wrong",
@@ -22,7 +22,7 @@ export const get_users = async (
       `/users/?page=${page}&limit=${limit}&search=${search}`
     );
     return response.data;
-  } catch (err: any) {
+  } catch (err) {
     return err.data;
   }
 };

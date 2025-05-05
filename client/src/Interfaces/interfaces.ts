@@ -14,6 +14,8 @@ export interface ExpertData {
 export interface Category {
     _id: string;
     name: string;
+    isActive:boolean,
+    description:string, image:string
 }
 
 export interface Service {
@@ -35,9 +37,10 @@ export interface IUser{
     phone:string;
     googleId: string;
     profile_image: string;
-    location:{lat:number,lng:number};
+    location:{lat:number,lng:number,coordinates:number[]};
     expertStatus:string
     rejectReason?:string
+    savedServices:string[]
     resetPasswordToken: string |undefined; // Changed to string
     resetPasswordExpires: Date |undefined; // Changed to Date
     isVerified: boolean;
@@ -74,7 +77,7 @@ export interface IExpert  {
   location?: {type:string,coordinates:number[]},
   gallery:string[]
   subscription:{
-    plan:any
+    plan:IPlan
     startDate:Date,
     endDate: Date,
     isActive:boolean
@@ -94,3 +97,61 @@ export interface IMessage {
   timestamp?: Date;
   read?: boolean;
 }
+
+export interface IServices {
+  _id:string,
+  name :string,
+  categoryId:Category,
+  description :string,
+  isActive?:boolean
+  image:string,
+  createdAt?:Date
+}
+
+export interface IBooking {
+  _id:string;
+  userId: IUser;
+  expertId:IExpert;
+  slotId: string;
+  time: string;
+  date: Date;
+  notes?: string;
+  distance:number;
+  images?: string[]; // file URLs or paths
+  location?: {address:string, type: string, coordinates: number[] }; // GeoJSON format
+  review:boolean
+  cancellationReason?:string
+  status:"pending" | "confirmed" | "cancelled"| "completed";
+  createdAt: Date;
+}
+
+
+export interface IExpertCard{
+  _id:string
+  name:string,
+  profile:string,
+  distanceInKm:string,
+  averageRating:number,
+  ratingCount:number,
+  service:string
+}
+
+export interface IPlan{
+  _id: string;
+  name: string;
+  durationMonths: number;
+  durationDisplay: string;
+  price: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+
+
+export interface ISlot {
+    _id: string;
+    date: string;
+    timeSlots: string[];
+    createdAt: string;
+  }

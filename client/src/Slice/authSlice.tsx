@@ -1,9 +1,10 @@
 // features/authSlice.ts
+import { IUser } from "@/Interfaces/interfaces";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 
 export interface AuthState {
-  user: any;
+  user: IUser;
   loading: boolean;
   error: string | null;
 role:string
@@ -33,7 +34,7 @@ const authSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    signUpSuccess: (state, action: PayloadAction<any>) => {
+    signUpSuccess: (state, action: PayloadAction<IUser>) => {
       state.loading = false;
       state.otpSent = true;
       state.user = action.payload;
@@ -46,7 +47,7 @@ const authSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    verifyOtpSuccess: (state, action: PayloadAction<any>) => {
+    verifyOtpSuccess: (state, action: PayloadAction<IUser>) => {
       state.loading = false;
       state.otpVerified = true;
       state.otpSent=false;
@@ -82,14 +83,14 @@ const authSlice = createSlice({
       state.loading= true;
       state.error=null
     },
-    loginSuccess:(state,action:PayloadAction<any>)=>{
+    loginSuccess:(state,action:PayloadAction<{user:IUser}>)=>{
     
       state.loading=false;
       state.user= action.payload.user;
       state.isAuthenticated=true
      
     },
-    loginFailure:(state,action:PayloadAction<any>)=>{
+    loginFailure:(state,action:PayloadAction<string>)=>{
       state.loading=false,
       state.error=action.payload
     },

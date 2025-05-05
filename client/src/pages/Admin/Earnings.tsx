@@ -46,7 +46,7 @@ function Earnings() {
       } else {
         toast.error(response.message || "Failed to fetch earnings");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message || "Something went wrong");
       console.error(error);
     } finally {
