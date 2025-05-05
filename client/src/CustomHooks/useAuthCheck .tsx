@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { changeRole, loginSuccess, logout } from "../Slice/authSlice";
 import { userAPI, adminAPI } from "../../config/axiosConfig";
-import { getRoleFromToken } from "@/Utils/jwt.decode";
-import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const useAuthCheck = () => {
@@ -17,7 +15,7 @@ const useAuthCheck = () => {
         });
         if (response.data.success) {
           let role = response.data.role;
-console.log('role :',response.data.role);
+console.log('role from customhooks :',response.data.role);
 
           if (role === "expert") {
             dispatch(changeRole("expert"));

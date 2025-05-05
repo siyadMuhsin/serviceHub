@@ -8,7 +8,7 @@ import Service from "../pages/User/Service";
 import Profile from "../pages/User/Home/Profile";
 import NotFound from "../pages/User/NotFount";
 import Loading from "@/components/Loading";
-import useAuthCheck from "../CostomHooks/useAuthCheck ";
+import useAuthCheck from "../CustomHooks/useAuthCheck ";
 import { PublicLayout, PrivateLayout } from "../layout/user.layoute";
 import { LoginRoute } from "./Protect.routes";
 import ExpertsPage from "@/pages/User/ExpertsPage";
