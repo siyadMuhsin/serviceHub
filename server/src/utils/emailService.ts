@@ -35,7 +35,7 @@ export const generateResetToken=()=>{
 }
 
 export const sendResetMail=async(email:string,token:string)=>{
-    const resetUrl =`${clientApi}/${token}`
+    const resetUrl =`${clientApi}/reset-password/${token}`
     const mailOptions={
         from: process.env.EMAIL_USER,
         to: email,

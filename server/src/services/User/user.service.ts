@@ -107,6 +107,11 @@ export class ProfileService implements IProfileService {
           if (!user) {
             return { success: false, message: 'User not found' };
           }
+          if(user.isGoogleUser && !user.password){
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+          await this._userRepositry.updateById(userId, { password: hashedPassword });
+          return { success: true, message: 'Password changed successfully'}
+          }
           const isMatch = await bcrypt.compare(oldPassword, user.password);
           if (!isMatch) {
             return { success: false, message: 'Current password is incorrect' };
@@ -151,7 +156,6 @@ export class ProfileService implements IProfileService {
           if (!service) {
             return { success: false, message: "Service not found" };
           }
-      
           await this._userRepositry.removeFromSavedServices(userId, serviceId);
       
           return { success: true, message: "Service unsaved successfully" };
