@@ -370,7 +370,7 @@ export const ProfilePage: React.FC = () => {
                       className="w-full justify-start pl-4 mb-1 rounded-lg text-blue-600 hover:bg-blue-100"
                     >
                       <User className="mr-2 h-4 w-4" />
-                      Switch to User Account
+                      Switch to Expert Account
                     </Button>
                   )}
                 </>
