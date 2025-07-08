@@ -71,7 +71,7 @@ export class AuthMiddleware implements IAuthMiddleware {
                 res.clearCookie('refreshToken',{
                     httpOnly:true,
                     secure:true,
-                    sameSite:'none'
+                    sameSite:'none' 
                   })
                   this.sendErrorResponse(res, HttpStatus.FORBIDDEN, "Your account has been blocked by the admin.");
                   return;

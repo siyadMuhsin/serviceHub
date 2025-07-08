@@ -7,7 +7,7 @@ export interface TokenPayload {
     expertId?: string; // Optional, only included for expert role
   }
 export const generateAccessToken = (userId: string, role: string, expertId?: string) => {
-
+  
   const payload: TokenPayload = { userId, role };
   if (expertId) payload.expertId = expertId; // Include expertId if provided
   return jwt.sign(payload, process.env.ACCESS_SECRET as string, { expiresIn: '15m' });

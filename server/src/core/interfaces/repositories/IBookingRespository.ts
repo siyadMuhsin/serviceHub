@@ -4,7 +4,7 @@ interface PaginatedResult<T> {
     bookings: T[];
     totalCount: number;
   }
-export interface IBookingRepository{
+export interface IBookingRepository  {
     create(data:Partial<IBooking>):Promise<IBooking>
     getBookingsToExpert(expertId:string,page:number,limit:number,status?:string):Promise< {bookings: IBooking[] | [], total: number} >
     findById(id:string):Promise<IBooking|null>
