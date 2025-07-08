@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { adminLogin, adminLogout} from "../Slice/adminAuthSlice";
 import { AppDispatch } from "../store"; // Ensure you have a typed Redux store
 
-
+//admin auth hook
 const AdminAuthCheck= () => {
   const [loading, setLoading] = useState<boolean>(true);
   const dispatch: AppDispatch = useDispatch(); 
