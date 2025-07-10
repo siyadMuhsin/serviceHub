@@ -11,7 +11,7 @@ import http from 'http'
 import cors from 'cors'
 import { Server } from "socket.io";
 import { initializeSocketHandler } from "./sockets/socketHandler";
-import limiting from "./utils/ratelimitting";
+// import limiting from "./utils/ratelimitting";
 dotenv.config()
 const app=express()
 const clientApi=process.env.CLIENT_API
@@ -34,7 +34,7 @@ const io = new Server(server, {
 });
 
 app.use(cors(corsOptions))
-app.use(limiting)
+// app.use(limiting)
 initializeSocketHandler(io);
 app.use(cookieParser())
 dotenv.config()
