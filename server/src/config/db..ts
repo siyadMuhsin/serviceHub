@@ -1,21 +1,22 @@
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import logger from './logger';
 
-import mongoos from 'mongoose'
-import dotenv from 'dotenv'
-dotenv.config()
-
-const mongoURL = process.env.MONGO_URL
-
+dotenv.config();
+const mongoURL = process.env.MONGO_URL;
 if (!mongoURL) {
-    throw new Error('Please define the MONGO_URI environment variable in .env');
+    logger.error('MongoDB connection failed: MONGO_URL not defined');
+    throw new Error('MongoDB connection failed: MONGO_URL not defined');
 }
-const connectDB =async () :Promise<void>=>{
-    try{
-        mongoos.set('strictQuery', true);
-        await mongoos.connect(mongoURL)
-        console.log('Connected to MongoDB');
-    }catch(err){
-        console.error('MongoDB connection error:', err);
-        process.exit(1); 
-    } 
-}
-export default connectDB
+const connectDB = async (): Promise<void> => {
+    try {
+        mongoose.set('strictQuery', true);
+        await mongoose.connect(mongoURL);
+        logger.info('MongoDB connected successfully');
+    } catch (err) {
+        logger.error('MongoDB connection error');
+        process.exit(1);
+    }
+};
+
+export default connectDB;

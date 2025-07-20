@@ -9,7 +9,7 @@ import { store } from "./store";
 const clientId:string = import.meta.env.VITE_CLIENT_ID 
 console.log("cliend id",clientId)
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <GoogleOAuthProvider clientId={clientId}>
     <Provider store={store}>
     <App />
@@ -17,5 +17,5 @@ createRoot(document.getElementById('root')!).render(
 
     </GoogleOAuthProvider>
     
-  </StrictMode>,
+  // </StrictMode>,
 )
