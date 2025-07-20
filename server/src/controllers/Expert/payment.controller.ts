@@ -6,6 +6,7 @@ import { Response } from "express";
 import { AuthRequest } from "../../types/User";
 import { HttpStatus } from "../../types/httpStatus";
 import { ReturnDocument } from "mongodb";
+import logger from "../../config/logger";
 
 @injectable()
 export class PaymentController implements IPaymentController{
@@ -63,7 +64,7 @@ async verifyPayment(req: AuthRequest, res: Response): Promise<void> {
       this.sendResponse(res, response, HttpStatus.OK);
     } catch (error) {
       const err= error as Error
-      console.error(error);
+      logger.error(error);
       this.sendResponse(res, { message:err.message|| "Internal Server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -76,7 +77,7 @@ async verifyPayment(req: AuthRequest, res: Response): Promise<void> {
       res.status(result.success ? 200 : 400).json(result);
     } catch (error) {
       const err= error as Error
-      console.error('Controller error:', err);
+      logger.error('Controller error:', err);
       res.status(500).json({
         success: false,
         message: err.message || 'Internal server error',

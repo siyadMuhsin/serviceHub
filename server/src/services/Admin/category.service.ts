@@ -4,6 +4,7 @@ import { ICategory } from "../../types/Admin";
 import { CloudinaryService } from "../../config/cloudinary";
 import { ICategoryService } from '../../core/interfaces/services/ICategoryService';
 import { TYPES } from "../../di/types";
+import logger from '../../config/logger';
 
 @injectable()
 export class CategoryService implements ICategoryService {
@@ -33,7 +34,7 @@ export class CategoryService implements ICategoryService {
             };
         } catch (error) {
             const err= error as Error
-            console.error("Error in createCategory Service:", err);
+            logger.error("Error in createCategory Service:", err);
             return {
                 success: false,
                 message:err.message|| "Something went wrong. Please try again.",
@@ -47,7 +48,7 @@ export class CategoryService implements ICategoryService {
             return { success: true, categories };
         } catch (error) {
             const err= error as Error
-            console.error("Error in getAllCategories:", err);
+            logger.error("Error in getAllCategories:", err);
             return { success: false, message:err.message|| "Failed to fetch categories" };
         }
     }
@@ -86,7 +87,7 @@ export class CategoryService implements ICategoryService {
             return { success: true, category };
         } catch (error) {
             const err= error as Error
-            console.error("Error in getCategoryById:", err);
+            logger.error("Error in getCategoryById:", err);
             return { success: false, message:err.message|| "Failed to fetch category" };
         }
     }
@@ -125,7 +126,7 @@ export class CategoryService implements ICategoryService {
             };
         } catch (error) {
             const err= error as Error
-            console.error("Error in updateCategory:", err);
+            logger.error("Error in updateCategory:", err);
             return { success: false, message:err.message|| "Failed to update category" };
         }
     }
@@ -140,7 +141,7 @@ export class CategoryService implements ICategoryService {
             return { success: true, message: "category get in success", result };
         } catch (error) {
             const err= error as Error
-            console.error("Error in getCategoryToMange:", err);
+            logger.error("Error in getCategoryToMange:", err);
             return { success: false, message:err.message|| "Failed to get categories" };
         }
     }

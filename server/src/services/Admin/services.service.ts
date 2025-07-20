@@ -5,6 +5,7 @@ import { CloudinaryService } from "../../config/cloudinary";
 import { IServiceService } from '../../core/interfaces/services/IServiceService';
 import { TYPES } from "../../di/types";
 import mongoose, { ObjectId, Types } from 'mongoose';
+import logger from '../../config/logger';
 
 @injectable()
 export class ServiceService implements IServiceService {
@@ -23,14 +24,7 @@ export class ServiceService implements IServiceService {
             if (!imageUrl) {
                 return { success: false, message: 'Cloudinary upload failed' };
             }
-
-            const service = await this._serviceRepository.create({ 
-                name, 
-                categoryId, 
-                description, 
-                image: imageUrl 
-            });
-            
+            const service = await this._serviceRepository.create({ name, categoryId,  description, image: imageUrl });
             const populatedService = await this._serviceRepository.getServiceById(service._id);
             return { 
                 success: true, 
@@ -39,7 +33,7 @@ export class ServiceService implements IServiceService {
             };
         } catch (error) {
             const err= error as Error
-            console.error("Error creating service:", err);
+            logger.error("Error creating service:", err);
             return { 
                 success: false, 
                 message:err.message|| "Error creating service" 
@@ -53,7 +47,7 @@ export class ServiceService implements IServiceService {
             return { success: true, services };
         } catch (error) {
             const err= error as Error
-            console.error("Error fetching services:", err);
+            logger.error("Error fetching services:", err);
             return { 
                 success: false, 
                 message:err.message|| "Error fetching services" 
@@ -70,7 +64,7 @@ export class ServiceService implements IServiceService {
             return { success: true, service };
         } catch (error) {
             const err= error as Error
-            console.error("Error fetching service:", err);
+            logger.error("Error fetching service:", err);
             return { 
                 success: false, 
                 message:err.message|| "Error fetching service" 
@@ -85,7 +79,7 @@ export class ServiceService implements IServiceService {
             return { success: true, services };
         } catch (error) {
             const err= error as Error
-            console.error("Error fetching services by category:", err);
+            logger.error("Error fetching services by category:", err);
             return { 
                 success: false, 
                 message:err.message|| "Error fetching services by category" 
@@ -127,7 +121,7 @@ export class ServiceService implements IServiceService {
             };
         } catch (error) {
             const err= error as Error
-            console.error("Error updating service:", err);
+            logger.error("Error updating service:", err);
             return { 
                 success: false, 
                 message:err.message|| "Error updating service" 
@@ -157,7 +151,7 @@ export class ServiceService implements IServiceService {
             
         } catch (error) {
             const err= error as Error
-            console.error("Error changing service status:", err);
+            logger.error("Error changing service status:", err);
             return {
                 success: false,
                 message: err.message
@@ -176,7 +170,7 @@ export class ServiceService implements IServiceService {
             return response;
         } catch (error) {
             const err= error as Error
-            console.error("Error fetching services by category limit:", err);
+            logger.error("Error fetching services by category limit:", err);
             throw err.message;
         }
     }
@@ -187,7 +181,7 @@ export class ServiceService implements IServiceService {
             return response;
         } catch (error) {
             const err= error as Error
-            console.error("Error fetching services to manage:", error);
+            logger.error("Error fetching services to manage:", error);
             throw new Error(`Error fetching services: ${err.message}`);
         }
     }

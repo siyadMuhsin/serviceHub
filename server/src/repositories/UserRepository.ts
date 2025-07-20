@@ -5,6 +5,7 @@ import { IExpert } from '../types/Expert';
 import Expert from '../models/expert.model';
 import { BaseRepository } from './BaseRepository';
 import { FilterQuery, LeanDocument } from 'mongoose';
+import logger from '../config/logger';
 
 @injectable()
 export class UserRepository extends BaseRepository<IUser> implements IUserRepository {
@@ -20,7 +21,7 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
             return await this.create(newData)
         } catch (error) {
           const err= error as Error
-            console.error("Error creating user:", err);
+            logger.error("Error creating user:", err);
             throw new Error(err.message||"Failed to create user");
         }
     }
@@ -34,7 +35,7 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
             ).lean();
         } catch (error) {
           const err= error as Error
-            console.error(`Error updating user by email (${email}):`, err);
+            logger.error(`Error updating user by email (${email}):`, err);
             throw new Error(err.message||"Failed to update user");
         }
     }
@@ -47,7 +48,7 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
             }).lean();
         } catch (error) {
           const err= error as Error
-            console.error("Error finding user by token:", err);
+            logger.error("Error finding user by token:", err);
             throw new Error(err.message||"Failed to find user by token");
         }
     }
@@ -63,7 +64,7 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
             );
         } catch (error) {
           const err= error as Error
-            console.error("Error clearing reset token:", err);
+            logger.error("Error clearing reset token:", err);
             throw new Error(err.message||"Failed to reset password");
         }
     }

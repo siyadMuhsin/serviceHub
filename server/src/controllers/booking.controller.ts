@@ -5,6 +5,7 @@ import { inject, injectable } from "inversify";
 import { IBookingService } from "../core/interfaces/services/IBookingService";
 import { TYPES } from "../di/types";
 import { HttpStatus } from "../types/httpStatus";
+import logger from "../config/logger";
 
 @injectable()
 export class BookingController implements IBookingController {
@@ -44,7 +45,7 @@ if(coordinates.length<0){
       this.sendResponse(res, result, HttpStatus.CREATED);
     } catch (error) {
       const err= error as Error
-      console.error("Error creating booking:", err);
+      logger.error("Error creating booking:", err);
       this.sendResponse(res, { success: false, message:err.message || "Internal server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -116,7 +117,7 @@ if(coordinates.length<0){
   
     } catch (error) {
       const err= error as Error
-      console.error("Status change error:", err.message);
+      logger.error("Status change error:", err.message)
       this.sendResponse(res, { message: "Internal server error" }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

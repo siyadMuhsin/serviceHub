@@ -6,6 +6,7 @@ import { TYPES } from "../../di/types";
 import { IUserExpertService } from "../../core/interfaces/services/IUserExpertService";
 import mongoose from "mongoose";
 import { HttpStatus } from "../../types/httpStatus";
+import logger from "../../config/logger";
 
 @injectable()
 export class UserExpertController implements IUserExpertController {
@@ -45,7 +46,7 @@ export class UserExpertController implements IUserExpertController {
         this.sendResponse(res,response,response.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
       } catch (error) {
         const err= error as Error
-        console.error(err)
+        logger.error(err)
         this.sendResponse(res,error,HttpStatus.INTERNAL_SERVER_ERROR)
       }
   } 

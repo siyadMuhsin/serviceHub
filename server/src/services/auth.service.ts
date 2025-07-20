@@ -7,6 +7,7 @@ import { generateOTP, sendMailer, generateResetToken, sendResetMail } from "../u
 import { AuthResult } from "../types/User";
 import { IAuthService } from '../core/interfaces/services/IAuthService';
 import { TYPES } from "../di/types";
+import logger from '../config/logger';
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -47,7 +48,7 @@ export class AuthService implements IAuthService {
       return { success: false, message: "Registration failed" };
     } catch (error) {
       const err= error as Error
-      console.error("Error in registerUser:", err);
+      logger.error("Error in registerUser:", err);
       throw new Error(err.message||"Registration failed");
     }
   }
@@ -77,7 +78,7 @@ export class AuthService implements IAuthService {
       };
     } catch (error) {
       const err= error as Error
-      console.error("Error in verifyOtp:", err);
+      logger.error("Error in verifyOtp:", err);
       throw new Error(err.message||"OTP verification failed");
     }
   }
@@ -97,7 +98,7 @@ export class AuthService implements IAuthService {
       return await this.generateAndSendOtp(email);
     } catch (error) {
       const err= error as Error
-      console.error("Error in resendOtp:", err);
+      logger.error("Error in resendOtp:", err);
       throw new Error(err.message||"Failed to resend OTP");
     }
   }
@@ -140,7 +141,7 @@ export class AuthService implements IAuthService {
       };
     } catch (error) {
       const err= error as Error
-      console.error("Error in loginUser:", error);
+      logger.error("Error in loginUser:", error);
       throw new Error(err.message||"Login failed");
     }
   }
@@ -154,7 +155,7 @@ export class AuthService implements IAuthService {
       return { success: true, user: userDetails };
     } catch (error) {
       const err= error as Error
-      console.error("Error in findUser:", error);
+      logger.error("Error in findUser:", error);
       throw new Error(err.message||"Failed to fetch user details");
     }
   }
@@ -199,7 +200,7 @@ export class AuthService implements IAuthService {
       return { success: false, message: "Google sign-in failed" };
     } catch (error) {
       const err= error as Error
-      console.error("Error in saveGoogleUser:", error);
+      logger.error("Error in saveGoogleUser:", error);
       throw new Error(err.message||"Google sign-in failed");
     }
   }
@@ -207,7 +208,7 @@ export class AuthService implements IAuthService {
   async forgetPassword(email: string): Promise<AuthResult> {
     try {
       const existingUser = await this._userRepository.findOne({email});
-      console.log(existingUser)
+      
       if (!existingUser) {
         return { success: false, message: "Email not found" };
       }
@@ -223,7 +224,7 @@ export class AuthService implements IAuthService {
       return { success: true, message: "Password reset email sent" };
     } catch (error) {
       const err= error as Error
-      console.error("Error in forgetPassword:", error);
+      logger.error("Error in forgetPassword:", error);
       throw new Error(err.message||"Failed to process password reset request");
     }
   }
@@ -240,15 +241,13 @@ export class AuthService implements IAuthService {
       return { success: true, message: "Password reset successful" };
     } catch (error) {
       const err= error as Error
-      // console.error("Error in resetPassword:", error);
+      // logger.error("Error in resetPassword:", error);
       throw new Error(err.message||"Failed to reset password");
     }
   }
 
   private async generateAndSendOtp(email: string): Promise<AuthResult> {
     const otp = generateOTP();
-    console.log(otp);
-    
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); 
     await this._otpRepository.create({email, otp, expiresAt});
     await sendMailer(email, otp);

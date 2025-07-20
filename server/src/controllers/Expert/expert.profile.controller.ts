@@ -6,6 +6,7 @@ import { HttpStatus } from "../../types/httpStatus";
 import { IExpertProfileController } from "../../core/interfaces/controllers/IExpertProfileController";
 import { TYPES } from "../../di/types";
 import { IExpertProfileService } from '../../core/interfaces/services/IExpertProfileService';
+import logger from '../../config/logger';
 
 @injectable()
 export class ExpertProfileController implements IExpertProfileController {
@@ -26,7 +27,7 @@ export class ExpertProfileController implements IExpertProfileController {
             this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
             const err= error as Error
-            console.error('Error fetching expert data:', err);
+            logger.error('Error fetching expert data:', err);
             this.sendErrorResponse(res, err.message || 'Internal server error');
         }
     }

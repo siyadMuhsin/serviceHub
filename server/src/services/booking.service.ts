@@ -10,6 +10,7 @@ import { IBooking } from "../models/booking.model";
 import { CloudinaryService } from "../config/cloudinary";
 import { calculateDistance } from "../utils/distanceInKm";
 import { IUserRepository } from "../core/interfaces/repositories/IUserRepository";
+import logger from "../config/logger";
 
 @injectable()
 export class BookingService implements IBookingService {
@@ -57,7 +58,7 @@ export class BookingService implements IBookingService {
       return { success: true, message: "Booking created successfully", data: booking };
     } catch (error) {
       const err= error as Error
-      console.error("BookingService error:", error);
+      logger.error("BookingService error:", error);
       return { success: false, message: err.message || "Failed to create booking" };
     }
   }
@@ -197,7 +198,7 @@ export class BookingService implements IBookingService {
     };
     } catch (error) {
       const err= error as Error
-      console.error('Error cancelling booking:', error);
+      logger.error('Error cancelling booking:', error);
       throw new Error(err.message || 'Failed to cancel booking');
     }
     

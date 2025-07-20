@@ -1,6 +1,7 @@
 // repositories/BaseRepository.ts
 import { Model, Document, FilterQuery, UpdateQuery, LeanDocument } from 'mongoose';
 import { IBaseRepository } from '../core/interfaces/repositories/IBaseRepository';
+import logger from '../config/logger';
 
 export abstract class BaseRepository<T extends Document> implements IBaseRepository<T> {
   protected readonly model: Model<T>;
@@ -113,7 +114,6 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
   }
 
   async count(filter: FilterQuery<T> = {}): Promise<number> {
-    console.log(filter);
     try {
       return await this.model.countDocuments(filter).exec();
     } catch (error) {
@@ -123,7 +123,7 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
 
   
   protected handleError(error: unknown, message: string): never {
-    console.error(`${message}:`, error);
+    logger.error(`${message}:`, error);
     throw new Error(message);
   }
   protected transformToObject(doc: LeanDocument<T> | null): T | null {

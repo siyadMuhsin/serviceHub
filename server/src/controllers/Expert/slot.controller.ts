@@ -5,6 +5,7 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../../di/types";
 import { ISlotService } from "../../core/interfaces/services/ISlotService";
 import { HttpStatus } from "../../types/httpStatus";
+import logger from "../../config/logger";
 
 @injectable()
 export class SlotController implements ISlotController {
@@ -22,7 +23,7 @@ export class SlotController implements ISlotController {
       this.sendResponse(res,result,result.success?HttpStatus.CREATED:HttpStatus.BAD_REQUEST)
     } catch (error) {
       const err= error as Error
-      console.error("Error creating slot:", err);
+      logger.error("Error creating slot:", err);
       this.sendResponse(res,{ success: false, message:err.message|| "Server error"},HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
@@ -48,7 +49,7 @@ export class SlotController implements ISlotController {
      this.sendResponse(res,result,result.success?HttpStatus.OK:HttpStatus.BAD_REQUEST)
     } catch (error) {
       const err= error as Error
-      console.error("Error deleting slot:", error);
+      logger.error("Error deleting slot:", error);
       this.sendResponse(res,{ success: false, message:err.message|| "Internal server error" },HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }

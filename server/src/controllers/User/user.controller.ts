@@ -5,6 +5,7 @@ import { AuthRequest } from "../../types/User";
 import { HttpStatus } from "../../types/httpStatus";
 import { TYPES } from "../../di/types";
 import { IProfileService } from "../../core/interfaces/services/IProfileService";
+import logger from "../../config/logger";
 @injectable()
 export class ProfileController implements IProfileController {
     constructor(
@@ -43,7 +44,7 @@ export class ProfileController implements IProfileController {
           );
         } catch (error) {
           const err= error as Error
-          console.error("Error in add_location:", err);
+          logger.error("Error in add_location:", err);
           this.sendResponse(
             res,
             { success: false, message:err.message|| "Internal server error" },

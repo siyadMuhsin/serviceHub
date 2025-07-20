@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { AuthRequest } from "../types/User";
 import { HttpStatus } from "../types/httpStatus";
+import logger from "../config/logger";
 
 export const verifyAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
   const token = req.cookies.accessToken;
@@ -38,7 +39,7 @@ export const verifyAdmin = (req: AuthRequest, res: Response, next: NextFunction)
       return
     }
 
-    console.error("JWT verification error:", error);
+    logger.error("JWT verification error:", error);
 
      res.status(HttpStatus.UNAUTHORIZED).json({
       success: false,

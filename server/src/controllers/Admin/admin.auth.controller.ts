@@ -5,6 +5,7 @@ import { AuthRequest } from "../../types/User";
 import { HttpStatus } from "../../types/httpStatus";
 import { IAdminAuthController } from "../../core/interfaces/controllers/IAdminAuthController";
 import { TYPES } from "../../di/types";
+import logger from '../../config/logger';
 
 @injectable()
 export class AdminAuthController implements IAdminAuthController {
@@ -34,9 +35,7 @@ export class AdminAuthController implements IAdminAuthController {
         }
     }
 
-    async logout(req: Request, res: Response): Promise<void> {
-        console.log("logourt");
-        
+    async logout(req: Request, res: Response): Promise<void> {        
         res.clearCookie("accessToken",{
             httpOnly:true,
             secure:true,
@@ -59,7 +58,7 @@ export class AdminAuthController implements IAdminAuthController {
             res.status(HttpStatus.OK).json({ success: true, admin: req.admin });
         } catch (error) {
             const err= error as Error
-            console.error("Error checking admin:", err);
+            logger.error("Error checking admin:", err);
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
                 success: false, 
                 message: "Internal server error" 

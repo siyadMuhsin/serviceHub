@@ -4,6 +4,7 @@ import { generateAccessToken, generateRefreshToken } from '../../utils/jwt';
 import { IAdminService } from '../../core/interfaces/services/IAdminService';
 import { AuthResult } from '../../types/User';
 import { TYPES } from '../../di/types';
+import logger from '../../config/logger';
 
 @injectable()
 export class AdminService implements IAdminService {
@@ -25,7 +26,7 @@ export class AdminService implements IAdminService {
                 return { success: false, message: "Invalid password" };
             }
         } catch (error) {
-            console.error("Error in admin login:", error);
+            logger.error("Error in admin login:", error);
             throw new Error("Login failed");
         }
     }

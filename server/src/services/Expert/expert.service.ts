@@ -7,6 +7,7 @@ import cloudinary from "../../config/cloudinary";
 import { sendExpertStatusUpdate } from "../../utils/emailService";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt";
 import { TYPES } from "../../di/types";
+import logger from '../../config/logger';
 
 @injectable()
 export class ExpertService implements IExpertService {
@@ -37,7 +38,7 @@ export class ExpertService implements IExpertService {
                 },
                 (error, result) => {
                     if (error) {
-                        console.error("Cloudinary Upload Error:", error);
+                        logger.error("Cloudinary Upload Error:", error);
                         reject(new Error("Failed to upload to Cloudinary"));
                     } else {
                         resolve(result);
@@ -95,7 +96,7 @@ export class ExpertService implements IExpertService {
             };
         } catch (error) {
             const err= error as Error
-            console.error('Error fetching experts:', err);
+            logger.error('Error fetching experts:', err);
             return { success: false, message: err.message||'Failed to fetch experts.' };
         }
     }
@@ -107,7 +108,7 @@ export class ExpertService implements IExpertService {
             return expert?.isBlocked ?true:false;
         } catch (error) {
             const err= error as Error
-            console.error("Error checking user block status:", err);
+            logger.error("Error checking user block status:", err);
             return { 
                 success: false, 
                 message:err.message||"Failed to check user status" 
@@ -137,7 +138,7 @@ export class ExpertService implements IExpertService {
             return { success: true, data: updatedExpert };
         } catch (error) {
             const err= error as Error
-            console.error('Error in actionChange:', err);
+            logger.error('Error in actionChange:', err);
             throw new Error(err.message||'Error updating expert status');
         }
     }
@@ -149,7 +150,6 @@ export class ExpertService implements IExpertService {
                 return { success: false, message: 'Expert does not exist' };
             }
             const query: any = {};
-            console.log(active)
             query.isBlocked = active;
             const updatedExpert = await this._expertRepository.findByIdAndUpdate(id, query);
             if (!updatedExpert) {
@@ -162,7 +162,7 @@ export class ExpertService implements IExpertService {
             };
         } catch (error) {
             const err= error as Error
-            console.error('Error in block_unblock:', err);
+            logger.error('Error in block_unblock:', err);
             throw new Error(err.message||'Error updating expert status');
         }
     }
@@ -182,7 +182,7 @@ export class ExpertService implements IExpertService {
 
     async switch_expert(userId: string) {
         try {
-            console.log('switch to expert')
+            logger.info('switch to expert')
             const expert = await this._expertRepository.findOne({ userId: userId });
             if (!expert) {
                 return { success: false, message: "Cannot switch to expert account: User not found" };
@@ -203,7 +203,7 @@ export class ExpertService implements IExpertService {
             };
         } catch (error) {
             const err= error as Error
-            console.error("Error in switch_expert service:", err);
+            logger.error("Error in switch_expert service:", err);
             throw err.message;
         }
     }
@@ -226,7 +226,7 @@ export class ExpertService implements IExpertService {
             };
         } catch (error) {
             const err= error as Error
-            console.error("Error in switch_user service:", err);
+            logger.error("Error in switch_user service:", err);
             throw err.message;
         }
     }

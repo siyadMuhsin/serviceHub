@@ -10,6 +10,7 @@ import { TYPES } from "../di/types";
 import { IMessageService } from "../core/interfaces/services/IMessageService";
 import { IUserService } from "../core/interfaces/services/IUserService";
 import { IExpertService } from "../core/interfaces/services/IExpertService";
+import logger from "../config/logger";
 
 @injectable()
 // private readonly messageService: MessageService
@@ -21,16 +22,16 @@ export class MessageController implements IMessageController {
 ) {}
 
 handleConnection(io: Server, socket: Socket) {
-    console.log(`New connection: ${socket.id}`);
+    logger.info(`New connection: ${socket.id}`);
 
     socket.on('join', (userId: string) => {
       if (!userId) {
-        console.error('No userId provided for join');
+        logger.error('No userId provided for join');
         socket.emit('error', { message: 'Invalid userId' });
         return;
       }
       socket.join(userId);
-      console.log(`User ${userId} joined their room`);
+      logger.info(`User ${userId} joined their room`);
     });
 
     socket.on('sendMessage', async (data: Partial<IMessage>) => {
@@ -63,7 +64,7 @@ handleConnection(io: Server, socket: Socket) {
         socket.emit('messageSent', savedMessage);
       } catch (error) {
         const err= error as Error
-        console.error('Failed to send message:', error);
+        logger.error('Failed to send message:', error);
         socket.emit('messageError', {
           error: err instanceof Error ? err.message : 'Failed to send message',
         });
@@ -71,7 +72,7 @@ handleConnection(io: Server, socket: Socket) {
     });
 
     socket.on('disconnect', () => {
-      console.log(`Client disconnected: ${socket.id}`);
+      logger.info(`Client disconnected: ${socket.id}`);
     });
   
     }
@@ -86,7 +87,7 @@ handleConnection(io: Server, socket: Socket) {
           res.status(HttpStatus.OK).json(messages);
         } catch (error) {
           const err= error as Error
-          console.error("Error fetching conversation:",err);
+          logger.error("Error fetching conversation:",err);
           res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: err.message||"Failed to fetch conversation" });
         }
       }

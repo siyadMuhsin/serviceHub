@@ -4,7 +4,6 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../types/httpStatus";
 import { ITokenController } from "../core/interfaces/controllers/ITokenController";
 import { generateAccessToken, generateRefreshToken, TokenPayload, TokenVerify } from "../utils/jwt";
-import { error } from 'console';
 @injectable()
 export class TokenController implements ITokenController {
     private readonly _refreshTokenSecret: string;

@@ -8,6 +8,7 @@ import { IExpertRepository } from "../../core/interfaces/repositories/IExpertRep
 import { IPaymentRepository } from "../../core/interfaces/repositories/IPaymentRepositroy";
 import { ObjectId, Types } from "mongoose";
 import { IPayment } from "../../models/payment.model";
+import logger from "../../config/logger";
 dotenv.config()
 @injectable()
 export class PaymentService implements IPaymentService{
@@ -45,7 +46,6 @@ export class PaymentService implements IPaymentService{
     async paymentVerify(expertId: string, paymentIntentId: string,planId:string): Promise<any> {
         try {
             const paymentDetails= await this.stripe.paymentIntents.retrieve(paymentIntentId)
-            console.log(paymentDetails)
             if(paymentDetails.status !== 'succeeded'){
                 return {success:false,message:"Payment not successful"}
             }
@@ -79,7 +79,7 @@ export class PaymentService implements IPaymentService{
 
         } catch (error) {
             const err= error as Error
-            console.error("Payment verification failed:", error);
+            logger.error("Payment verification failed:", error);
             return { success: false, message: err.message ||"Internal server error" };
         }
     }
@@ -107,7 +107,7 @@ export class PaymentService implements IPaymentService{
           };
         } catch (error) {
             const err= error as Error
-          console.error('Service error:', err);
+          logger.error('Service error:', err);
         throw new Error(err.message)
         }
       }

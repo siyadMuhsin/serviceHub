@@ -13,6 +13,6 @@ export interface IServices extends Document{
     categoryId:ObjectId,
     description :string,
     isActive?:boolean
-    image:string,
+image:string,
     createdAt?:Date
 }

@@ -7,6 +7,7 @@ import { IServiceController } from '../../core/interfaces/controllers/IServiceCo
 
 
 import { TYPES } from "../../di/types";
+import logger from '../../config/logger';
 
 @injectable()
 export class ServiceController implements IServiceController {
@@ -164,7 +165,7 @@ export class ServiceController implements IServiceController {
     }
 
     private sendErrorResponse(res: Response, error:Error): void {
-        console.error("Error:", error);
+        logger.error("Error:", error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: error.message || "Internal server error"

@@ -2,6 +2,7 @@ import { inject, injectable } from 'inversify';
 import { IUserRepository } from '../../core/interfaces/repositories/IUserRepository';
 import { IUserService } from '../../core/interfaces/services/IUserService';
 import { TYPES } from '../../di/types';
+import logger from '../../config/logger';
 
 @injectable()
 export class UserService implements IUserService {
@@ -22,7 +23,7 @@ export class UserService implements IUserService {
             };
         } catch (error) {
             const err= error as Error
-            console.error("Error fetching users:", err);
+            logger.error("Error fetching users:", err);
             return { 
                 success: false, 
                 message:err.message|| "Failed to fetch users" 
@@ -52,7 +53,7 @@ export class UserService implements IUserService {
             };
         } catch (error) {
             const err= error as Error
-            console.error("Error updating user status:", err);
+            logger.error("Error updating user status:", err);
             return { 
                 success: false, 
                 message:err.message|| "Failed to update user status" 
@@ -67,7 +68,7 @@ export class UserService implements IUserService {
             return user?.isBlocked ?true:false;
         } catch (error) {
             const err= error as Error
-            console.error("Error checking user block status:", err);
+            logger.error("Error checking user block status:", err);
             return { 
                 success: false, 
                 message:err.message|| "Failed to check user status" 

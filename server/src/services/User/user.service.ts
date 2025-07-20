@@ -9,6 +9,7 @@ import { CloudinaryService } from "../../config/cloudinary";
 import { IUser } from "../../models/user.model";
 import { IServiceRepository } from "../../core/interfaces/repositories/IServiceRepository";
 import { IServices } from "../../types/Admin";
+import logger from "../../config/logger";
 @injectable()
 export class ProfileService implements IProfileService {
     constructor(
@@ -39,7 +40,7 @@ export class ProfileService implements IProfileService {
             };
         } catch (error) {
           const err= error as Error
-            console.error("Error in addLocation:", err);
+            logger.error("Error in addLocation:", err);
             return {
                 success: false,
                 message:err.message|| "Failed to update location"
@@ -86,7 +87,6 @@ export class ProfileService implements IProfileService {
               coordinates: [data.location.lng, data.location.lat], // GeoJSON format
             };
           }
-          console.log(updateData)
           await this._userRepositry.updateById(userId, updateData);
           return {
             success: true,
@@ -121,7 +121,7 @@ export class ProfileService implements IProfileService {
           return { success: true, message: 'Password changed successfully' };
         } catch (error) {
           const err= error as Error
-          console.error("Change password error:", err); // optional: for debugging
+          logger.error("Change password error:", err); // optional: for debugging
           return { success: false, message:err.message|| 'Failed to change password' };
         }
       }
@@ -142,7 +142,7 @@ export class ProfileService implements IProfileService {
           return { success: true, message: "Service saved successfully" };
         } catch (error) {
           const err= error as Error
-          console.error("Error saving service:", err);
+          logger.error("Error saving service:", err);
           return { success: false, message: err.message||"Failed to save service" };
         }
       }
@@ -161,7 +161,7 @@ export class ProfileService implements IProfileService {
           return { success: true, message: "Service unsaved successfully" };
         } catch (error) {
           const err= error as Error
-          console.error("Error unsaving service:", err);
+          logger.error("Error unsaving service:", err);
           return { success: false, message:err.message|| "Failed to unsave service" };
         }
       }
@@ -174,7 +174,7 @@ export class ProfileService implements IProfileService {
           return { success: true,message:"saved survice get in success", services: user.savedServices };
         } catch (error) {
           const err= error as Error
-          console.error("Error fetching saved services:", err);
+          logger.error("Error fetching saved services:", err);
           return { success: false, message: err.message||"Failed to fetch saved services" };
         }
       }

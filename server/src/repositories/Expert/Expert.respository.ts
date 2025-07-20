@@ -6,6 +6,7 @@ import { findPackageJSON } from 'module';
 import mongoose from 'mongoose';
 import { BaseRepository } from '../BaseRepository';
 import { IUser } from '../../models/user.model';
+import logger from '../../config/logger';
 
 @injectable()
 export class ExpertRepository extends BaseRepository<IExpert> implements IExpertRepository {
@@ -50,7 +51,7 @@ export class ExpertRepository extends BaseRepository<IExpert> implements IExpert
 
             return { experts, totalRecords };
         } catch (error) {
-            console.error('Error in fetching experts:', error);
+            logger.error('Error in fetching experts:', error);
             throw error;
         }
     }

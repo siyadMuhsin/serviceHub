@@ -4,6 +4,7 @@ import { HttpStatus } from "../../types/httpStatus";
 import { ICategoryService } from "../../core/interfaces/services/ICategoryService";
 import { ICategoryController } from "../../core/interfaces/controllers/ICategoryController";
 import { TYPES } from "../../di/types";
+import logger from '../../config/logger';
 
 @injectable()
 export class CategoryController implements ICategoryController {
@@ -38,7 +39,7 @@ export class CategoryController implements ICategoryController {
             this.sendResponse(res, response, response.success ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST);
         } catch (error) {
             const err= error as Error
-            console.error("Error in createCategory Controller:", err);
+            logger.error("Error in createCategory Controller:", err);
             this.sendResponse(res, {
                 success: false,
                 message: "Internal server error"
@@ -52,7 +53,7 @@ export class CategoryController implements ICategoryController {
             this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
             const err= error as Error
-            console.error("Error in getAllCategories:", err);
+            logger.error("Error in getAllCategories:", err);
             this.sendResponse(res, {
                 success: false,
                 message: "Internal Server Error"
@@ -67,7 +68,7 @@ export class CategoryController implements ICategoryController {
             this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
         } catch (error) {
             const err= error as Error
-            console.error("Error in getCategoryById:", err);
+            logger.error("Error in getCategoryById:", err);
             this.sendResponse(res, {
                 success: false,
                 message: "Internal Server Error"
@@ -82,7 +83,7 @@ export class CategoryController implements ICategoryController {
             this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.NOT_FOUND);
         } catch (error) {
             const err= error as Error
-            console.error("Error in list_and_unlist:", err);
+            logger.error("Error in list_and_unlist:", err);
             this.sendResponse(res, {
                 success: false,
                 message: "Internal Server Error"
@@ -98,7 +99,7 @@ export class CategoryController implements ICategoryController {
             this.sendResponse(res, response, response.success ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
         } catch (error) {
             const err= error as Error
-            console.error("Error in updateCategory:", err);
+            logger.error("Error in updateCategory:", err);
             this.sendResponse(res, {
                 success: false,
                 message: "Internal Server Error"
@@ -150,7 +151,7 @@ export class CategoryController implements ICategoryController {
             }, HttpStatus.OK);
         } catch (error) {
             const err= error as Error
-            console.error("Error in getCategoryToManage:", err);
+            logger.error("Error in getCategoryToManage:", err);
             this.sendResponse(res, {
                 success: false,
                 message:err.message ||  "Internal Server Error"

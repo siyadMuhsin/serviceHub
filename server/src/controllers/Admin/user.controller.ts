@@ -5,6 +5,7 @@ import { HttpStatus } from "../../types/httpStatus";
 import { IUsersController } from "../../core/interfaces/controllers/IUsersController";
 import { TYPES } from "../../di/types";
 import { AuthRequest } from '../../types/User';
+import logger from '../../config/logger';
 
 @injectable()
 export class UsersController implements IUsersController {
@@ -75,7 +76,7 @@ export class UsersController implements IUsersController {
     }
 
     private handleError(res: Response, message: string, error: Error): void {
-        console.error(message, error);
+        logger.error(message, error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ 
             success: false, 
             message:error.message || "Internal server error" 
