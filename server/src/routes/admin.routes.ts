@@ -20,7 +20,7 @@ const router = express.Router();
 const adminAuthController = container.get<IAdminAuthController>(TYPES.AdminAuthController);
 const tokenController = container.get<ITokenController>(TYPES.TokenController);
 
-router.post('/login', adminAuthController.login.bind(adminAuthController));
+router.post('/login',adminAuthController.login.bind(adminAuthController));
 router.post('/logout', verifyAdmin, adminAuthController.logout.bind(adminAuthController));
 router.post('/refresh', tokenController.refreshToken.bind(tokenController));
 router.get('/', verifyAdmin, adminAuthController.checkAdmin.bind(adminAuthController));

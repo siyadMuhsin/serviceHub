@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { adminLoginService } from "../../../services/Admin/adminAuth.service";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { adminLogin} from "../../../Slice/adminAuthSlice";
 import { toast } from "react-toastify";
 
@@ -12,6 +12,7 @@ const AdminLogin: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // const isLogined=useSelector((state)=>state.)
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
