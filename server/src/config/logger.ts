@@ -20,31 +20,45 @@ interface LogInfo extends Record<string, unknown> {
 }
 
 // Create the logger with proper typing
+const isProduction = process.env.NODE_ENV === 'production';
+
+const transportsArray = [];
+
+// Always log errors to file
+transportsArray.push(
+  new DailyRotateFile({
+    filename: path.join(logDir, 'error-%DATE%.log'),
+    datePattern: 'YYYY-MM-DD',
+    level: 'error',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '14d',
+  })
+);
+
+if (isProduction) {
+  // In production, also write combined logs if needed
+  transportsArray.push(
+    new DailyRotateFile({
+      filename: path.join(logDir, 'combined-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      level: 'info', // optional: change to 'warn' or 'error' if you want fewer
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '14d',
+    })
+  );
+}
+
 const logger: Logger = createLogger({
-  level: 'http',
+  level: isProduction ? 'info' : 'http',
   format: format.combine(
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }),
     format.splat(),
     format.json()
   ),
-  transports: [
-    new DailyRotateFile({
-      filename: path.join(logDir, 'error-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      level: 'error',
-      zippedArchive: true,
-      maxSize: '20m',
-      maxFiles: '14d',
-    }),
-    new DailyRotateFile({
-      filename: path.join(logDir, 'combined-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      zippedArchive: true,
-      maxSize: '20m',
-      maxFiles: '14d',
-    }),
-  ],
+  transports: transportsArray,
   exceptionHandlers: [
     new DailyRotateFile({
       filename: path.join(logDir, 'exceptions-%DATE%.log'),
@@ -65,8 +79,8 @@ const logger: Logger = createLogger({
   ],
 });
 
-// Console transport for non-production environments
-if (process.env.NODE_ENV !== 'production') {
+// Console logging (always in development, optional in production)
+if (!isProduction) {
   logger.add(
     new transports.Console({
       format: format.combine(
@@ -89,12 +103,5 @@ if (process.env.NODE_ENV !== 'production') {
     })
   );
 }
-
-// Morgan stream for HTTP logging
-export const stream = {
-  write: (message: string) => {
-    logger.info(message.trim());
-  },
-};
 
 export default logger;

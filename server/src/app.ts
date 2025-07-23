@@ -13,6 +13,7 @@ import { Server } from "socket.io";
 import { initializeSocketHandler } from "./sockets/socketHandler";
 import Logger from './config/logger'
 import { requestLogger } from "./middlewares/requestLogger";
+import '../src/jobs/deactivateExpiredSubscriptions'
 // import limiting from "./utils/ratelimitting";
 
 dotenv.config()
@@ -21,7 +22,6 @@ const clientApi = process.env.CLIENT_API
 
 // Replaced console.log with Logger
 Logger.info(`Client id: ${clientApi}`)
-
 app.use(requestLogger)
 const corsOptions: cors.CorsOptions = {
     origin: clientApi, 
