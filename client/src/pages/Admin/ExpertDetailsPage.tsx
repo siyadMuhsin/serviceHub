@@ -1,14 +1,14 @@
-import { useParams } from 'react-router-dom';
-import { getExpertData } from '../../services/Admin/expert.service';
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import { 
-  Card, 
+import { useParams } from "react-router-dom";
+import { getExpertData } from "../../services/Admin/expert.service";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import {
+  Card,
   CardContent,
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,7 +21,7 @@ const ExpertDetailsPage = () => {
   const [expertData, setExpertData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
-   
+
   useEffect(() => {
     const fetchExpertData = async (id) => {
       try {
@@ -37,15 +37,18 @@ const ExpertDetailsPage = () => {
     };
     fetchExpertData(id);
   }, [id]);
-console.log(expertData);
 
   // Function to get status color
   const getStatusColor = (status) => {
-    switch(status?.toLowerCase()) {
-      case 'approved': return 'bg-green-100 text-green-800 border-green-300';
-      case 'rejected': return 'bg-red-100 text-red-800 border-red-300';
-      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      default: return 'bg-blue-100 text-blue-800 border-blue-300';
+    switch (status?.toLowerCase()) {
+      case "approved":
+        return "bg-green-100 text-green-800 border-green-300";
+      case "rejected":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      default:
+        return "bg-blue-100 text-blue-800 border-blue-300";
     }
   };
 
@@ -63,7 +66,9 @@ console.log(expertData);
       <div className="flex items-center justify-center h-screen">
         <div className="flex flex-col items-center">
           <div className="w-16 h-16 border-4 border-t-blue-500 border-b-blue-700 border-l-blue-600 border-r-blue-600 rounded-full animate-spin"></div>
-          <p className="mt-4 text-lg font-medium text-gray-700">Loading expert details...</p>
+          <p className="mt-4 text-lg font-medium text-gray-700">
+            Loading expert details...
+          </p>
         </div>
       </div>
     );
@@ -73,11 +78,13 @@ console.log(expertData);
     return (
       <div className="flex items-center justify-center h-screen">
         <Card className="w-full max-w-md">
-          <CardHeader className="bg-red-50">
+          <CardHeader className="bg-[#171730]">
             <CardTitle className="text-red-700">Expert Not Found</CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <p className="text-gray-600">The expert details you're looking for could not be found.</p>
+            <p className="text-gray-600">
+              The expert details you're looking for could not be found.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -85,7 +92,7 @@ console.log(expertData);
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8">
+    <div className="max-w-6xl mx-auto p-4 md:p-8 ">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left sidebar */}
         <div className="lg:col-span-4">
@@ -94,17 +101,28 @@ console.log(expertData);
             <div className="px-6 pb-6">
               <div className="flex justify-center -mt-16">
                 <Avatar className="w-32 h-32 border-4 border-white">
-                  <AvatarImage src={expertData.userId.profile_image} alt={expertData.accountName} />
+                  <AvatarImage
+                    src={expertData.userId.profile_image}
+                    alt={expertData.accountName}
+                  />
                   <AvatarFallback className="bg-blue-100 text-blue-800 text-2xl">
-                    {expertData.accountName?.charAt(0) || 'E'}
+                    {expertData.accountName?.charAt(0) || "E"}
                   </AvatarFallback>
                 </Avatar>
               </div>
               <div className="text-center mt-3">
-                <h2 className="text-2xl font-bold text-gray-800">{expertData.accountName}</h2>
-                <p className="text-sm text-gray-500">{expertData.userId?.email}</p>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  {expertData.accountName}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {expertData.userId?.email}
+                </p>
                 <div className="mt-2">
-                  <Badge className={`${getStatusColor(expertData.status)} px-3 py-1 font-medium rounded-full`}>
+                  <Badge
+                    className={`${getStatusColor(
+                      expertData.status
+                    )} px-3 py-1 font-medium rounded-full`}
+                  >
                     {expertData.status}
                   </Badge>
                 </div>
@@ -130,8 +148,13 @@ console.log(expertData);
                   <div>
                     <p className="text-sm text-gray-500">Experience</p>
                     <div className="flex items-center">
-                      <p className="font-medium">{expertData.experience} years</p>
-                      <Progress className="h-2 w-24 ml-2" value={Math.min(expertData.experience * 4, 100)} />
+                      <p className="font-medium">
+                        {expertData.experience} years
+                      </p>
+                      <Progress
+                        className="h-2 w-24 ml-2"
+                        value={Math.min(expertData.experience * 4, 100)}
+                      />
                     </div>
                   </div>
                 </div>
@@ -142,7 +165,10 @@ console.log(expertData);
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Age & Birth Date</p>
-                    <p className="font-medium">{calculateAge(expertData.dob)} years • {new Date(expertData.dob).toLocaleDateString()}</p>
+                    <p className="font-medium">
+                      {calculateAge(expertData.dob)} years •{" "}
+                      {new Date(expertData.dob).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
 
@@ -158,8 +184,6 @@ console.log(expertData);
               </div>
             </div>
           </Card>
-
-          
         </div>
 
         {/* Main content */}
@@ -177,20 +201,35 @@ console.log(expertData);
                   <CardTitle className="flex items-center">
                     <span className="mr-2">📋</span> Expert Information
                   </CardTitle>
-                  <CardDescription>Complete expert profile details</CardDescription>
+                  <CardDescription>
+                    Complete expert profile details
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <h3 className="text-lg font-semibold mb-3 flex items-center">
-                        <span className="text-indigo-600 mr-2">🔖</span> 
+                        <span className="text-indigo-600 mr-2">🔖</span>
                         Category Details
                       </h3>
                       <div className="bg-blue-50 p-4 rounded-lg">
-                        <p className="font-semibold">{expertData.categoryId?.name}</p>
-                        <p className="text-gray-600 mt-2">{expertData.categoryId?.description}</p>
-                        <Badge className="mt-2" variant={expertData.categoryId?.isActive ? "outline" : "secondary"}>
-                          {expertData.categoryId?.isActive ? "Active" : "Inactive"}
+                        <p className="font-semibold">
+                          {expertData.categoryId?.name}
+                        </p>
+                        <p className="text-gray-600 mt-2">
+                          {expertData.categoryId?.description}
+                        </p>
+                        <Badge
+                          className="mt-2"
+                          variant={
+                            expertData.categoryId?.isActive
+                              ? "outline"
+                              : "secondary"
+                          }
+                        >
+                          {expertData.categoryId?.isActive
+                            ? "Active"
+                            : "Inactive"}
                         </Badge>
                       </div>
                     </div>
@@ -201,16 +240,27 @@ console.log(expertData);
                         Service Details
                       </h3>
                       <div className="bg-purple-50 p-4 rounded-lg">
-                        <p className="font-semibold">{expertData.serviceId?.name}</p>
-                        <p className="text-gray-600 mt-2">{expertData.serviceId?.description}</p>
-                        <Badge className="mt-2" variant={expertData.serviceId?.isActive ? "outline" : "secondary"}>
-                          {expertData.serviceId?.isActive ? "Active" : "Inactive"}
+                        <p className="font-semibold">
+                          {expertData.serviceId?.name}
+                        </p>
+                        <p className="text-gray-600 mt-2">
+                          {expertData.serviceId?.description}
+                        </p>
+                        <Badge
+                          className="mt-2"
+                          variant={
+                            expertData.serviceId?.isActive
+                              ? "outline"
+                              : "secondary"
+                          }
+                        >
+                          {expertData.serviceId?.isActive
+                            ? "Active"
+                            : "Inactive"}
                         </Badge>
                       </div>
                     </div>
                   </div>
-
-                  
                 </CardContent>
               </Card>
             </TabsContent>
@@ -225,9 +275,9 @@ console.log(expertData);
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="bg-white border rounded-lg overflow-hidden">
-                    <img 
-                      src={expertData.certificateUrl} 
-                      alt="Expert Certificate" 
+                    <img
+                      src={expertData.certificateUrl}
+                      alt="Expert Certificate"
                       className="w-full h-auto max-h-96 object-contain"
                     />
                   </div>
@@ -241,44 +291,63 @@ console.log(expertData);
                   <CardTitle className="flex items-center">
                     <span className="mr-2">📌</span> Service Details
                   </CardTitle>
-                  <CardDescription>Service offered by this expert</CardDescription>
+                  <CardDescription>
+                    Service offered by this expert
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h3 className="text-lg font-semibold mb-3">Service Information</h3>
+                      <h3 className="text-lg font-semibold mb-3">
+                        Service Information
+                      </h3>
                       <div className="bg-amber-50 p-4 rounded-lg">
-                        <p className="font-semibold">{expertData.serviceId?.name}</p>
-                        <p className="text-gray-600 mt-2">{expertData.serviceId?.description}</p>
+                        <p className="font-semibold">
+                          {expertData.serviceId?.name}
+                        </p>
+                        <p className="text-gray-600 mt-2">
+                          {expertData.serviceId?.description}
+                        </p>
                         <div className="flex items-center mt-3">
-                          <span className="text-sm text-gray-500 mr-2">Category:</span>
-                          <Badge variant="outline">{expertData.categoryId?.name}</Badge>
+                          <span className="text-sm text-gray-500 mr-2">
+                            Category:
+                          </span>
+                          <Badge variant="outline">
+                            {expertData.categoryId?.name}
+                          </Badge>
                         </div>
                       </div>
                     </div>
                     <div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3">Service Image</h3>
-                      <div className="bg-white border rounded-lg overflow-hidden">
-                        <img 
-                          src={expertData.serviceId?.image} 
-                          alt="Service Image" 
-                          className="w-full h-auto max-h-64 object-cover"
-                        />
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">
+                          Service Image
+                        </h3>
+                        <div className="bg-white border rounded-lg overflow-hidden">
+                          <img
+                            src={expertData.serviceId?.image}
+                            alt="Service Image"
+                            className="w-full h-auto max-h-64 object-cover"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                  </div>
                 </CardContent>
                 <CardFooter className="bg-orange-50 flex justify-between">
-                  <p className="text-sm text-gray-600">ID: {expertData.serviceId?._id.toString()}</p>
-                  <p className="text-sm text-gray-600">Created: {new Date(expertData.serviceId?.createdAt).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-600">
+                    ID: {expertData.serviceId?._id.toString()}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Created:{" "}
+                    {new Date(
+                      expertData.serviceId?.createdAt
+                    ).toLocaleDateString()}
+                  </p>
                 </CardFooter>
               </Card>
             </TabsContent>
           </Tabs>
-
-
         </div>
       </div>
     </div>

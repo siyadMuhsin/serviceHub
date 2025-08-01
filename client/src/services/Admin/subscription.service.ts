@@ -1,5 +1,5 @@
 import { adminAPI } from "config/axiosConfig";
-import { ArrowUpWideNarrow } from "lucide-react";
+
 interface IPlanRequest {
   name: string;
   durationMonths: number;
@@ -27,7 +27,7 @@ const actionChange = async (planId: string) => {
     const response = await adminAPI.patch(`/plan/${planId}`);
     return response.data;
   } catch (error) {
-    throw new Error(error.resonse.data.message);
+    throw new Error(error.response.data.message);
   }
 };
 const updatePlan = async (

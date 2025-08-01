@@ -1,4 +1,4 @@
-import { Form } from "react-router-dom";
+
 import { adminAPI } from "../../../config/axiosConfig";
 
 export const getServices = async (page:number,limit:number,search:string) => {
@@ -18,7 +18,6 @@ export const add_service = async (formData: FormData) => {
         "Content-Type": "multipart/form-data",
       },
     });
-
     return resonse.data;
   } catch (err) {
     return err.response.data;
@@ -44,7 +43,7 @@ export const edit_service=async(id:string,formData:FormData)=>{
         })
         return response.data
     } catch (error) {
-        return error.data
+        throw new Error(error?.response?.data?.message || "Error in update service")
         
     }
 

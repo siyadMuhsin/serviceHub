@@ -51,7 +51,7 @@ const Category: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
-      toast.error("Failed to fetch categories");
+      toast.error(error?.message || "Failed to fetch categories");
     } finally {
       setIsLoading(false);
     }
@@ -80,8 +80,7 @@ const Category: React.FC = () => {
           toast.error(response.message);
         }
       } catch (error) {
-        console.log(error);
-        toast.error("Failed to update category");
+        toast.error(error?.message || "Failed to update Category")
       } finally {
         setIsLoading(false);
       }
@@ -98,8 +97,7 @@ const Category: React.FC = () => {
         toast.error(response.message);
       }
     } catch (error) {
-      console.log("Error adding category:", error);
-      toast.error(error.message);
+      toast.error(error?.message || "Error adding category" );
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +123,6 @@ setFilterText(value)
     try {
       const response = await category_list_unlist(
         confirmationModal.categoryId, 
-        confirmationModal.currentStatus
       );
 
       if (response?.success) {
@@ -141,8 +138,7 @@ setFilterText(value)
         toast.error(response?.message || "Failed to update category status");
       }
     } catch (error) {
-      toast.error("Error updating category status");
-      console.error("Error updating category status:", error);
+      toast.error(error?.message ||"Error updating category status");
     } finally {
       setIsLoading(false);
       setConfirmationModal({ ...confirmationModal, isOpen: false });

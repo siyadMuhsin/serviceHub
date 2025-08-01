@@ -10,14 +10,12 @@ import {
 } from "../../services/Admin/service.service";
 import AddServiceModal from "../../components/Admin/Modals/ServiceModal";
 import { add_service } from "../../services/Admin/service.service";
-import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../components/Loading";
 
 import { ConfirmationModal } from "@/components/ConfirmModal";
 import { Pagination, Stack } from "@mui/material";
 import debounce from "@/Utils/debouce";
 import { IServices } from "@/Interfaces/interfaces";
-import { FpxBankElementProps } from "@stripe/react-stripe-js";
 
 const Services: React.FC = () => {
   const [services, setServices] = useState([]);
@@ -42,7 +40,6 @@ const Services: React.FC = () => {
     serviceId: '',
     currentStatus: false,
   });
-  const dispatch = useDispatch();
   const limit = 5;
 
   const fetchServices = async (page: number, limit: number, search: string = "") => {
@@ -170,10 +167,10 @@ const handleSearch=debounce((value:string)=>{
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#171730] text-white transition-all">
+      <div className="min-h-screen bg-[#171730] text-white transition-all ">
         <Sidebar onToggle={(expanded: boolean) => setIsSidebarExpanded(expanded)} />
         <main className={`transition-all duration-300 ${isSidebarExpanded ? "ml-64" : "ml-16"} pt-16 p-3 md:p-5`}>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-5">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-5 mt-14">
           <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-0">Service Management</h3>
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <input
@@ -193,7 +190,7 @@ const handleSearch=debounce((value:string)=>{
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden md:block overflow-auto max-h-[calc(100vh-200px)]">
+        <div className="hidden md:block overflow-auto max-h-[calc(100vh-200px)] ">
           <table className="min-w-full bg-[#2A2A3C] rounded-lg overflow-hidden">
             <thead>
               <tr>

@@ -18,15 +18,16 @@ export const addCategory = async (formData: FormData) => {
     });
     return response.data;
   } catch (error) {
-    return error.response.data;
+    throw new Error(error?.response?.data?.message || "Error in category create");
+    // return error.response.data
   }
 };
-export const category_list_unlist = async (id: string, status: boolean) => {
+export const category_list_unlist = async (id: string, ) => {
   try {
     const response = await adminAPI.patch(`/category/${id}/status`);
     return response.data;
   } catch (error) {
-    return error.data;
+    throw new Error(error?.response?.data?.message || "Error in category status change");
   }
 };
 
@@ -39,8 +40,7 @@ export const edit_category = async (id: string, formData: FormData) => {
     });
     return response.data;
   } catch (error) {
-    console.log(error);
-    return error.data;
+    throw new Error(error?.response?.data?.message || "Faild to update category")
   }
 };
 

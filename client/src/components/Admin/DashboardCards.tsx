@@ -3,12 +3,8 @@ import {
   FiUsers, 
   FiTool, 
   FiDollarSign, 
-  FiCheckCircle, 
-  FiClock, 
-  FiTrendingUp, 
   FiAlertCircle,
-  FiUserCheck,
-  FiBriefcase
+
 } from 'react-icons/fi';
 import { 
   getDashboardStats, 
