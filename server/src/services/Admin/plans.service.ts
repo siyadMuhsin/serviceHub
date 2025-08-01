@@ -65,12 +65,16 @@ if(existingPlan){
       if(!existPlan){
         return {success:false,message:"No matching plan found"}
       }
+       const query={_id:{$ne:existPlan._id},name:updateData.name}
+      const existingName=await this._planRepository.findOne(query)
+      if(existingName)return {success:false,message:"The Plan name already exist"}
       const updatedPlan= await this._planRepository.updateById(planId,updateData)
       if(updatedPlan){
         return {success:true,message:"Plan Updated Successfully",planData:updatedPlan}
       }
       return {success:false,message:"Plan updation failed"}
     } catch (error) {
+      console.log(error)
       const err= error as Error
       throw new Error(err.message)
     }

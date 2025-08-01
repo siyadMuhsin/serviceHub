@@ -1,6 +1,7 @@
 import { ICategory } from "../../../types/Admin";
+import { IBaseRepository } from "./IBaseRepository";
 
-export interface ICategoryRepository {
+export interface ICategoryRepository extends IBaseRepository<ICategory>{
     create(categoryData: Partial<ICategory>): Promise<ICategory>;
     findAll(): Promise<ICategory[]>;
     getCategoryByName(name: string): Promise<ICategory | null>;

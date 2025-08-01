@@ -105,7 +105,9 @@ export class CategoryService implements ICategoryService {
             if (!existingCategory) {
                 return { success: false, message: "Category not found" };
             }
-    
+            const query={_id:{$ne:existingCategory._id},name:name}
+            const existingName=await this._categoryRepository.findOne(query)
+            if(existingName)return {success:false,message:"CategoryName Already exists"}
             const updatedData: any = {};
             if (name) updatedData.name = name;
             if (description) updatedData.description = description;

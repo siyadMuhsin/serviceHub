@@ -1,5 +1,6 @@
 import { IServices } from "../../../types/Admin";
-export interface IServiceRepository {
+import { IBaseRepository } from "./IBaseRepository";
+export interface IServiceRepository extends IBaseRepository<IServices>{
     create(data: Partial<IServices>): Promise<any>;
     getServiceByName(name: string): Promise<IServices | null>;
     getAllServices(): Promise<IServices[]>;

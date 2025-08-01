@@ -16,6 +16,7 @@ export class ServiceService implements IServiceService {
     async createService(name: string, categoryId: any, description: string, image: Express.Multer.File) {
         try {
             const existingService = await this._serviceRepository.getServiceByName(name);
+            console.log(existingService)
             if (existingService) {
                 return { success: false, message: 'Service name already used' };
             }
@@ -89,6 +90,7 @@ export class ServiceService implements IServiceService {
 
     async updateService(serviceId: string, data: Partial<IServices>, file?: Express.Multer.File) {
         try {
+            
             let imageUrl: string | null = null;
             if (file) {
                 imageUrl = await CloudinaryService.uploadImage(file);
@@ -102,7 +104,11 @@ export class ServiceService implements IServiceService {
             if (!existingService) {
                 return { success: false, message: "Service not found" };
             }
-
+            const query={_id:{$ne:existingService._id},name:data.name}
+            const existingName=await this._serviceRepository.findOne(query)
+            if(existingName){
+                return {success:false,message:"The service Name Already Exisits"}
+            }
             const updatedData: any = {};
             if (data.name) updatedData.name = data.name;
             if (data.description) updatedData.description = data.description;

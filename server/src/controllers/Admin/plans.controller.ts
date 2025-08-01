@@ -14,7 +14,7 @@ export class PlansController implements IPlansController {
   constructor(@inject(TYPES.PlansService) private _planService: IPlanService) {}
   async createPlan(req: AuthRequest, res: Response): Promise<void> {
     try {
-      for(let [key,value] of Object.entries(req.body)){
+      for(let [_,value] of Object.entries(req.body)){
         if(typeof value == 'string' && !value.trim()){
         this.sendResponse(
           res,
