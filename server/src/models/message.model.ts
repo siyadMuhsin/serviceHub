@@ -7,6 +7,7 @@ export interface IMessage extends Document {
   receiver: mongoose.Types.ObjectId;
   receiverModel: 'User' | 'Expert';
   content: string;
+  createdAt?:Date;
   timestamp?: Date;
   read?: boolean;
 }
