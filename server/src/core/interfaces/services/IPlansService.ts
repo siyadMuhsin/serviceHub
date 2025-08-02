@@ -1,10 +1,11 @@
+import { PlanDTO } from "../../../mappers/plans.mapper";
 import { IPlan } from "../../../models/plans.model";
 
 export interface IPlanService {
   createPlan(data: Omit<Partial<IPlan>, "durationDisplay">): Promise<{
     success: boolean;
     message: string;
-    plan?: IPlan;
+    plan?: PlanDTO;
   }>;
   listAndUnlist(planId: string): Promise<{
     success: boolean;
@@ -16,10 +17,10 @@ export interface IPlanService {
   ): Promise<{
     success: boolean;
     message: string;
-    planData?: IPlan;
+    planData?: PlanDTO;
   }>;
-  getAllPlans(): Promise<{plans:IPlan[]}>;
+  getAllPlans(): Promise<{plans:PlanDTO[]}>;
   availablePlans():Promise<{
     success:boolean,
-    plans:IPlan[]}>
+    plans:PlanDTO[]}>
 } 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Resolver, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { expertSchemaValidation } from "../../../validations/expertValidation";
-import { Category, Service, ExpertData, IExpert } from "../../../Interfaces/interfaces";
+import { Category, Service, ExpertData,  } from "../../../Interfaces/interfaces";
 import { getAll_categories, getAll_services } from "@/services/category.service";
 import { toast } from "react-toastify";
 

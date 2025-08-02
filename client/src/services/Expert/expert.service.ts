@@ -1,6 +1,5 @@
 import { expertAPI } from "config/axiosConfig"
-import NoWorkResult_ from "postcss/lib/no-work-result"
-import { LIMIT } from "styled-components/dist/utils/createWarnTooManyClasses"
+
 
 const get_expert=async()=>{
     try {

@@ -12,7 +12,6 @@ export class AdminAuthController implements IAdminAuthController {
     constructor(
         @inject(TYPES.AdminService) private _adminService: IAdminService
     ) {}
-
     async login(req: Request, res: Response): Promise<void> {
         try {
             const { email, password } = req.body;

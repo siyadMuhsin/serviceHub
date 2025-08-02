@@ -6,6 +6,7 @@ import { IServiceService } from '../../core/interfaces/services/IServiceService'
 import { TYPES } from "../../di/types";
 import mongoose, { ObjectId, Types } from 'mongoose';
 import logger from '../../config/logger';
+import { mapServiceToDTO } from '../../mappers/service.mapper';
 
 @injectable()
 export class ServiceService implements IServiceService {
@@ -16,7 +17,6 @@ export class ServiceService implements IServiceService {
     async createService(name: string, categoryId: any, description: string, image: Express.Multer.File) {
         try {
             const existingService = await this._serviceRepository.getServiceByName(name);
-            console.log(existingService)
             if (existingService) {
                 return { success: false, message: 'Service name already used' };
             }
@@ -27,10 +27,12 @@ export class ServiceService implements IServiceService {
             }
             const service = await this._serviceRepository.create({ name, categoryId,  description, image: imageUrl });
             const populatedService = await this._serviceRepository.getServiceById(service._id);
+            if(!populatedService)throw new Error("Error creating service")
+            const serviceDTO=mapServiceToDTO(populatedService)
             return { 
                 success: true, 
                 message: "Service created successfully", 
-                service: populatedService 
+                service: serviceDTO
             };
         } catch (error) {
             const err= error as Error
@@ -45,7 +47,8 @@ export class ServiceService implements IServiceService {
     async getAllServices() {
         try {
             const services = await this._serviceRepository.getAllServices();
-            return { success: true, services };
+            const servicesDTO=services.map((x)=>mapServiceToDTO(x))
+            return { success: true, services:servicesDTO };
         } catch (error) {
             const err= error as Error
             logger.error("Error fetching services:", err);
@@ -62,7 +65,8 @@ export class ServiceService implements IServiceService {
             if (!service) {
                 return { success: false, message: "Service not found" };
             }
-            return { success: true, service };
+            const serviceDTO=mapServiceToDTO(service)
+            return { success: true, service:serviceDTO };
         } catch (error) {
             const err= error as Error
             logger.error("Error fetching service:", err);
@@ -77,7 +81,9 @@ export class ServiceService implements IServiceService {
         try {
             const categoryIdObjectId= new mongoose.Schema.Types.ObjectId(categoryId)
             const services = await this._serviceRepository.findMany({categoryId:categoryIdObjectId});
-            return { success: true, services };
+            const servicesDTO=services.map((x)=>mapServiceToDTO(x))
+
+            return { success: true, services:servicesDTO };
         } catch (error) {
             const err= error as Error
             logger.error("Error fetching services by category:", err);
@@ -119,11 +125,11 @@ export class ServiceService implements IServiceService {
             if (!updatedService) {
                 return { success: false, message: "Service update failed" };
             }
-
+            const serviceDTO=mapServiceToDTO(updatedService)
             return {
                 success: true,
                 message: "Service updated successfully",
-                service: updatedService,
+                service: serviceDTO,
             };
         } catch (error) {
             const err= error as Error
@@ -146,10 +152,11 @@ export class ServiceService implements IServiceService {
             const updatedService = await this._serviceRepository.updateService(id, { isActive: updateStatus });
 
             if(updatedService){
+                const serviceDTO=mapServiceToDTO(updatedService)
               return {
                 success: true,
                 message: `Service ${updateStatus ? "listed" : "unlisted"} successfully`,
-                service: updatedService
+                service: serviceDTO
             };
             }else{
               return {success:false,message:"updated service not found"}
@@ -173,7 +180,8 @@ export class ServiceService implements IServiceService {
                 page,
                 search
             );
-            return response;
+            const servicesDTO=response.services.map((x)=>mapServiceToDTO(x))
+            return {...response,services:servicesDTO};
         } catch (error) {
             const err= error as Error
             logger.error("Error fetching services by category limit:", err);
@@ -184,7 +192,9 @@ export class ServiceService implements IServiceService {
     async getServicesToMange(page: number, limit: number, search: string) {
         try {
             const response = await this._serviceRepository.getAllServicesByLimit(page, limit, search);
-            return response;
+            const servicesDTO=response.services.map((x)=>mapServiceToDTO(x))
+
+            return {...response,services:servicesDTO};
         } catch (error) {
             const err= error as Error
             logger.error("Error fetching services to manage:", error);

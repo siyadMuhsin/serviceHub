@@ -10,6 +10,7 @@ import Stack from "@mui/material/Stack";
 import debounce from "@/Utils/debouce";
 import { IUser } from "@/Interfaces/interfaces";
 
+
 const UserManagement: React.FC = () => {
   const [filterText, setFilterText] = useState("");
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -156,7 +157,7 @@ const UserManagement: React.FC = () => {
                 <tr key={user._id} className="border-b border-[#2A2A3C] hover:bg-[#2A2A3C]">
                   <td className="p-2 md:p-3 hidden sm:table-cell">
                     <img
-                      src={user.profile_image}
+                      src={user.profile_image?user.profile_image:'/default_profile.png'}
                       alt={user.name}
                       className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-full"
                     />

@@ -10,6 +10,7 @@ import { IUser } from "../../models/user.model";
 import { IServiceRepository } from "../../core/interfaces/repositories/IServiceRepository";
 import { IServices } from "../../types/Admin";
 import logger from "../../config/logger";
+import { mapExpertToDTO } from "../../mappers/expert.mapper";
 @injectable()
 export class ProfileService implements IProfileService {
     constructor(
@@ -53,7 +54,8 @@ export class ProfileService implements IProfileService {
         try {
             const expertData= await this._userRepositry.getExpertByUserId(id)
             if(expertData){
-                return {success:true,message:'Expert data fetched successfully',expert:expertData}
+              const expertDTO=mapExpertToDTO(expertData)
+                return {success:true,message:'Expert data fetched successfully',expert:expertDTO}
             }
             return {success:false,message:"Expert data not found"}
         } catch (error) {

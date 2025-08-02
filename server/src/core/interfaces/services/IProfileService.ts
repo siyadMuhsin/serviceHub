@@ -1,3 +1,4 @@
+import { ExpertDTO } from "../../../mappers/expert.mapper";
 import { IUser } from "../../../models/user.model";
 import { IExpert } from "../../../types/Expert";
 
@@ -9,7 +10,7 @@ export interface IProfileService{
     getExpertData (id:string):Promise<{
         success:boolean,
         message:string,
-        expert?:IExpert | undefined
+        expert?:ExpertDTO | undefined
     }>
     profileImageUpload(userId:string,file:Express.Multer.File):Promise<{
         success:boolean,

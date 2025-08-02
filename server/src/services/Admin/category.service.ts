@@ -5,6 +5,7 @@ import { CloudinaryService } from "../../config/cloudinary";
 import { ICategoryService } from '../../core/interfaces/services/ICategoryService';
 import { TYPES } from "../../di/types";
 import logger from '../../config/logger';
+import { mapCategoryToDTO } from '../../mappers/category.mapper';
 
 @injectable()
 export class CategoryService implements ICategoryService {
@@ -27,10 +28,11 @@ export class CategoryService implements ICategoryService {
                 description,
                 image: imageUrl,
             });
+            const categoryToDTO=mapCategoryToDTO(category)
             return {
                 success: true,
                 message: "Category created successfully",
-                category,
+                category:categoryToDTO,
             };
         } catch (error) {
             const err= error as Error
@@ -45,7 +47,9 @@ export class CategoryService implements ICategoryService {
     async getAllCategories() {
         try {
             const categories = await this._categoryRepository.findAll();
-            return { success: true, categories };
+            const mapToCategories=categories.map((x)=>mapCategoryToDTO(x))
+            console.log(mapToCategories)
+            return { success: true, categories:mapToCategories };
         } catch (error) {
             const err= error as Error
             logger.error("Error in getAllCategories:", err);
@@ -62,10 +66,11 @@ export class CategoryService implements ICategoryService {
             const updateStatus = !category.isActive;
             const updatedCategory = await this._categoryRepository.updateById(id, { isActive: updateStatus });
             if(updatedCategory){
+                const categoryToDTO=mapCategoryToDTO(updatedCategory)
               return { 
                 success: true,
                 message: `Category ${updateStatus ? "listed" : "unlisted"} successfully`,
-                category: updatedCategory 
+                category: categoryToDTO 
             };
             }else{
               return {success:false,message:"update category not found"}
@@ -80,11 +85,12 @@ export class CategoryService implements ICategoryService {
     async getCategoryById(id: string) {
         try {
             const category = await this._categoryRepository.findById(id);
+
             if (!category) {
                 return { success: false, message: "Category not found" };
             }
-
-            return { success: true, category };
+            const categoryToDTO=mapCategoryToDTO(category)
+            return { success: true, category:categoryToDTO };
         } catch (error) {
             const err= error as Error
             logger.error("Error in getCategoryById:", err);
@@ -121,10 +127,11 @@ export class CategoryService implements ICategoryService {
             if (!updatedCategory) {
                 return { success: false, message: "Failed to update category" };
             }
+            const categoryToDTO=mapCategoryToDTO(updatedCategory)
             return {
                 success: true,
                 message: "Category updated successfully",
-                updatedCategory,
+                updatedCategory:categoryToDTO,
             };
         } catch (error) {
             const err= error as Error
@@ -134,13 +141,16 @@ export class CategoryService implements ICategoryService {
     }
     async getCategoriesByLimit(page: number, limit: number, search: string) {
         const result = await this._categoryRepository.getCategoriesByLimit(page, limit, search);
-        return result;
+        const categoriesToDTO=result.categories.map((x)=>mapCategoryToDTO(x))
+        return {categories:categoriesToDTO,total:result.total};
     }
     async getCategoryToMange(page: number, limit: number, search: string) {
         try {
             const isAdmin = true;
             const result = await this._categoryRepository.getCategoriesByLimit(page, limit, search, isAdmin);
-            return { success: true, message: "category get in success", result };
+            const cateogoriesToDTO=result.categories.map((x)=>mapCategoryToDTO(x))
+
+            return { success: true, message: "category get in success", result:{...result,categories:cateogoriesToDTO} };
         } catch (error) {
             const err= error as Error
             logger.error("Error in getCategoryToMange:", err);

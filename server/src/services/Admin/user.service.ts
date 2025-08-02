@@ -3,6 +3,7 @@ import { IUserRepository } from '../../core/interfaces/repositories/IUserReposit
 import { IUserService } from '../../core/interfaces/services/IUserService';
 import { TYPES } from '../../di/types';
 import logger from '../../config/logger';
+import { mapUserToDTO } from '../../mappers/user.mapper';
 
 @injectable()
 export class UserService implements IUserService {
@@ -14,9 +15,10 @@ export class UserService implements IUserService {
         try {
             const { users, total, totalPages, currentPage } = 
                 await this._userRepository.findUsersByPagination(page, limit, search);
+            const userToDTO=users.map((x)=>mapUserToDTO(x))
             return { 
                 success: true, 
-                users,
+                users:userToDTO,
                 totalUsers: total,
                 totalPages,
                 currentPage
@@ -45,12 +47,17 @@ export class UserService implements IUserService {
             const updatedUser = await this._userRepository.updateById(id, { 
                 isBlocked: newStatus 
             });
+            if(updatedUser){
+                const userToDTO=mapUserToDTO(updatedUser)
+                return { 
+                    success: true, 
+                    message: `User ${block ? "blocked" : "unblocked"} successfully`,
+                    updatedUser:userToDTO
+                };
 
-            return { 
-                success: true, 
-                message: `User ${block ? "blocked" : "unblocked"} successfully`,
-                updatedUser 
-            };
+            }else{
+                return {success:false,message:'Failed to update user status'}
+            }
         } catch (error) {
             const err= error as Error
             logger.error("Error updating user status:", err);

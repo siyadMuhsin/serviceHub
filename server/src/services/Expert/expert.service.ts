@@ -8,6 +8,7 @@ import { sendExpertStatusUpdate } from "../../utils/emailService";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt";
 import { TYPES } from "../../di/types";
 import logger from '../../config/logger';
+import { ExpertDTO, mapExpertToDTO } from '../../mappers/expert.mapper';
 
 @injectable()
 export class ExpertService implements IExpertService {
@@ -16,7 +17,7 @@ export class ExpertService implements IExpertService {
         @inject(TYPES.UserRepository) private _userRepository: IUserRepository
     ) {}
 
-    async createExpert(data: Partial<IExpert>, file: Express.Multer.File, userId: string): Promise<IExpert |null> {
+    async createExpert(data: Partial<IExpert>, file: Express.Multer.File, userId: string): Promise<ExpertDTO |null> {
         const existingName = await this._expertRepository.findOne({ accountName: data.accountName });
         if (existingName && existingName.userId._id.toString() !== userId) {
             throw new Error("The Account Name is already used by another expert");
@@ -72,10 +73,17 @@ export class ExpertService implements IExpertService {
         await this._userRepository.updateById(userId, { 
             expertStatus: "pending",
         });
-        return response;
+        if(response){
+
+            const expertDTO=mapExpertToDTO(response)
+            return expertDTO;
+        }else {
+            return null
+        }
     }
-    async getExperts(): Promise<IExpert[]> {
-        return await this._expertRepository.getExperts();
+    async getExperts(): Promise<ExpertDTO[]> {
+        const expertsDTO=await this._expertRepository.getExperts();
+        return expertsDTO.map((x)=>mapExpertToDTO(x))
     }
     async getExpertBy_limit(page: number, limit: number, filter: string, search: string) {
         try {
@@ -88,9 +96,11 @@ export class ExpertService implements IExpertService {
             }
             const { experts, totalRecords } = await this._expertRepository.getExpertBy_limit(page, limit, query);
             const totalPages = Math.ceil(totalRecords / limit);
+            const expertsDTO=experts.map((x)=>mapExpertToDTO(x))
+
             return { 
                 success: true, 
-                experts, 
+                experts:expertsDTO, 
                 totalRecords, 
                 totalPages 
             };
@@ -126,7 +136,7 @@ export class ExpertService implements IExpertService {
             if (!updatedExpert) {
                 return { success: false, message: 'Failed to update expert status' };
             }
-          
+        
             const userId: string = updatedExpert.userId.toString();
             await this._userRepository.updateById(userId, {
                 role: action === 'approved' ? 'expert' : 'user',
@@ -135,7 +145,8 @@ export class ExpertService implements IExpertService {
             });
 
             await sendExpertStatusUpdate(existingExpert.userId.email, action,reason);
-            return { success: true, data: updatedExpert };
+            const expertDTO=mapExpertToDTO(updatedExpert)
+            return { success: true, data: expertDTO };
         } catch (error) {
             const err= error as Error
             logger.error('Error in actionChange:', err);
@@ -155,10 +166,11 @@ export class ExpertService implements IExpertService {
             if (!updatedExpert) {
                 return { success: false, message: 'Failed to update expert status' };
             }
+            const expertDTO=mapExpertToDTO(updatedExpert)
             return { 
                 success: true, 
                 message: `Expert ${active ? 'unblocked' : 'blocked'} successfully`, 
-                data: updatedExpert 
+                data: expertDTO 
             };
         } catch (error) {
             const err= error as Error
@@ -171,7 +183,8 @@ export class ExpertService implements IExpertService {
         try {
             const expert = await this._expertRepository.findById(id);
             if (expert) {
-                return { success: true, expert };
+                const expertDTO=mapExpertToDTO(expert)
+                return { success: true, expert:expertDTO };
             }
             return { success: false, message: "Expert not found" };
         } catch (error) {

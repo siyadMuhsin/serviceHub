@@ -4,7 +4,6 @@ import { io, Socket } from 'socket.io-client';
 import { IMessage } from '@/Interfaces/interfaces';
 import { getConversation } from '@/services/chat.service';
 import { useSelector } from 'react-redux';
-// import { getUserIdAndRole } from '@/Utils/getUserIdAndRole';
 import { baseUrl } from 'config/axiosConfig';
 import { RootState } from '@/store';
 
@@ -16,20 +15,21 @@ export default function ChatPage() {
   const [userId, setUserId] = useState('');
   const [userRole, setUserRole] = useState<'User' | 'Expert'>('User');
   const [error, setError] = useState<string | null>(null);
-  
+  const [isTyping, setIsTyping] = useState(false);
+  const [isReceiverTyping, setIsReceiverTyping] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
   const scrollToBottom = () => {
-    // messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    const  id = user._id
-    // console.log(id,role);
-    
+    const id = user._id;
     setUserId(id);
-    setUserRole( 'User');
+    setUserRole('User');
 
     // Initialize socket
     socketRef.current = io(baseUrl, {
@@ -40,7 +40,7 @@ export default function ChatPage() {
     // Join room
     socketRef.current.emit('join', id);
 
-    // Handle incoming messages
+    // Socket event listeners
     socketRef.current.on('receiveMessage', (message: IMessage) => {
       setMessages((prev) => {
         if (prev.some((msg) => msg._id === message._id)) return prev;
@@ -48,7 +48,6 @@ export default function ChatPage() {
       });
     });
 
-    // Handle message sent confirmation
     socketRef.current.on('messageSent', (message: IMessage) => {
       setMessages((prev) => {
         if (prev.some((msg) => msg._id === message._id)) return prev;
@@ -56,11 +55,34 @@ export default function ChatPage() {
       });
     });
 
-
-    // Handle errors
     socketRef.current.on('messageError', ({ error }) => {
       setError(error);
     });
+
+    socketRef.current.on('userOnline', (userId: string) => {
+      if (userId === receiverId) {
+        setIsOnline(true);
+      }
+    });
+
+    socketRef.current.on('userOffline', (userId: string) => {
+      if (userId === receiverId) {
+        setIsOnline(false);
+      }
+    });
+
+    socketRef.current.on('typing', (userId: string) => {
+      if (userId === receiverId) {
+        setIsReceiverTyping(true);
+      }
+    });
+
+    socketRef.current.on('stopTyping', (userId: string) => {
+      if (userId === receiverId) {
+        setIsReceiverTyping(false);
+      }
+    });
+
     return () => {
       socketRef.current?.disconnect();
     };
@@ -69,10 +91,12 @@ export default function ChatPage() {
   useEffect(() => {
     if (userId && receiverId) {
       fetchConversation();
+      // Check online status when receiver changes
+      socketRef.current?.emit('checkOnlineStatus', receiverId);
     }
   }, [userId, receiverId]);
 
-  useEffect(scrollToBottom, [messages]);
+  useEffect(scrollToBottom, [messages, isReceiverTyping]);
 
   const fetchConversation = async () => {
     try {
@@ -96,18 +120,31 @@ export default function ChatPage() {
     };
 
     socketRef.current.emit('sendMessage', messageData);
-    socketRef.current.emit('stopTyping');
+    socketRef.current.emit('stopTyping', receiverId);
     setNewMessage('');
+    setIsTyping(false);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
   };
 
   const handleTyping = () => {
-    if (!socketRef.current) return;
-    
-    if (newMessage.trim()) {
-      socketRef.current.emit('typing');
-    } else {
-      socketRef.current.emit('stopTyping');
+    if (!socketRef.current || !receiverId) return;
+
+    if (!isTyping) {
+      socketRef.current.emit('typing', receiverId);
+      setIsTyping(true);
     }
+
+    // Reset typing status after 2 seconds of inactivity
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      socketRef.current?.emit('stopTyping', receiverId);
+      setIsTyping(false);
+    }, 2000);
   };
 
   return (
@@ -115,15 +152,27 @@ export default function ChatPage() {
       {/* Header */}
       <div className="bg-white shadow-sm p-4 flex items-center justify-between border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
-            {user?.name?.charAt(0).toUpperCase() || 'U'}
+          <div className="relative">
+            <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
+              {user?.name?.charAt(0).toUpperCase() || 'U'}
+            </div>
+            {isOnline && (
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+            )}
           </div>
           <div>
             <h1 className="text-xl font-bold text-gray-800">Chat</h1>
-         
+            <div className="text-xs text-gray-500">
+              {isReceiverTyping ? (
+                <span className="text-indigo-500">typing...</span>
+              ) : isOnline ? (
+                <span className="text-green-500">online</span>
+              ) : (
+                <span>offline</span>
+              )}
+            </div>
           </div>
         </div>
-       
       </div>
 
       {/* Chat Area */}
@@ -137,32 +186,44 @@ export default function ChatPage() {
             <p className="text-sm">Send your first message below</p>
           </div>
         ) : (
-          messages.map((msg) => (
-            <div
-              key={msg._id}
-              className={`flex ${msg.sender.toString() === userId ? 'justify-end' : 'justify-start'}`}
-            >
+          <>
+            {messages.map((msg) => (
               <div
-                className={`max-w-[80%] px-4 py-3 rounded-2xl transition-all duration-200 ${
-                  msg.sender.toString() === userId
-                    ? 'bg-indigo-500 text-white rounded-br-none'
-                    : 'bg-white text-gray-800 rounded-bl-none shadow-sm'
-                }`}
+                key={msg._id}
+                className={`flex ${msg.sender.toString() === userId ? 'justify-end' : 'justify-start'}`}
               >
-                <p className="whitespace-pre-wrap">{msg.content}</p>
-                <p className={`text-xs mt-1 ${
-                  msg.sender.toString() === userId ? 'text-indigo-100' : 'text-gray-500'
-                }`}>
-                  {new Date(msg.timestamp).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
+                <div
+                  className={`max-w-[80%] px-4 py-3 rounded-2xl transition-all duration-200 ${
+                    msg.sender.toString() === userId
+                      ? 'bg-indigo-500 text-white rounded-br-none'
+                      : 'bg-white text-gray-800 rounded-bl-none shadow-sm'
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  <p className={`text-xs mt-1 ${
+                    msg.sender.toString() === userId ? 'text-indigo-100' : 'text-gray-500'
+                  }`}>
+                    {new Date(msg.timestamp).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+            {isReceiverTyping && (
+              <div className="flex justify-start">
+                <div className="max-w-[80%] px-4 py-3 bg-white text-gray-800 rounded-2xl rounded-bl-none shadow-sm">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
-    
         <div ref={messagesEndRef}></div>
       </div>
 
@@ -177,7 +238,6 @@ export default function ChatPage() {
           </div>
         )}
         <div className="flex items-center space-x-2">
-        
           <input
             type="text"
             value={newMessage}
