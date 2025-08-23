@@ -13,7 +13,7 @@ import { Server } from "socket.io";
 import { initializeSocketHandler } from "./sockets/socketHandler";
 import Logger from './config/logger'
 import { requestLogger } from "./middlewares/requestLogger";
-import '../src/jobs/deactivateExpiredSubscriptions'
+// import '../src/jobs/deactivateExpiredSubscriptions'
 // import limiting from "./utils/ratelimitting";
 
 dotenv.config()
