@@ -8,8 +8,8 @@ WORKDIR /src/app
 COPY package*.json ./
 
 # 4. Install project dependencies
-# RUN npm install
-RUN npm ci --legacy-peer-deps
+RUN npm install
+# RUN npm ci --legacy-peer-deps
 
 # 5. Copy the rest of your backend code into the container
 COPY . .
@@ -21,6 +21,6 @@ RUN npm run build
 EXPOSE 3000
 
 # 8. Start the app using compiled JavaScript
-# CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev"]
 # CMD ["npm", "start"]
-CMD ["node", "dist/app.js"]
+# CMD ["node", "dist/app.js"]
