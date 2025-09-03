@@ -164,6 +164,35 @@ export class AuthController implements IAuthController {
     }
   }
 
+  async gitHubLogin(req:Request,res:Response):Promise<void>{
+    try {
+    const {code}=req.query as {code:string}
+    console.log('code will get ');
+    console.log(code);
+    if(!code){
+      res.status(HttpStatus.BAD_REQUEST).json({message:'Authorization code not received'})
+      return
+    }
+    const result=await this.authService.loginWithGitHub(code)
+    console.log(result);
+    
+if (result?.success && result.accessToken && result.refreshToken) {
+        this.setAuthCookies(res, result.accessToken, result.refreshToken);
+        res.status(HttpStatus.OK).json({
+          success: true,
+          user: result.user,
+        });
+      } else {
+        res.status(HttpStatus.BAD_REQUEST).json(result);
+      }
+
+      
+    } catch (error) {
+      this.handleError(res, error, HttpStatus.INTERNAL_SERVER_ERROR);
+      
+    }
+  }
+
   async forgetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;

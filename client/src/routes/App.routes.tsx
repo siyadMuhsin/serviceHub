@@ -15,6 +15,7 @@ import ExpertsPage from "@/pages/User/ExpertsPage";
 import ExpertViewProfile from "@/pages/User/ExpertViewProfile";
 import Bookings from "@/pages/User/Bookings";
 import ChatPage from "@/pages/User/ChatPage";
+import { GitHubCallback } from "@/pages/User/Auth/GitHubCallback";
 
 const AppRoutes = () => {
   const loading = useAuthCheck();
@@ -28,6 +29,8 @@ const AppRoutes = () => {
       {/* Public Routes (No Navbar & Footer) */}
       <Route element={<PublicLayout />}>
         <Route path="/login" element={<LoginRoute><Login /></LoginRoute>} />
+        <Route path="/auth/github/callback" element={<LoginRoute><GitHubCallback/></LoginRoute>} />
+
         <Route path="/forget_password" element={<LoginRoute><ForgetPassword /></LoginRoute>} />
         <Route path="/reset-password/:token" element={ <LoginRoute > <ResetPassword /> </LoginRoute>} />
       </Route>

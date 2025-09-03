@@ -1,7 +1,6 @@
 // services/authService.ts
 import axios from "axios";
 import {userAPI} from "../../../config/axiosConfig";
-import { ConnectingAirportsOutlined } from "@mui/icons-material";
 
 export const registerUser = async (formData: {
   name: string;
@@ -121,4 +120,15 @@ export const get_userData=async()=>{
     return {success:false,error:error.response.data}
     
   }
+}
+
+export const github_login=async(code:string)=>{
+  try{
+    const response=await userAPI.get(`/auth/github?code=${code}`)
+    return response.data
+  }catch(err){
+   throw new Error (err.response.data.message)
+
+  }
+
 }

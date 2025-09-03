@@ -10,6 +10,7 @@ export interface IAuthController {
   logoutUser(req: AuthRequest, res: Response): Promise<void>;
   getCurrentUser(req: AuthRequest, res: Response): Promise<void>;
   googleSignIn(req: Request, res: Response): Promise<void>;
+  gitHubLogin(req:Request,res:Response):Promise<void>;
   forgetPassword(req: Request, res: Response): Promise<void>;
   resetPassword(req: Request, res: Response): Promise<void>;
 }

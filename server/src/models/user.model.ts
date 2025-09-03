@@ -18,7 +18,8 @@ export interface IUser extends Document {
   isVerified: boolean;
   rejectReason?: string;
   location?: { type: string; coordinates: number[] };
-  savedServices: mongoose.Types.ObjectId[]; // Add savedServices field
+  savedServices: mongoose.Types.ObjectId[] // Add savedServices field
+  isGitHubUser:boolean
 }
 
 const userSchema = new Schema<IUser>(
@@ -32,6 +33,7 @@ const userSchema = new Schema<IUser>(
     isBlocked: { type: Boolean, default: false },
     googleId: { type: String, required: false },
     profile_image: { type: String, required: false },
+    isGitHubUser:{type:Boolean,required:false},
     phone: { type: String },
     expertStatus: { type: String, enum: ['default', 'pending', 'approved', 'rejected'], default: 'default' },
     resetPasswordToken: { type: String },

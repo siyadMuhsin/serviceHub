@@ -24,4 +24,6 @@ router.post('/google-signin', authController.googleSignIn.bind(authController));
 router.get('/me', authMiddleware.verifyToken.bind(authMiddleware), authController.getCurrentUser.bind(authController));
 router.post('/refresh', tokenController.refreshToken.bind(tokenController));
 
+
+router.get('/github',authController.gitHubLogin.bind(authController))
 export default router;

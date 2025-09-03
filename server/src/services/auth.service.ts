@@ -8,7 +8,7 @@ import { AuthResult } from "../types/User";
 import { IAuthService } from '../core/interfaces/services/IAuthService';
 import { TYPES } from "../di/types";
 import logger from '../config/logger';
-
+import axios from 'axios';
 @injectable()
 export class AuthService implements IAuthService {
   constructor(
@@ -203,6 +203,86 @@ export class AuthService implements IAuthService {
       logger.error("Error in saveGoogleUser:", error);
       throw new Error(err.message||"Google sign-in failed");
     }
+  }
+
+  async loginWithGitHub(code:string):Promise<AuthResult>{
+    try {
+      const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+      const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+            const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
+                  client_id: GITHUB_CLIENT_ID,
+                  client_secret: GITHUB_CLIENT_SECRET,
+                  code: code,
+              }, {
+                  headers: {
+                      Accept: 'application/json'
+                  }
+              });
+            // console.log("TOken response",tokenResponse);
+      
+            const accessToken=tokenResponse.data.access_token
+            if(!accessToken){
+              throw new Error('Failed to get access token from GitHub.')
+            }
+            const userResponse = await axios.get("https://api.github.com/user", {
+              headers: { Authorization: `token ${accessToken}` }
+            });
+
+            let userData = userResponse.data;
+
+            // if no email, fetch from /user/emails
+            if (!userData.email) {
+              const emailResponse = await axios.get("https://api.github.com/user/emails", {
+                headers: { Authorization: `token ${accessToken}` }
+            });
+console.log('github1');
+
+          const primaryEmail = emailResponse.data.find((e: any) => e.primary && e.verified);
+          userData.email = primaryEmail?.email || null;
+          }
+          const existingUser = await this._userRepository.findOne({email:userData.email});
+          if(existingUser){
+            if (existingUser.isBlocked) {
+          return {
+            success: false,
+            message: "Admin has blocked your account"
+          };
+           }
+           if (existingUser.isGitHubUser) {
+          return this.generateAuthResponse(existingUser);
+        } else {
+          const updateUser = await this._userRepository.findUserAndUpdate(
+            existingUser.email,
+            { isGitHubUser: true,profile_image:userData.avatar_url }
+          );
+          if (updateUser) {
+            return this.generateAuthResponse(updateUser);
+          }
+        }
+          }else{
+            const createUser=await this._userRepository.createUser({
+          email:userData.email,
+          name:userData.name,
+          profile_image: userData.avatar_url,
+          isGitHubUser: true,
+          isVerified: true,
+            })
+
+            if (createUser) {
+          return this.generateAuthResponse(createUser);
+        }
+          }
+            
+            // console.log('user response ',userReponse);
+
+      return { success: false, message: "GitHub sign-in failed" };
+
+      
+    } catch (error) {
+      const err=error as Error
+      throw new Error(err.message)
+    }
+
   }
 
   async forgetPassword(email: string): Promise<AuthResult> {

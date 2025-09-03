@@ -25,6 +25,7 @@ import {
 } from "../../../services/User/AuthServices";
 import { toast } from "react-toastify";
 import { useGoogleLogin } from "@react-oauth/google";
+import { GitHubLogin } from "@/components/User/GithubLogin";
 
 // Type definitions
 interface FormData {
@@ -415,6 +416,7 @@ const Login: React.FC = () => {
               >
                 <FaGoogle className={styles.googleIcon} /> Sign in with Google
               </button>
+              <GitHubLogin/>
               <p>
                 <b onClick={() => navigate('/forget_password')} className={styles.cursorPointer}>
                   Forgot password?
