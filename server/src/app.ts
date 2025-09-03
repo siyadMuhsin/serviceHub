@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import 'reflect-metadata'
-import connectDB from "./config/db.";
+import connectDB from "./config/dbs";
 import dotenv from 'dotenv'
 import authRoutes from "./routes/auth.routes";
 import adminRoute from './routes/admin.routes'
@@ -13,12 +13,14 @@ import { Server } from "socket.io";
 import { initializeSocketHandler } from "./sockets/socketHandler";
 import Logger from './config/logger'
 import { requestLogger } from "./middlewares/requestLogger";
-import '../src/jobs/deactivateExpiredSubscriptions'
+// import '../src/jobs/deactivateExpiredSubscriptions'
+import './jobs/deactivateExpiredSubscriptions'
 // import limiting from "./utils/ratelimitting";
 
 dotenv.config()
 const app: Express = express()
 const clientApi = process.env.CLIENT_API
+
 
 // Replaced console.log with Logger
 Logger.info(`Client id: ${clientApi}`)
@@ -36,6 +38,7 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
+console.log('test1');
 
 app.use(cors(corsOptions))
 // app.use(limiting)

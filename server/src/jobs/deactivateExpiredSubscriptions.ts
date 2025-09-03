@@ -2,7 +2,9 @@ import cron from "node-cron";
 import expertModel from "../models/expert.model";
 import logger from "../config/logger";
 // Run every day at midnight
+console.log("cron job");
 cron.schedule("0 0 * * *", async () => {
+    
   logger.info(`[CRON] Checking for expired subscriptions...`);
 
   const now = new Date();
