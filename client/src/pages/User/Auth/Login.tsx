@@ -333,6 +333,10 @@ const Login: React.FC = () => {
                 >
                   <FaGoogle className={styles.googleIcon} /> Sign up with Google
                 </button>
+                <div className={`${styles.gitHubBtn} pt-2 `}>
+
+              <GitHubLogin/>
+              </div>
 
                 <p>
                   <span>Already have an account?</span>
@@ -416,7 +420,10 @@ const Login: React.FC = () => {
               >
                 <FaGoogle className={styles.googleIcon} /> Sign in with Google
               </button>
+              <div className={`${styles.gitHubBtn} pt-2`}>
+
               <GitHubLogin/>
+              </div>
               <p>
                 <b onClick={() => navigate('/forget_password')} className={styles.cursorPointer}>
                   Forgot password?
